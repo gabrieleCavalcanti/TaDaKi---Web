@@ -21,23 +21,23 @@ export const AuthContext = createContext<AuthContextType | undefined>(
     undefined
 );
 
-export interface CadastroCliente {
-    nome: string;
-    usuario: string;
-    email: string;
-    senha: string;
-    dataNascimento: string;
-}
+// export interface CadastroCliente {
+//     nome: string;
+//     usuario: string;
+//     email: string;
+//     senha: string;
+//     dataNascimento: string;
+// }
 
-export interface CadastroOrganizacao {
-    nomeOrganizacao: string;
-    nomeFantasia: string;
-    usuario: string;
-    email: string;
-    senha: string;
-    tipoDocumento: "cpf" | "cnpj";
-    documento: string;
-}
+// export interface CadastroOrganizacao {
+//     nomeOrganizacao: string;
+//     nomeFantasia: string;
+//     usuario: string;
+//     email: string;
+//     senha: string;
+//     tipoDocumento: "cpf" | "cnpj";
+//     documento: string;
+// }
 
 export const AuthProvider = ({ children }: { children: any }) => {
     const [user, setUser] = useState<User | null>(null);
@@ -111,104 +111,51 @@ export const AuthProvider = ({ children }: { children: any }) => {
         }
     };
 
-    const cadastrarCliente = async (
-        dados: CadastroCliente
-    ) => {
+    // const cadastrarCliente = async (
+    //     dados: CadastroCliente
+    // ) => {
 
-        try {
+    //     try {
 
-            await apiFetch(
-                "/auth/registro/cliente",
-                {
-                    method: "POST",
+    //         await apiFetch(
+    //             "/auth/registro/cliente",
+    //             {
+    //                 method: "POST",
 
-                    body: JSON.stringify({
-                        nome: dados.nome,
+    //                 body: JSON.stringify({
+    //                     nome: dados.nome,
 
-                        usuario: dados.usuario,
+    //                     usuario: dados.usuario,
 
-                        email: dados.email,
+    //                     email: dados.email,
 
-                        senha: dados.senha,
+    //                     senha: dados.senha,
 
-                        dataNascimento:
-                            dados.dataNascimento,
-                    }),
-                }
-            );
+    //                     dataNascimento:
+    //                         dados.dataNascimento,
+    //                 }),
+    //             }
+    //         );
 
-        } catch (error: unknown) {
+    //     } catch (error: unknown) {
 
-            if (error instanceof Error) {
+    //         if (error instanceof Error) {
 
-                setError(error.message);
+    //             setError(error.message);
 
-            } else {
+    //         } else {
 
-                setError(
-                    "Erro ao cadastrar cliente!"
-                );
+    //             setError(
+    //                 "Erro ao cadastrar cliente!"
+    //             );
 
-            }
+    //         }
 
-            throw error;
-        }
-    };
+    //         throw error;
+    //     }
+    // };
 
-    const cadastrarOrganizacao = async (
-        dados: CadastroOrganizacao
-    ) => {
-
-        try {
-
-            await apiFetch(
-                "/registro/organizacao",
-                {
-                    method: "POST",
-
-                    body: JSON.stringify({
-
-                        nomeOrganizacao:
-                            dados.nomeOrganizacao,
-
-                        nomeFantasia:
-                            dados.nomeFantasia,
-
-                        usuario:
-                            dados.usuario,
-
-                        email:
-                            dados.email,
-
-                        senha:
-                            dados.senha,
-
-                        tipoDocumento:
-                            dados.tipoDocumento,
-
-                        documento:
-                            dados.documento,
-                    }),
-                }
-            );
-
-        } catch (error: unknown) {
-
-            if (error instanceof Error) {
-
-                setError(error.message);
-
-            } else {
-
-                setError(
-                    "Erro ao cadastrar organização!"
-                );
-
-            }
-
-            throw error;
-        }
-    };
+    
 
     const logout = async () => {
         try {
@@ -225,8 +172,7 @@ export const AuthProvider = ({ children }: { children: any }) => {
     return (
         <AuthContext.Provider
             value={{
-                user, loading, error, login, cadastrarCliente,
-                cadastrarOrganizacao, logout
+                user, loading, error, login, logout
             }}
         >
             {children}
