@@ -88,6 +88,7 @@ export const AuthProvider = ({ children }: { children: any }) => {
     }, []);
 
     const login = async (username: string, password: string) => {
+        console.log(username, password)
         try {
             const response = await apiFetch<{
                 message: string;
@@ -155,7 +156,7 @@ export const AuthProvider = ({ children }: { children: any }) => {
     //     }
     // };
 
-    
+
 
     const logout = async () => {
         try {

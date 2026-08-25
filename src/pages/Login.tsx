@@ -42,11 +42,13 @@ export const Login: React.FC = () => {
       await login(username, password);
 
       navigate("/");
-    } catch (error) {
-      setErrorMessage(
-        "Falha na autenticação. Verifique seus dados."
-      );
-    } finally {
+} catch (error) {
+  console.error("ERRO REAL DO LOGIN:", error);
+
+  setErrorMessage(
+    "Falha na autenticação. Verifique seus dados."
+  );
+} finally {
       setLoadingSubmit(false);
     }
   };
