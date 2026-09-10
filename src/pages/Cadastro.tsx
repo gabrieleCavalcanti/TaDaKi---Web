@@ -8,6 +8,9 @@ import {
     Eye,
     EyeOff,
     Building2,
+    Phone,
+    MapPin,
+    House,
 } from "lucide-react";
 
 import "../App.css";
@@ -735,6 +738,8 @@ export const Cadastro: React.FC = () => {
                                 placeholder="Telefone"
                             />
 
+                            <Phone size={20} />
+
                         </div>
 
 
@@ -748,7 +753,7 @@ export const Cadastro: React.FC = () => {
                                 name="cep"
                                 placeholder="CEP"
                             />
-
+                            <MapPin size={20} />
                         </div>
 
 
@@ -762,7 +767,7 @@ export const Cadastro: React.FC = () => {
                                 name="numero"
                                 placeholder="Número"
                             />
-
+                            <House size={20} />
                         </div>
 
 
