@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
     CircleUser,
@@ -12,13 +12,29 @@ import {
 
 import "../App.css";
 
+import {
+    cadastrarPessoa,
+    apiFetch,
+} from "../services/api";
+
+
 export const Cadastro: React.FC = () => {
+
+    // =========================================================
+    // TIPO DE USUÁRIO
+    // =========================================================
 
     const [tipoUsuario, setTipoUsuario] = useState<
         "cliente" | "organizacao"
     >("cliente");
 
-    const organizacao = tipoUsuario === "organizacao";
+    const organizacao =
+        tipoUsuario === "organizacao";
+
+
+    // =========================================================
+    // SENHAS - CLIENTE
+    // =========================================================
 
     const [mostrarSenhaCliente, setMostrarSenhaCliente] =
         useState(false);
@@ -27,6 +43,10 @@ export const Cadastro: React.FC = () => {
         useState(false);
 
 
+    // =========================================================
+    // SENHAS - ORGANIZAÇÃO
+    // =========================================================
+
     const [mostrarSenhaOrganizacao, setMostrarSenhaOrganizacao] =
         useState(false);
 
@@ -34,37 +54,137 @@ export const Cadastro: React.FC = () => {
         useState(false);
 
 
+    // =========================================================
+    // CPF / CNPJ
+    // =========================================================
+
     const [tipoDocumento, setTipoDocumento] = useState<
         "cpf" | "cnpj"
     >("cnpj");
 
-    const [loadingSubmit, setLoadingSubmit] = useState(false);
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+    // =========================================================
+    // ÁREA DE ATUAÇÃO
+    // =========================================================
+
+    const [areasAtuacao, setAreasAtuacao] =
+        useState<any[]>([]);
+
+    const [areaAtuacao, setAreaAtuacao] =
+        useState("");
+
+
+
+
+    // =========================================================
+    // MENSAGENS
+    // =========================================================
+
+    const [loadingSubmit, setLoadingSubmit] =
+        useState(false);
+
+    const [errorMessage, setErrorMessage] =
+        useState<string | null>(null);
+
+    const [successMessage, setSuccessMessage] =
+        useState<string | null>(null);
+
+
+    // =========================================================
+    // CARREGAR ÁREAS DE ATUAÇÃO
+    // =========================================================
+
+    useEffect(() => {
+        async function carregarAreas() {
+            try {
+                const resposta = await apiFetch("/AreaAtuacao");
+
+                console.log("RESPOSTA COMPLETA:", resposta);
+                console.log(
+                    "RESULTADO:",
+                    resposta?.resultadoSelecionaTodos
+                );
+
+                if (Array.isArray(resposta?.resultadoSelecionaTodos)) {
+                    setAreasAtuacao(
+                        resposta.resultadoSelecionaTodos
+                    );
+                } else {
+                    console.error(
+                        "A resposta não possui resultadoSelecionaTodos como array:",
+                        resposta
+                    );
+
+                    setAreasAtuacao([]);
+                }
+            } catch (error) {
+                console.error(
+                    "Erro ao carregar áreas de atuação:",
+                    error
+                );
+
+                setAreasAtuacao([]);
+            }
+        }
+
+        carregarAreas();
+    }, []);
+
+    // =========================================================
+    // SUBMIT
+    // =========================================================
 
     const handleSubmit = async (
         e: React.FormEvent<HTMLFormElement>
     ) => {
+
         e.preventDefault();
 
         setErrorMessage(null);
         setSuccessMessage(null);
         setLoadingSubmit(true);
 
+
         try {
-            const formData = new FormData(e.currentTarget);
+
+            const formData =
+                new FormData(e.currentTarget);
+
+
+            // =================================================
+            // CLIENTE
+            // =================================================
 
             if (tipoUsuario === "cliente") {
-                const nome = formData.get("nome") as string;
-                const usuario = formData.get("usuario") as string;
-                const email = formData.get("email") as string;
-                const senha = formData.get("senha") as string;
-                const confirmarSenha = formData.get(
-                    "confirmarSenha"
-                ) as string;
-                const dataNascimento = formData.get(
-                    "dataNascimento"
-                ) as string;
+
+                const nome = String(
+                    formData.get("nome") || ""
+                ).trim();
+
+                const usuario = String(
+                    formData.get("usuario") || ""
+                ).trim();
+
+                const email = String(
+                    formData.get("email") || ""
+                ).trim();
+
+                const senha = String(
+                    formData.get("senha") || ""
+                );
+
+                const confirmarSenha = String(
+                    formData.get("confirmarSenha") || ""
+                );
+
+                const dataNascimento = String(
+                    formData.get("dataNascimento") || ""
+                );
+
+
+                // ---------------------------------------------
+                // VALIDAÇÃO
+                // ---------------------------------------------
 
                 if (
                     !nome ||
@@ -74,123 +194,296 @@ export const Cadastro: React.FC = () => {
                     !confirmarSenha ||
                     !dataNascimento
                 ) {
+
                     setErrorMessage(
                         "Preencha todos os campos."
                     );
+
                     return;
+
                 }
 
+
                 if (senha !== confirmarSenha) {
+
                     setErrorMessage(
                         "As senhas não coincidem."
                     );
+
                     return;
+
                 }
 
-                // Aqui você chama sua função/API de cadastro
-                await cadastrarCliente({
+
+                // ---------------------------------------------
+                // DADOS
+                // ---------------------------------------------
+
+                const dados = {
+
                     nome,
-                    usuario,
+
+                    tipo: "CLIENTE",
+
+                    username: usuario,
+
+                    password: senha,
+
                     email,
-                    senha,
-                    dataNascimento,
-                });
 
-            } else {
-                const nomeOrganizacao = formData.get(
-                    "nomeOrganizacao"
-                ) as string;
+                    data_nascimento:
+                        dataNascimento,
 
-                const nomeFantasia = formData.get(
-                    "nomeFantasia"
-                ) as string;
+                };
 
-                const usuario = formData.get(
-                    "usuario"
-                ) as string;
 
-                const email = formData.get(
-                    "email"
-                ) as string;
+                console.log(
+                    "Dados enviados para o backend:",
+                    dados
+                );
 
-                const senha = formData.get(
-                    "senha"
-                ) as string;
 
-                const confirmarSenha = formData.get(
-                    "confirmarSenha"
-                ) as string;
+                await cadastrarPessoa(dados);
 
-                const documento = formData.get(
-                    tipoDocumento
-                ) as string;
+            }
+
+
+            // =================================================
+            // ORGANIZAÇÃO
+            // =================================================
+
+            else {
+
+                const nomeOrganizacao =
+                    String(
+                        formData.get(
+                            "nomeOrganizacao"
+                        ) || ""
+                    ).trim();
+
+
+                const usuario =
+                    String(
+                        formData.get(
+                            "usuario"
+                        ) || ""
+                    ).trim();
+
+
+                const email =
+                    String(
+                        formData.get(
+                            "email"
+                        ) || ""
+                    ).trim();
+
+
+                const telefone =
+                    String(
+                        formData.get(
+                            "telefone"
+                        ) || ""
+                    ).trim();
+
+
+                const cep =
+                    String(
+                        formData.get(
+                            "cep"
+                        ) || ""
+                    ).trim();
+
+
+                const numero =
+                    String(
+                        formData.get(
+                            "numero"
+                        ) || ""
+                    ).trim();
+
+
+                const senha =
+                    String(
+                        formData.get(
+                            "senha"
+                        ) || ""
+                    );
+
+
+                const confirmarSenha =
+                    String(
+                        formData.get(
+                            "confirmarSenha"
+                        ) || ""
+                    );
+
+
+                const documento =
+                    String(
+                        formData.get(
+                            tipoDocumento
+                        ) || ""
+                    ).trim();
+
+
+                const dataCriacao =
+                    String(
+                        formData.get(
+                            "data_criacao"
+                        ) || ""
+                    );
+
+
+                const idAreaAtuacao = areaAtuacao;
+
+
+                // ---------------------------------------------
+                // VALIDAÇÃO
+                // ---------------------------------------------
 
                 if (
                     !nomeOrganizacao ||
-                    !nomeFantasia ||
                     !usuario ||
                     !email ||
+                    !telefone ||
+                    !cep ||
+                    !numero ||
                     !senha ||
                     !confirmarSenha ||
-                    !documento
+                    !documento ||
+                    !dataCriacao ||
+                    !idAreaAtuacao
                 ) {
+
                     setErrorMessage(
                         "Preencha todos os campos."
                     );
+
                     return;
+
                 }
 
-                if (senha !== confirmarSenha) {
+
+                if (
+                    senha !== confirmarSenha
+                ) {
+
                     setErrorMessage(
                         "As senhas não coincidem."
                     );
+
                     return;
+
                 }
 
-                // Aqui você chama sua função/API
-                await cadastrarOrganizacao({
-                    nomeOrganizacao,
-                    nomeFantasia,
-                    usuario,
+
+                // ---------------------------------------------
+                // DADOS PARA O BACKEND
+                // ---------------------------------------------
+
+                const dados: any = {
+                    nome: nomeOrganizacao,
+                    tipo: "ORGANIZACAO",
+
+                    username: usuario,
+                    password: senha,
+
                     email,
-                    senha,
-                    tipoDocumento,
-                    documento,
-                });
+                    telefone,
+
+                    cep,
+                    numero,
+
+                    // Envia sempre os dois campos.
+                    // O documento que não foi escolhido vai como null.
+                    cpf: tipoDocumento === "cpf" ? documento : null,
+                    cnpj: tipoDocumento === "cnpj" ? documento : null,
+
+
+                    data_criacao: dataCriacao,
+
+                    id_area_atuacao: Number(areaAtuacao),
+                };
+
+                console.log(
+                    "Dados enviados para o backend:",
+                    dados
+                );
+
+
+                await cadastrarPessoa(
+                    dados
+                );
+
             }
+
+
+            // =================================================
+            // SUCESSO
+            // =================================================
 
             setSuccessMessage(
                 "Cadastro realizado com sucesso!"
             );
 
+
         } catch (error) {
-            console.error(error);
+
+            console.error(
+                "Erro ao realizar cadastro:",
+                error
+            );
+
 
             setErrorMessage(
-                "Não foi possível realizar o cadastro."
+
+                error instanceof Error
+                    ? error.message
+                    : "Não foi possível realizar o cadastro."
+
             );
 
         } finally {
+
             setLoadingSubmit(false);
+
         }
+
     };
+
+
+    // =========================================================
+    // JSX
+    // =========================================================
+
     return (
+
         <main className="cadastro-page">
 
             <div
-                className={`cadastro-container ${organizacao ? "active" : ""
-                    }`}
+                className={
+                    `cadastro-container ${organizacao
+                        ? "active"
+                        : ""
+                    }`
+                }
             >
 
-                {/* ================================================= */}
-                {/* FORMULÁRIO CLIENTE */}
-                {/* ================================================= */}
+
+                {/* =================================================
+                    CLIENTE
+                ================================================= */}
 
                 <div className="form-box cliente">
 
-                    <form>
+                    <form onSubmit={handleSubmit}>
 
-                        <h1>Cadastro de Cliente</h1>
+                        <h1>
+                            Cadastro de Cliente
+                        </h1>
+
+
+                        {/* NOME */}
 
                         <div className="input-box">
 
@@ -205,6 +498,9 @@ export const Cadastro: React.FC = () => {
 
                         </div>
 
+
+                        {/* USUÁRIO */}
+
                         <div className="input-box">
 
                             <input
@@ -218,6 +514,9 @@ export const Cadastro: React.FC = () => {
 
                         </div>
 
+
+                        {/* EMAIL */}
+
                         <div className="input-box">
 
                             <input
@@ -230,6 +529,9 @@ export const Cadastro: React.FC = () => {
                             <Mail size={20} />
 
                         </div>
+
+
+                        {/* SENHA */}
 
                         <div className="input-box">
 
@@ -264,6 +566,9 @@ export const Cadastro: React.FC = () => {
 
                         </div>
 
+
+                        {/* CONFIRMAR SENHA */}
+
                         <div className="input-box">
 
                             <input
@@ -297,6 +602,9 @@ export const Cadastro: React.FC = () => {
 
                         </div>
 
+
+                        {/* DATA NASCIMENTO */}
+
                         <div className="input-box">
 
                             <input
@@ -311,13 +619,42 @@ export const Cadastro: React.FC = () => {
                         </div>
 
 
+                        {/* MENSAGENS */}
+
+                        {errorMessage &&
+                            !organizacao && (
+
+                                <p className="error-message">
+                                    {errorMessage}
+                                </p>
+
+                            )}
+
+
+                        {successMessage &&
+                            !organizacao && (
+
+                                <p className="success-message">
+                                    {successMessage}
+                                </p>
+
+                            )}
+
+
                         {/* BOTÃO */}
 
                         <button
-                            type="button"
+                            type="submit"
                             className="cadastro-btn"
+                            disabled={
+                                loadingSubmit
+                            }
                         >
-                            Cadastrar
+
+                            {loadingSubmit
+                                ? "Cadastrando..."
+                                : "Cadastrar"}
+
                         </button>
 
                     </form>
@@ -325,15 +662,21 @@ export const Cadastro: React.FC = () => {
                 </div>
 
 
-                {/* ================================================= */}
-                {/* FORMULÁRIO ORGANIZAÇÃO */}
-                {/* ================================================= */}
+
+                {/* =================================================
+                    ORGANIZAÇÃO
+                ================================================= */}
 
                 <div className="form-box organizacao">
 
-                    <form>
+                    <form onSubmit={handleSubmit}>
 
-                        <h1>Cadastro de Organização</h1>
+                        <h1>
+                            Cadastro de Organização
+                        </h1>
+
+
+                        {/* NOME ORGANIZAÇÃO */}
 
                         <div className="input-box">
 
@@ -349,18 +692,7 @@ export const Cadastro: React.FC = () => {
                         </div>
 
 
-                        <div className="input-box">
-
-                            <input
-                                type="text"
-                                id="nomeFantasia"
-                                name="nomeFantasia"
-                                placeholder="Nome fantasia"
-                            />
-
-                            <Building2 size={20} />
-
-                        </div>
+                        {/* USUÁRIO */}
 
                         <div className="input-box">
 
@@ -375,6 +707,9 @@ export const Cadastro: React.FC = () => {
 
                         </div>
 
+
+                        {/* EMAIL */}
+
                         <div className="input-box">
 
                             <input
@@ -387,6 +722,51 @@ export const Cadastro: React.FC = () => {
                             <Mail size={20} />
 
                         </div>
+
+
+                        {/* TELEFONE */}
+
+                        <div className="input-box">
+
+                            <input
+                                type="text"
+                                id="telefone"
+                                name="telefone"
+                                placeholder="Telefone"
+                            />
+
+                        </div>
+
+
+                        {/* CEP */}
+
+                        <div className="input-box">
+
+                            <input
+                                type="text"
+                                id="cep"
+                                name="cep"
+                                placeholder="CEP"
+                            />
+
+                        </div>
+
+
+                        {/* NÚMERO */}
+
+                        <div className="input-box">
+
+                            <input
+                                type="text"
+                                id="numero"
+                                name="numero"
+                                placeholder="Número"
+                            />
+
+                        </div>
+
+
+                        {/* SENHA */}
 
                         <div className="input-box">
 
@@ -421,6 +801,9 @@ export const Cadastro: React.FC = () => {
 
                         </div>
 
+
+                        {/* CONFIRMAR SENHA */}
+
                         <div className="input-box">
 
                             <input
@@ -454,52 +837,132 @@ export const Cadastro: React.FC = () => {
 
                         </div>
 
-                        {/* ESCOLHA CPF / CNPJ */}
-                     
 
-                        <div className="documento-tipo">
+                        {/* =================================================
+                            CPF / CNPJ
+                        ================================================= */}
 
-                            <label>
-
-                                <input
-                                    type="radio"
-                                    name="tipoDocumento"
-                                    value="cnpj"
-                                    checked={
-                                        tipoDocumento === "cnpj"
-                                    }
-                                    onChange={() =>
-                                        setTipoDocumento("cnpj")
-                                    }
-                                />
-
-                                CNPJ
-
-                            </label>
+                        <div className="documento-toggle">
 
 
-                            <label>
+                            {/* CPF */}
 
-                                <input
-                                    type="radio"
-                                    name="tipoDocumento"
-                                    value="cpf"
-                                    checked={
-                                        tipoDocumento === "cpf"
-                                    }
-                                    onChange={() =>
-                                        setTipoDocumento("cpf")
-                                    }
-                                />
+                            <button
+                                type="button"
+                                className={
+                                    `documento-card ${tipoDocumento === "cpf"
+                                        ? "ativo"
+                                        : ""
+                                    }`
+                                }
+                                onClick={() =>
+                                    setTipoDocumento(
+                                        "cpf"
+                                    )
+                                }
+                            >
 
-                                CPF
+                                <div className="documento-icone">
 
-                            </label>
+                                    <CircleUser
+                                        size={19}
+                                    />
+
+                                </div>
+
+
+                                <div className="documento-info">
+
+                                    <strong>
+                                        CPF
+                                    </strong>
+
+                                    <span>
+                                        Pessoa Física
+                                    </span>
+
+                                </div>
+
+
+                                <div className="documento-check">
+
+                                    {tipoDocumento === "cpf"
+                                        ? "✓"
+                                        : ""}
+
+                                </div>
+
+                            </button>
+
+
+
+                            {/* CNPJ */}
+
+                            <button
+                                type="button"
+                                className={
+                                    `documento-card ${tipoDocumento === "cnpj"
+                                        ? "ativo"
+                                        : ""
+                                    }`
+                                }
+                                onClick={() =>
+                                    setTipoDocumento(
+                                        "cnpj"
+                                    )
+                                }
+                            >
+
+                                <div className="documento-icone">
+
+                                    <Building2
+                                        size={19}
+                                    />
+
+                                </div>
+
+
+                                <div className="documento-info">
+
+                                    <strong>
+                                        CNPJ
+                                    </strong>
+
+                                    <span>
+                                        Empresa
+                                    </span>
+
+                                </div>
+
+
+                                <div className="documento-check">
+
+                                    {tipoDocumento === "cnpj"
+                                        ? "✓"
+                                        : ""}
+
+                                </div>
+
+                            </button>
 
                         </div>
 
 
-                        <div className="input-box">
+                        {/* LABEL */}
+
+                        <label
+                            className="documento-label"
+                            htmlFor="documentoOrganizacao"
+                        >
+
+                            {tipoDocumento.toUpperCase()}
+
+                        </label>
+
+
+                        {/* DOCUMENTO */}
+
+                        <div className="input-box documento-input">
 
                             <input
                                 type="text"
@@ -507,23 +970,100 @@ export const Cadastro: React.FC = () => {
                                 name={tipoDocumento}
                                 placeholder={
                                     tipoDocumento === "cnpj"
-                                        ? "CNPJ"
-                                        : "CPF"
+                                        ? "00.000.000/0000-00"
+                                        : "000.000.000-00"
                                 }
                             />
 
-                            <CreditCard size={20} />
+                            <CreditCard
+                                size={20}
+                            />
 
                         </div>
+
+
+                        {/* AJUDA */}
+
+                        <p className="documento-ajuda">
+
+                            Informe seu{" "}
+                            {tipoDocumento.toUpperCase()}{" "}
+                            (apenas números).
+
+                        </p>
+
+
+                        <div className="area-data-container">
+
+                            <div className="area-atuacao-box">
+                                <select
+                                    id="id_area_atuacao"
+                                    name="id_area_atuacao"
+                                    value={areaAtuacao}
+                                    onChange={(e) => setAreaAtuacao(e.target.value)}
+                                    required
+                                >
+                                    <option value="">Área de atuação</option>
+
+                                    {areasAtuacao.map((area) => (
+                                        <option
+                                            key={area.id_area_atuacao}
+                                            value={area.id_area_atuacao}
+                                        >
+                                            {area.descricao}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className="data-criacao-box">
+                                <input
+                                    type="date"
+                                    id="data_criacao"
+                                    name="data_criacao"
+                                    required
+                                />
+                            </div>
+
+                        </div>
+
+
+                        {/* MENSAGENS */}
+
+                        {errorMessage &&
+                            organizacao && (
+
+                                <p className="error-message">
+                                    {errorMessage}
+                                </p>
+
+                            )}
+
+
+                        {successMessage &&
+                            organizacao && (
+
+                                <p className="success-message">
+                                    {successMessage}
+                                </p>
+
+                            )}
 
 
                         {/* BOTÃO */}
 
                         <button
-                            type="button"
+                            type="submit"
                             className="cadastro-btn"
+                            disabled={
+                                loadingSubmit
+                            }
                         >
-                            Cadastrar
+
+                            {loadingSubmit
+                                ? "Cadastrando..."
+                                : "Cadastrar"}
+
                         </button>
 
                     </form>
@@ -531,11 +1071,13 @@ export const Cadastro: React.FC = () => {
                 </div>
 
 
-                {/* ================================================= */}
-                {/* ÁREA DE TRANSIÇÃO */}
-                {/* ================================================= */}
+
+                {/* =================================================
+                    TOGGLE
+                ================================================= */}
 
                 <div className="toggle-box">
+
 
                     <div className="toggle-panel toggle-left">
 
@@ -551,13 +1093,19 @@ export const Cadastro: React.FC = () => {
                             type="button"
                             className="toggle-btn"
                             onClick={() =>
-                                setTipoUsuario("organizacao")
+                                setTipoUsuario(
+                                    "organizacao"
+                                )
                             }
                         >
+
                             Organização
+
                         </button>
 
                     </div>
+
+
 
                     <div className="toggle-panel toggle-right">
 
@@ -573,10 +1121,14 @@ export const Cadastro: React.FC = () => {
                             type="button"
                             className="toggle-btn"
                             onClick={() =>
-                                setTipoUsuario("cliente")
+                                setTipoUsuario(
+                                    "cliente"
+                                )
                             }
                         >
+
                             Cliente
+
                         </button>
 
                     </div>
@@ -586,5 +1138,6 @@ export const Cadastro: React.FC = () => {
             </div>
 
         </main>
+
     );
 };
