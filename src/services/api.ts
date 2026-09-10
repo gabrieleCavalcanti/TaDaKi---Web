@@ -1,4 +1,5 @@
 const BASE_URL = "http://localhost:8000";
+// const BASE_URL = "http://192.168.0.109:3000";
 
 // Essa é uma função "generica" nós vamos enviar o tipo na hora da requisição, caso não seja informado o tipo ela vai utilizar qualquer um.
 export async function apiFetch<T = any>(
@@ -58,4 +59,13 @@ export async function apiFetch<T = any>(
   }
 
   return data;
+}
+
+// CADASTRO DE PESSOA (Cliente ou Organização)
+export async function cadastrarPessoa(dados: any) {
+
+    return apiFetch("/pessoas", {
+        method: "POST",
+        body: JSON.stringify(dados),
+    });
 }
