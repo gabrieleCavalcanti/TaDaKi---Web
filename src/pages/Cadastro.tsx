@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
 import {
     CircleUser,
@@ -20,6 +20,7 @@ import {
     apiFetch,
 } from "../services/api";
 
+import { Link } from "react-router-dom";
 
 export const Cadastro: React.FC = () => {
 
@@ -76,7 +77,12 @@ export const Cadastro: React.FC = () => {
     const [areaAtuacao, setAreaAtuacao] =
         useState("");
 
+    // data de criação
 
+    const dataCriacaoRef = useRef<HTMLInputElement>(null);
+
+    // data de nascimento
+    const dataNascimentoRef = useRef<HTMLInputElement>(null);
 
 
     // =========================================================
@@ -489,15 +495,17 @@ export const Cadastro: React.FC = () => {
                         {/* NOME */}
 
                         <div className="input-box">
+                            <div className="input">
+                                <input
+                                    type="text"
+                                    id="nomeCliente"
+                                    name="nome"
+                                    placeholder="Nome completo"
+                                />
 
-                            <input
-                                type="text"
-                                id="nomeCliente"
-                                name="nome"
-                                placeholder="Nome completo"
-                            />
+                                <CircleUser size={20} />
+                            </div>
 
-                            <CircleUser size={20} />
 
                         </div>
 
@@ -506,14 +514,18 @@ export const Cadastro: React.FC = () => {
 
                         <div className="input-box">
 
-                            <input
-                                type="text"
-                                id="usuarioCliente"
-                                name="usuario"
-                                placeholder="Usuário"
-                            />
+                            <div className="input">
 
-                            <CircleUser size={20} />
+                                <input
+                                    type="text"
+                                    id="usuarioCliente"
+                                    name="usuario"
+                                    placeholder="Usuário"
+                                />
+
+                                <CircleUser size={20} />
+                            </div>
+
 
                         </div>
 
@@ -521,51 +533,52 @@ export const Cadastro: React.FC = () => {
                         {/* EMAIL */}
 
                         <div className="input-box">
+                            <div className="input">
+                                <input
+                                    type="email"
+                                    id="emailCliente"
+                                    name="email"
+                                    placeholder="E-mail"
+                                />
 
-                            <input
-                                type="email"
-                                id="emailCliente"
-                                name="email"
-                                placeholder="E-mail"
-                            />
-
-                            <Mail size={20} />
-
+                                <Mail size={20} />
+                            </div>
                         </div>
 
 
                         {/* SENHA */}
 
                         <div className="input-box">
+                            <div className="input">
+                                <input
+                                    type={
+                                        mostrarSenhaCliente
+                                            ? "text"
+                                            : "password"
+                                    }
+                                    id="senhaCliente"
+                                    name="senha"
+                                    placeholder="Senha"
+                                />
 
-                            <input
-                                type={
-                                    mostrarSenhaCliente
-                                        ? "text"
-                                        : "password"
-                                }
-                                id="senhaCliente"
-                                name="senha"
-                                placeholder="Senha"
-                            />
+                                <button
+                                    type="button"
+                                    className="icon-button"
+                                    onClick={() =>
+                                        setMostrarSenhaCliente(
+                                            !mostrarSenhaCliente
+                                        )
+                                    }
+                                >
 
-                            <button
-                                type="button"
-                                className="icon-button"
-                                onClick={() =>
-                                    setMostrarSenhaCliente(
-                                        !mostrarSenhaCliente
-                                    )
-                                }
-                            >
+                                    {mostrarSenhaCliente ? (
+                                        <EyeOff size={20} />
+                                    ) : (
+                                        <Eye size={20} />
+                                    )}
 
-                                {mostrarSenhaCliente ? (
-                                    <EyeOff size={20} />
-                                ) : (
-                                    <Eye size={20} />
-                                )}
-
-                            </button>
+                                </button>
+                            </div>
 
                         </div>
 
@@ -573,52 +586,56 @@ export const Cadastro: React.FC = () => {
                         {/* CONFIRMAR SENHA */}
 
                         <div className="input-box">
+                            <div className="input">
+                                <input
+                                    type={
+                                        mostrarConfirmacaoCliente
+                                            ? "text"
+                                            : "password"
+                                    }
+                                    id="confirmarSenhaCliente"
+                                    name="confirmarSenha"
+                                    placeholder="Confirmar senha"
+                                />
 
-                            <input
-                                type={
-                                    mostrarConfirmacaoCliente
-                                        ? "text"
-                                        : "password"
-                                }
-                                id="confirmarSenhaCliente"
-                                name="confirmarSenha"
-                                placeholder="Confirmar senha"
-                            />
+                                <button
+                                    type="button"
+                                    className="icon-button"
+                                    onClick={() =>
+                                        setMostrarConfirmacaoCliente(
+                                            !mostrarConfirmacaoCliente
+                                        )
+                                    }
+                                >
 
-                            <button
-                                type="button"
-                                className="icon-button"
-                                onClick={() =>
-                                    setMostrarConfirmacaoCliente(
-                                        !mostrarConfirmacaoCliente
-                                    )
-                                }
-                            >
+                                    {mostrarConfirmacaoCliente ? (
+                                        <EyeOff size={20} />
+                                    ) : (
+                                        <Eye size={20} />
+                                    )}
 
-                                {mostrarConfirmacaoCliente ? (
-                                    <EyeOff size={20} />
-                                ) : (
-                                    <Eye size={20} />
-                                )}
+                                </button>
 
-                            </button>
+                            </div>
 
                         </div>
 
 
                         {/* DATA NASCIMENTO */}
 
-                        <div className="input-box">
-
+                        <div
+                            className="input-box-nascimento"
+                            onClick={() => dataNascimentoRef.current?.showPicker()}
+                        >
                             <input
+                                ref={dataNascimentoRef}
                                 type="date"
-                                id="dataNascimento"
-                                name="dataNascimento"
-                                aria-label="Data de nascimento"
+                                id="data_nascimento"
+                                name="data_nascimento"
+                                required
                             />
 
                             <CalendarDays size={20} />
-
                         </div>
 
 
@@ -659,7 +676,10 @@ export const Cadastro: React.FC = () => {
                                 : "Cadastrar"}
 
                         </button>
-
+                        <p className="login-link">
+                            Já possui uma conta?{" "}
+                            <Link to="/login">Entrar</Link>
+                        </p>
                     </form>
 
                 </div>
@@ -683,63 +703,54 @@ export const Cadastro: React.FC = () => {
 
                         <div className="input-box">
 
-                            <input
-                                type="text"
-                                id="nomeOrganizacao"
-                                name="nomeOrganizacao"
-                                placeholder="Nome da organização"
-                            />
+                            <div className="input">
+                                <input
+                                    type="text"
+                                    id="nomeOrganizacao"
+                                    name="nomeOrganizacao"
+                                    placeholder="Nome da organização"
+                                />
 
-                            <Building2 size={20} />
+                                <Building2 size={20} />
+                            </div>
 
-                        </div>
+                            <div className="input">
+                                <input
+                                    type="text"
+                                    id="usuarioOrganizacao"
+                                    name="usuario"
+                                    placeholder="Usuário"
+                                />
 
+                                <CircleUser size={20} />
 
-                        {/* USUÁRIO */}
-
-                        <div className="input-box">
-
-                            <input
-                                type="text"
-                                id="usuarioOrganizacao"
-                                name="usuario"
-                                placeholder="Usuário"
-                            />
-
-                            <CircleUser size={20} />
-
+                            </div>
                         </div>
 
 
                         {/* EMAIL */}
-
                         <div className="input-box">
+                            <div className="input">
+                                <input
+                                    type="email"
+                                    id="emailOrganizacao"
+                                    name="email"
+                                    placeholder="E-mail"
+                                />
 
-                            <input
-                                type="email"
-                                id="emailOrganizacao"
-                                name="email"
-                                placeholder="E-mail"
-                            />
+                                <Mail size={20} />
+                            </div>
 
-                            <Mail size={20} />
+                            <div className="input">
+                                <input
+                                    type="text"
+                                    id="telefone"
+                                    name="telefone"
+                                    placeholder="Telefone"
+                                />
 
-                        </div>
-
-
-                        {/* TELEFONE */}
-
-                        <div className="input-box">
-
-                            <input
-                                type="text"
-                                id="telefone"
-                                name="telefone"
-                                placeholder="Telefone"
-                            />
-
-                            <Phone size={20} />
-
+                                <Phone size={20} />
+                            </div>
                         </div>
 
 
@@ -747,27 +758,24 @@ export const Cadastro: React.FC = () => {
 
                         <div className="input-box">
 
-                            <input
-                                type="text"
-                                id="cep"
-                                name="cep"
-                                placeholder="CEP"
-                            />
-                            <MapPin size={20} />
-                        </div>
-
-
-                        {/* NÚMERO */}
-
-                        <div className="input-box">
-
-                            <input
-                                type="text"
-                                id="numero"
-                                name="numero"
-                                placeholder="Número"
-                            />
-                            <House size={20} />
+                            <div className="input">
+                                <input
+                                    type="text"
+                                    id="cep"
+                                    name="cep"
+                                    placeholder="CEP"
+                                />
+                                <MapPin size={20} />
+                            </div>
+                            <div className="input">
+                                <input
+                                    type="text"
+                                    id="numero"
+                                    name="numero"
+                                    placeholder="Número"
+                                />
+                                <House size={20} />
+                            </div>
                         </div>
 
 
@@ -775,72 +783,72 @@ export const Cadastro: React.FC = () => {
 
                         <div className="input-box">
 
-                            <input
-                                type={
-                                    mostrarSenhaOrganizacao
-                                        ? "text"
-                                        : "password"
-                                }
-                                id="senhaOrganizacao"
-                                name="senha"
-                                placeholder="Senha"
-                            />
+                            <div className="input">
+                                <input
+                                    type={
+                                        mostrarSenhaOrganizacao
+                                            ? "text"
+                                            : "password"
+                                    }
+                                    id="senhaOrganizacao"
+                                    name="senha"
+                                    placeholder="Senha"
+                                />
 
-                            <button
-                                type="button"
-                                className="icon-button"
-                                onClick={() =>
-                                    setMostrarSenhaOrganizacao(
-                                        !mostrarSenhaOrganizacao
-                                    )
-                                }
-                            >
+                                <button
+                                    type="button"
+                                    className="icon-button"
+                                    onClick={() =>
+                                        setMostrarSenhaOrganizacao(
+                                            !mostrarSenhaOrganizacao
+                                        )
+                                    }
+                                >
 
-                                {mostrarSenhaOrganizacao ? (
-                                    <EyeOff size={20} />
-                                ) : (
-                                    <Eye size={20} />
-                                )}
+                                    {mostrarSenhaOrganizacao ? (
+                                        <EyeOff size={20} />
+                                    ) : (
+                                        <Eye size={20} />
+                                    )}
 
-                            </button>
+                                </button>
 
-                        </div>
+                            </div>
+                            <div className="input">
+                                <input
+                                    type={
+                                        mostrarConfirmacaoOrganizacao
+                                            ? "text"
+                                            : "password"
+                                    }
+                                    id="confirmarSenhaOrganizacao"
+                                    name="confirmarSenha"
+                                    placeholder="Confirmar senha"
+                                />
 
+                                <button
+                                    type="button"
+                                    className="icon-button"
+                                    onClick={() =>
+                                        setMostrarConfirmacaoOrganizacao(
+                                            !mostrarConfirmacaoOrganizacao
+                                        )
+                                    }
+                                >
 
-                        {/* CONFIRMAR SENHA */}
+                                    {mostrarConfirmacaoOrganizacao ? (
+                                        <EyeOff size={20} />
+                                    ) : (
+                                        <Eye size={20} />
+                                    )}
 
-                        <div className="input-box">
+                                </button>
+                            </div>
 
-                            <input
-                                type={
-                                    mostrarConfirmacaoOrganizacao
-                                        ? "text"
-                                        : "password"
-                                }
-                                id="confirmarSenhaOrganizacao"
-                                name="confirmarSenha"
-                                placeholder="Confirmar senha"
-                            />
-
-                            <button
-                                type="button"
-                                className="icon-button"
-                                onClick={() =>
-                                    setMostrarConfirmacaoOrganizacao(
-                                        !mostrarConfirmacaoOrganizacao
-                                    )
-                                }
-                            >
-
-                                {mostrarConfirmacaoOrganizacao ? (
-                                    <EyeOff size={20} />
-                                ) : (
-                                    <Eye size={20} />
-                                )}
-
-                            </button>
 
                         </div>
+
+
 
 
                         {/* =================================================
@@ -953,17 +961,6 @@ export const Cadastro: React.FC = () => {
                         </div>
 
 
-                        {/* LABEL */}
-
-                        <label
-                            className="documento-label"
-                            htmlFor="documentoOrganizacao"
-                        >
-
-                            {tipoDocumento.toUpperCase()}
-
-                        </label>
-
 
                         {/* DOCUMENTO */}
 
@@ -1021,14 +1018,27 @@ export const Cadastro: React.FC = () => {
                                 </select>
                             </div>
 
-                            <div className="data-criacao-box">
+                            <div
+                                className="data-criacao-box"
+                                onClick={() => dataCriacaoRef.current?.showPicker()}
+                            >
                                 <input
+                                    ref={dataCriacaoRef}
                                     type="date"
                                     id="data_criacao"
                                     name="data_criacao"
                                     required
                                 />
+
+                                <CalendarDays size={20} />
                             </div>
+                            {/* AJUDA */}
+
+                            <p className="documento-ajuda">
+
+                                Selecione a data de criação da organização
+
+                            </p>
 
                         </div>
 
@@ -1070,6 +1080,11 @@ export const Cadastro: React.FC = () => {
                                 : "Cadastrar"}
 
                         </button>
+
+                        <p className="login-link">
+                            Já possui uma conta?{" "}
+                            <a href="/login">Entrar</a>
+                        </p>
 
                     </form>
 
