@@ -21,23 +21,6 @@ export const AuthContext = createContext<AuthContextType | undefined>(
     undefined
 );
 
-// export interface CadastroCliente {
-//     nome: string;
-//     usuario: string;
-//     email: string;
-//     senha: string;
-//     dataNascimento: string;
-// }
-
-// export interface CadastroOrganizacao {
-//     nomeOrganizacao: string;
-//     nomeFantasia: string;
-//     usuario: string;
-//     email: string;
-//     senha: string;
-//     tipoDocumento: "cpf" | "cnpj";
-//     documento: string;
-// }
 
 export const AuthProvider = ({ children }: { children: any }) => {
     const [user, setUser] = useState<User | null>(null);
@@ -111,51 +94,6 @@ export const AuthProvider = ({ children }: { children: any }) => {
             throw error;
         }
     };
-
-    // const cadastrarCliente = async (
-    //     dados: CadastroCliente
-    // ) => {
-
-    //     try {
-
-    //         await apiFetch(
-    //             "/auth/registro/cliente",
-    //             {
-    //                 method: "POST",
-
-    //                 body: JSON.stringify({
-    //                     nome: dados.nome,
-
-    //                     usuario: dados.usuario,
-
-    //                     email: dados.email,
-
-    //                     senha: dados.senha,
-
-    //                     dataNascimento:
-    //                         dados.dataNascimento,
-    //                 }),
-    //             }
-    //         );
-
-    //     } catch (error: unknown) {
-
-    //         if (error instanceof Error) {
-
-    //             setError(error.message);
-
-    //         } else {
-
-    //             setError(
-    //                 "Erro ao cadastrar cliente!"
-    //             );
-
-    //         }
-
-    //         throw error;
-    //     }
-    // };
-
 
 
     const logout = async () => {
