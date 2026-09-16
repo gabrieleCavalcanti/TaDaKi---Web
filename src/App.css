@@ -179,6 +179,8 @@
   gap: 5px;
 }
 
+
+
 .input-box input {
   width: 100%;
 
@@ -271,6 +273,13 @@
   width: calc(50% - 4px);
 }
 
+/* ESPAÇO ENTRE A PRIMEIRA E A SEGUNDA LINHA */
+
+.form-box.organizacao .input-box:has(#nomeOrganizacao),
+.form-box.organizacao .input-box:has(#emailOrganizacao) {
+    margin-bottom: 5px;
+}
+
 .form-box.organizacao .input-box input {
   width: 100%;
 
@@ -351,6 +360,30 @@
   padding: 0;
 
   box-sizing: border-box;
+}
+
+/* TAMANHO DOS CAMPOS DE SENHA DA ORGANIZAÇÃO */
+
+.form-box.organizacao .senha-container {
+    width: 100% !important;
+    display: flex;
+    gap: 10px;
+    box-sizing: border-box;
+    margin-top: 0;
+}
+
+
+.form-box.organizacao .senha-container .input {
+    flex: 1 1 0 !important;
+    width: calc(50% - 5px) !important;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.form-box.organizacao .senha-container .input input {
+    width: 100% !important;
+    height: 39px;
+    box-sizing: border-box;
 }
 
 /* CARD CPF / CNPJ */
@@ -574,6 +607,28 @@
   color: #777;
   pointer-events: none;
   z-index: 10;
+}
+
+/* =========================================================
+   CAMPOS DE SENHA LADO A LADO
+========================================================= */
+.senha-container {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.senha-container .input {
+    flex: 1 1 0;
+    width: calc(50% - 5px) !important;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.senha-container .input input {
+    width: 100% !important;
+    box-sizing: border-box;
 }
 
 /* TEXTO DE AJUDA */

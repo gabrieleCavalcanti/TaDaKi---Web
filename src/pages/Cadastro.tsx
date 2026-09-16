@@ -355,8 +355,8 @@ export const Cadastro: React.FC = () => {
                     !usuario ||
                     !email ||
                     !telefone ||
-                    !cep ||
-                    !numero ||
+                    // !cep ||
+                    // !numero ||
                     !senha ||
                     !confirmarSenha ||
                     !documento ||
@@ -756,7 +756,7 @@ export const Cadastro: React.FC = () => {
 
                         {/* CEP */}
 
-                        <div className="input-box">
+                        {/* <div className="input-box">
 
                             <div className="input">
                                 <input
@@ -776,12 +776,11 @@ export const Cadastro: React.FC = () => {
                                 />
                                 <House size={20} />
                             </div>
-                        </div>
+                        </div> */}
 
 
-                        {/* SENHA */}
-
-                        <div className="input-box">
+                        {/* SENHAS */}
+                        <div className="input-box senha-container">
 
                             <div className="input">
                                 <input
@@ -804,16 +803,14 @@ export const Cadastro: React.FC = () => {
                                         )
                                     }
                                 >
-
                                     {mostrarSenhaOrganizacao ? (
                                         <EyeOff size={20} />
                                     ) : (
                                         <Eye size={20} />
                                     )}
-
                                 </button>
-
                             </div>
+
                             <div className="input">
                                 <input
                                     type={
@@ -835,16 +832,13 @@ export const Cadastro: React.FC = () => {
                                         )
                                     }
                                 >
-
                                     {mostrarConfirmacaoOrganizacao ? (
                                         <EyeOff size={20} />
                                     ) : (
                                         <Eye size={20} />
                                     )}
-
                                 </button>
                             </div>
-
 
                         </div>
 
