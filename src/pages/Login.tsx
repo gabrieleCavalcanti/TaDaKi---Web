@@ -1,30 +1,28 @@
-import React, { useState } from "react";
-import { CircleUser, KeyRound } from "lucide-react";
 
-// importar o icone da loja\
+import React, { useState } from "react";
+
+import { CircleUser, Eye, EyeOff } from "lucide-react";
 import { IoStorefront } from "react-icons/io5";
 
 import { useNavigate, Navigate, Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 
-// Olhinhos para ocultar a senha e visualizar a senha
-import { Eye, EyeOff } from "lucide-react";
+import logo from "../assets/Logo.png";
 
-// importação a logo
-import logo from "../assets/Logo.png"
-
-// Importação do background do lado direito
-import bkMapa from "../assets/imagem_fundo.jpg"
+import "../css/Login.css";
 
 export const Login: React.FC = () => {
-
   const { user, login } = useAuth();
+
   const navigate = useNavigate();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+
   const [showPassword, setShowPassword] = useState(false);
+
   const [loadingSubmit, setLoadingSubmit] = useState(false);
+
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Se já estiver logado, vai para a página inicial
@@ -42,103 +40,44 @@ export const Login: React.FC = () => {
       await login(username, password);
 
       navigate("/");
-} catch (error) {
-  console.error("ERRO REAL DO LOGIN:", error);
+    } catch (error) {
+      console.error("ERRO REAL DO LOGIN:", error);
 
-  setErrorMessage(
-    "Falha na autenticação. Verifique seus dados."
-  );
-} finally {
+      setErrorMessage(
+        "Falha na autenticação. Verifique seus dados."
+      );
+    } finally {
       setLoadingSubmit(false);
     }
   };
 
   return (
-    <section
-      className="login-page"
-      style={{
-        width: "100%",
-        height: "100vh",
-        position: "relative",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
+    <section className="login-page">
 
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "40%",
-          height: "100%",
-          background: "rgba(117, 8, 10, 1)",
-        }}>
+      {/* FUNDO VERMELHO */}
+      <div className="login-red-background">
+
         <IoStorefront
           size={390}
           color="#8f1725"
           strokeWidth={1}
-          style={{
-            position: "absolute",
-            left: "-30px",
-            bottom: "10px",
-            opacity: 0.45,
-          }}
+          className="login-store-icon"
         />
+
       </div>
 
+      {/* CARD */}
+      <div className="login-card">
 
-      <div
-        style={{
-          backgroundImage: `url(${bkMapa})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          position: "absolute",
-          top: 0,
-          right: 0,
-          width: "60%",
-          height: "100%",
-          objectFit: 'cover', // Mantém a proporção da imagem sem distorcer
-          objectPosition: 'center', // Foca no centro da imagem
-        }}
-      />
-
-      <div
-        className="card"
-        style={{
-          width: "38%",
-          height: "65%",
-          minWidth: "350px",
-          minHeight: "450px",
-          background: "#fff",
-          padding: "36px",
-          position: "relative",
-          boxSizing: "border-box",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          borderRadius: "10px"
-        }}
-      >
         {/* LOGO */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            marginBottom: "30px",
-          }}
-        >
+        <div className="login-logo-container">
+
           <img
             src={logo}
             alt="Logo"
-            style={{
-              width: "150px",
-              height: "auto",
-              transform: "translateY(-30px)",
-            }}
+            className="login-logo"
           />
+
         </div>
 
         {/* FORMULÁRIO */}
@@ -151,31 +90,18 @@ export const Login: React.FC = () => {
               Username
             </label>
 
-            <div style={{ position: "relative" }}>
+            <div className="login-input-container">
 
               <CircleUser
                 size={18}
                 color="#64748b"
-                style={{
-                  position: "absolute",
-                  left: "12px",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                }}
+                className="username-icon"
               />
 
               <input
                 id="username"
                 type="text"
                 className="form-input"
-                style={{
-                  paddingLeft: "38px",
-                  width: "100%",
-                  height: "30px",
-                  boxSizing: "border-box",
-                  border: "1px solid #e2e8f0",
-                  borderRadius: "8px"
-                }}
                 placeholder="seu.nome"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
@@ -183,68 +109,34 @@ export const Login: React.FC = () => {
               />
 
             </div>
+
           </div>
 
+
           {/* PASSWORD */}
-          <div
-            className="form-group"
-            style={{
-              marginTop: "20px",
-            }}
-          >
+          <div className="form-group password-group">
 
             <label htmlFor="password">
               Password
             </label>
 
-            <div style={{ position: "relative" }}>
-
-              {/* Ícone da chave */}
-              <KeyRound
-                size={18}
-                color="#64748b"
-                style={{
-                  position: "absolute",
-                  left: "12px",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                }}
-              />
+            <div className="login-input-container">
 
               <input
                 id="password"
                 type={showPassword ? "text" : "password"}
                 className="form-input"
-                style={{
-                  paddingLeft: "38px",
-                  paddingRight: "40px",
-                  width: "100%",
-                  height: "30px",
-                  boxSizing: "border-box",
-                  border: "1px solid #e2e8f0",
-                  borderRadius: "8px"
-                }}
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
 
-              {/* Ícone de mostrar/ocultar */}
+              {/* ÍCONE DE MOSTRAR/OCULTAR */}
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                style={{
-                  position: "absolute",
-                  right: "10px",
-                  top: "53%",
-                  transform: "translateY(-50%)",
-                  background: "none",
-                  border: "none",
-                  padding: 0,
-                  cursor: "pointer",
-                  color: "#64748b",
-                }}
+                className="password-toggle"
               >
                 {showPassword ? (
                   <EyeOff size={18} />
@@ -254,127 +146,83 @@ export const Login: React.FC = () => {
               </button>
 
             </div>
+
           </div>
+
 
           {/* ERRO */}
           {errorMessage && (
-            <p
-              style={{
-                color: "red",
-                marginTop: "15px",
-              }}
-            >
+            <p className="login-error">
               {errorMessage}
             </p>
           )}
 
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              width: "100%",
-              marginTop: "10px"
-            }}
-          >
-            <label
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                fontSize: "14px",
-                color: "#374151",
-              }}
-            >
+
+          {/* LEMBRE-ME / ESQUECEU A SENHA */}
+          <div className="login-options">
+
+            <label className="remember-label">
+
               <input type="checkbox" />
+
               Lembre-me
+
             </label>
 
             <a
               href="#"
-              style={{
-                fontSize: "14px",
-                color: "#d2272a",
-                textDecoration: "none",
-              }}
+              className="forgot-password"
             >
               Esqueceu a senha?
             </a>
+
           </div>
+
 
           {/* BOTÃO */}
           <button
             type="submit"
-            className="btn btn-primary"
-            style={{
-              marginTop: "20px",
-              width: "100%",
-              padding: "12px",
-              borderRadius: "5px",
-              backgroundColor: "rgb(210, 39, 42)",
-              color: "white",
-              fontWeight: "bold",
-              border: "1px solid rgba(255, 255, 255, 0.25)",
-            }}
+            className="login-button"
             disabled={loadingSubmit}
           >
             {loadingSubmit ? "Entrando..." : "Entrar"}
           </button>
 
         </form>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            width: "100%",
-            marginTop: "15px",
-          }}
-        >
-          <div style={{ flex: 1, borderTop: "1px solid #d1d5db" }} />
 
-          <span
-            style={{
-              fontSize: "13px",
-              color: "#374151",
-            }}
-          >
+
+        {/* DIVISOR */}
+        <div className="login-divider">
+
+          <div className="login-divider-line" />
+
+          <span className="login-divider-text">
             ou
           </span>
 
-          <div style={{ flex: 1, borderTop: "1px solid #d1d5db" }} />
+          <div className="login-divider-line" />
+
         </div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            width: "100%",
-            marginTop: "10px",
-          }}
-        >
-          <span
-            style={{
-              fontSize: "14px",
-              color: "#374151",
-            }}
-          >
+
+
+        {/* CADASTRO */}
+        <div className="login-register">
+
+          <span className="login-register-text">
             Não tem uma conta?
           </span>
 
           <Link
             to="/cadastro"
-            style={{
-              fontSize: "14px",
-              color: "rgb(210, 39, 42)",
-              textDecoration: "none",
-            }}
+            className="login-register-link"
           >
             Registre-se
           </Link>
+
         </div>
 
       </div>
+
     </section>
   );
 };
