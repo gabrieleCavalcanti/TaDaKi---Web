@@ -9,11 +9,11 @@ import {
     EyeOff,
     Building2,
     Phone,
-    MapPin,
-    House,
+    // MapPin,
+    // House,
 } from "lucide-react";
 
-import "../App.css";
+import "../css/Cadastro.css";
 
 import {
     cadastrarPessoa,
