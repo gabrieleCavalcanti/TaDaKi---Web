@@ -1,0 +1,405 @@
+/* =====================================================
+   TELA DE CRIAR AVALIAÇÃO
+   ===================================================== */
+
+.avaliacaoPagina {
+    min-height: 100vh;
+    width: 100%;
+    background: #f5f7f5;
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+    box-sizing: border-box;
+}
+
+.avaliacaoContainer {
+    width: 100%;
+    max-width: 700px;
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 35px;
+    box-sizing: border-box;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* =====================================================
+   BOTÃO VOLTAR
+   ===================================================== */
+
+.botaoVoltarAvaliacao {
+    border: none;
+    background: transparent;
+    color: #48634e;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 8px 0;
+    margin-bottom: 20px;
+}
+
+.botaoVoltarAvaliacao:hover {
+    color: #2f4935;
+}
+
+/* =====================================================
+   CABEÇALHO
+   ===================================================== */
+
+.cabecalhoAvaliacao {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.iconeAvaliacaoGrande {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 15px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #e7f0e8;
+    color: #7c9d82;
+
+    font-size: 34px;
+}
+
+.cabecalhoAvaliacao h1 {
+    margin: 0 0 10px;
+
+    color: #27352b;
+
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.cabecalhoAvaliacao p {
+    margin: 0 auto;
+
+    max-width: 500px;
+
+    color: #718074;
+
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+/* =====================================================
+   FORMULÁRIO
+   ===================================================== */
+
+.formularioAvaliacao {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.campoAvaliacao {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.campoAvaliacao label {
+    color: #344238;
+
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.campoAvaliacao input[type="text"],
+.campoAvaliacao textarea {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    border: 1px solid #d7dfd8;
+    border-radius: 10px;
+
+    background: #fafcfb;
+
+    color: #27352b;
+
+    font-family: inherit;
+    font-size: 15px;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+.campoAvaliacao input[type="text"] {
+    height: 48px;
+    padding: 0 14px;
+}
+
+.campoAvaliacao textarea {
+    min-height: 130px;
+    padding: 14px;
+    resize: vertical;
+    line-height: 1.5;
+}
+
+.campoAvaliacao input[type="text"]:focus,
+.campoAvaliacao textarea:focus {
+    border-color: #91b397;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 0 0 3px rgba(
+            145,
+            179,
+            151,
+            0.15
+        );
+}
+
+.campoAvaliacao input::placeholder,
+.campoAvaliacao textarea::placeholder {
+    color: #a3aea5;
+}
+
+/* =====================================================
+   CONTADOR
+   ===================================================== */
+
+.contadorCaracteres {
+    align-self: flex-end;
+
+    margin-top: -3px;
+
+    color: #8a968d;
+
+    font-size: 12px;
+}
+
+/* =====================================================
+   ESTRELAS
+   ===================================================== */
+
+.selecaoEstrelas {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.estrela,
+.estrelaSelecionada {
+    border: none;
+    background: transparent;
+
+    padding: 2px;
+
+    font-size: 38px;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.15s ease,
+        color 0.15s ease;
+}
+
+.estrela {
+    color: #d6ddd7;
+}
+
+.estrelaSelecionada {
+    color: #e2b84b;
+}
+
+.estrela:hover,
+.estrelaSelecionada:hover {
+    transform: scale(1.12);
+}
+
+.textoNota {
+    color: #718074;
+    font-size: 13px;
+}
+
+/* =====================================================
+   OPÇÃO ANÔNIMO
+   ===================================================== */
+
+.opcaoAnonimo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    color: #4d5b50;
+
+    font-size: 14px;
+
+    cursor: pointer;
+}
+
+.opcaoAnonimo input {
+    width: 17px;
+    height: 17px;
+
+    accent-color: #7c9d82;
+
+    cursor: pointer;
+}
+
+/* =====================================================
+   BOTÃO ENVIAR
+   ===================================================== */
+
+.botaoEnviarAvaliacao {
+    width: 100%;
+    height: 50px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: #8fb394;
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.15s ease,
+        box-shadow 0.2s ease;
+}
+
+.botaoEnviarAvaliacao:hover:not(:disabled) {
+    background: #789d7e;
+
+    box-shadow:
+        0 5px 15px rgba(
+            95,
+            125,
+            100,
+            0.2
+        );
+
+    transform: translateY(-1px);
+}
+
+.botaoEnviarAvaliacao:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.botaoEnviarAvaliacao:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+/* =====================================================
+   MENSAGENS
+   ===================================================== */
+
+.mensagemErroAvaliacao {
+    margin-bottom: 20px;
+
+    padding: 13px 15px;
+
+    border: 1px solid #efcaca;
+    border-radius: 10px;
+
+    background: #fff3f3;
+    color: #a33d3d;
+
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.mensagemSucessoAvaliacao {
+    margin-bottom: 20px;
+
+    padding: 13px 15px;
+
+    border: 1px solid #c8dfcc;
+    border-radius: 10px;
+
+    background: #eff8f0;
+    color: #47734d;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    line-height: 1.4;
+}
+
+/* =====================================================
+   BOTÃO CRIAR AVALIAÇÃO NO PERFIL
+   ===================================================== */
+
+.botaoCriarAvaliacao {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    border: none;
+    border-radius: 9px;
+
+    padding: 9px 14px;
+
+    background: #8fb394;
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.15s ease;
+}
+
+.botaoCriarAvaliacao:hover {
+    background: #789d7e;
+    transform: translateY(-1px);
+}
+
+.iconeBotaoAvaliacao {
+    font-size: 18px;
+    line-height: 1;
+}
+
+/* =====================================================
+   RESPONSIVIDADE
+   ===================================================== */
+
+@media (max-width: 600px) {
+    .avaliacaoPagina {
+        padding: 20px 12px;
+    }
+
+    .avaliacaoContainer {
+        padding: 25px 20px;
+        border-radius: 15px;
+    }
+
+    .cabecalhoAvaliacao h1 {
+        font-size: 24px;
+    }
+
+    .iconeAvaliacaoGrande {
+        width: 60px;
+        height: 60px;
+        font-size: 28px;
+    }
+
+    .estrela,
+    .estrelaSelecionada {
+        font-size: 34px;
+    }
+}

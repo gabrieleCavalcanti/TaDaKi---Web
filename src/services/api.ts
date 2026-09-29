@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:8000";
+export const BASE_URL = "http://localhost:3000";
 // const BASE_URL = "http://192.168.0.109:3000";
 
 // Essa é uma função "generica" nós vamos enviar o tipo na hora da requisição, caso não seja informado o tipo ela vai utilizar qualquer um.

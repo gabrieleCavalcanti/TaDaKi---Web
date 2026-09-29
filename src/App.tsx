@@ -1,51 +1,78 @@
 import React from "react";
 
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-
-// import { Navbar } from "./components/Navbar";
+import {
+    BrowserRouter,
+    Routes,
+    Route,
+    Navigate,
+} from "react-router-dom";
 
 import { Login } from "./pages/Login";
-
 import { Home } from "./pages/Home";
-
 import { Cadastro } from "./pages/Cadastro";
-
-// import { AuthProvider } from "./context/AuthContext";
+import Perfil from "./pages/Perfil";
 
 import { PrivateRoute } from "./components/PrivateRoute";
 
 export const App: React.FC = () => {
     return (
         <BrowserRouter>
-
-            {/* <AuthProvider> */}
-
-            {/* <Navbar /> */}
-
             <Routes>
 
-                {/* Rota Pública */}
-                <Route path="/login" element={<Login />} />
+                {/* =========================
+                    ROTAS PÚBLICAS
+                ========================= */}
 
-                <Route path="/cadastro" element={<Cadastro />} />
+                <Route
+                    path="/login"
+                    element={<Login />}
+                />
+
+                <Route
+                    path="/cadastro"
+                    element={<Cadastro />}
+                />
+
+                {/* PERFIL - SEM AUTENTICAÇÃO */}
+                <Route
+                    path="/perfil"
+                    element={<Perfil />}
+                />
+
+                {/* Perfil com ID - caso queira testar depois */}
+                <Route
+                    path="/perfil/:id_pessoa"
+                    element={<Perfil />}
+                />
 
 
-                {/* Rotas Privadas */}
+                {/* =========================
+                    ROTAS PRIVADAS
+                ========================= */}
+
                 <Route element={<PrivateRoute />}>
-                    <Route path="/" element={<Home />} />
+                    <Route
+                        path="/"
+                        element={<Home />}
+                    />
                 </Route>
 
 
-                {/* Rota Fallback */}
+                {/* =========================
+                    FALLBACK
+                ========================= */}
+
                 <Route
                     path="*"
-                    element={<Navigate to="/" replace />}
+                    element={
+                        <Navigate
+                            to="/perfil"
+                            replace
+                        />
+                    }
                 />
 
             </Routes>
-
-            {/* </AuthProvider> */}
-
         </BrowserRouter>
     );
 };
