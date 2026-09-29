@@ -65,12 +65,6 @@ export default function PerfilScreen() {
 
     const idPessoa = Number(id_pessoa);
 
-    /*
-     * =====================================================
-     * STATES
-     * =====================================================
-     */
-
     const [organizacao, setOrganizacao] =
         useState<IOrganizacao | null>(null);
 
@@ -107,10 +101,6 @@ export default function PerfilScreen() {
     const avaliacoesRef =
         useRef<HTMLDivElement | null>(null);
 
-    /*
-     * USEMEMO
-     */
-
     const media = useMemo(
         () =>
             calcularMediaAvaliacoes(
@@ -139,15 +129,6 @@ export default function PerfilScreen() {
         carregarDados();
     }, [id_pessoa]);
 
-    /*
-     * =====================================================
-     * SCROLL COM USEREF
-     * =====================================================
-     *
-     * Quando a aba muda, usamos a ref correspondente
-     * para levar o usuário até o conteúdo.
-     */
-
     useEffect(() => {
         const refs = {
             inicio: inicioRef,
@@ -167,21 +148,10 @@ export default function PerfilScreen() {
         }
     }, [abaSelecionada]);
 
-    /*
-     * =====================================================
-     * CARREGAR TODOS OS DADOS
-     * =====================================================
-     */
-
     async function carregarDados() {
         try {
             setLoading(true);
             setErro("");
-
-            console.log(
-                "📡 Carregando perfil da organização:",
-                idPessoa
-            );
 
             const pessoa =
                 await buscarPessoaPorId();
@@ -221,7 +191,7 @@ export default function PerfilScreen() {
             ]);
         } catch (error) {
             console.error(
-                "❌ Erro ao carregar perfil:",
+                "Erro ao carregar perfil:",
                 error
             );
 
@@ -242,19 +212,8 @@ export default function PerfilScreen() {
         setAvaliacoes([]);
     }
 
-    /*
-     * =====================================================
-     * BUSCAR PESSOA POR ID
-     * =====================================================
-     */
-
     async function buscarPessoaPorId(): Promise<IPessoa | null> {
         try {
-            console.log(
-                "📡 Buscando:",
-                `${BASE_URL}/pessoas/${idPessoa}`
-            );
-
             const resposta =
                 await fetch(
                     `${BASE_URL}/pessoas/${idPessoa}`,
@@ -266,11 +225,6 @@ export default function PerfilScreen() {
             if (resposta.ok) {
                 const data =
                     await resposta.json();
-
-                console.log(
-                    "✅ Pessoa encontrada por ID:",
-                    data
-                );
 
                 const pessoa =
                     data?.pessoa ||
@@ -294,9 +248,7 @@ export default function PerfilScreen() {
                     [];
 
                 if (
-                    Array.isArray(
-                        lista
-                    )
+                    Array.isArray(lista)
                 ) {
                     return (
                         lista.find(
@@ -310,23 +262,14 @@ export default function PerfilScreen() {
                     );
                 }
             }
-
-            console.log(
-                "⚠️ Endpoint /pessoas/:id não retornou a pessoa. Usando fallback."
-            );
         } catch (error) {
             console.warn(
-                "⚠️ Erro ao buscar /pessoas/:id. Tentando /pessoas...",
+                "Erro ao buscar pessoa:",
                 error
             );
         }
 
         try {
-            console.log(
-                "📡 Fallback:",
-                `${BASE_URL}/pessoas`
-            );
-
             const resposta =
                 await fetch(
                     `${BASE_URL}/pessoas`,
@@ -344,11 +287,6 @@ export default function PerfilScreen() {
             const data =
                 await resposta.json();
 
-            console.log(
-                "✅ Pessoas recebidas:",
-                data
-            );
-
             const lista =
                 data?.pessoas ||
                 data?.funcionarios ||
@@ -360,35 +298,23 @@ export default function PerfilScreen() {
                 return null;
             }
 
-            const pessoa =
+            return (
                 lista.find(
                     (item: IPessoa) =>
                         Number(
                             item.id_pessoa
                         ) === idPessoa
-                ) || null;
-
-            console.log(
-                "🔎 Pessoa encontrada:",
-                pessoa
+                ) || null
             );
-
-            return pessoa;
         } catch (error) {
             console.error(
-                "❌ Erro ao buscar pessoa:",
+                "Erro ao buscar pessoa:",
                 error
             );
 
             return null;
         }
     }
-
-    /*
-     * =====================================================
-     * CARREGAR ORGANIZAÇÃO
-     * =====================================================
-     */
 
     async function carregarOrganizacao(
         pessoa: IPessoa
@@ -500,7 +426,7 @@ export default function PerfilScreen() {
             }
         } catch (error) {
             console.error(
-                "❌ Erro ao buscar organização:",
+                "Erro ao buscar organização:",
                 error
             );
 
@@ -511,12 +437,6 @@ export default function PerfilScreen() {
             setCategoria(NA);
         }
     }
-
-    /*
-     * =====================================================
-     * CATEGORIA / ÁREA DE ATUAÇÃO
-     * =====================================================
-     */
 
     async function carregarCategoria(
         idArea: number
@@ -551,7 +471,7 @@ export default function PerfilScreen() {
             );
         } catch (error) {
             console.error(
-                "❌ Erro ao buscar área de atuação:",
+                "Erro ao buscar área de atuação:",
                 error
             );
 
@@ -559,19 +479,8 @@ export default function PerfilScreen() {
         }
     }
 
-    /*
-     * =====================================================
-     * AVALIAÇÕES
-     * =====================================================
-     */
-
     async function carregarAvaliacoes() {
         try {
-            console.log(
-                "⭐ Buscando avaliações da organização:",
-                idPessoa
-            );
-
             const resultado =
                 await buscarAvaliacoesPorOrganizacao(
                     idPessoa
@@ -582,7 +491,7 @@ export default function PerfilScreen() {
             );
         } catch (error) {
             console.error(
-                "❌ Erro ao buscar avaliações:",
+                "Erro ao buscar avaliações:",
                 error
             );
 
@@ -590,28 +499,12 @@ export default function PerfilScreen() {
         }
     }
 
-    /*
-     * =====================================================
-     * POSTS
-     * =====================================================
-     */
-
     async function carregarPosts() {
         try {
             setLoadingPosts(true);
 
-            console.log(
-                "📰 ID usado para buscar posts:",
-                idPessoa
-            );
-
             const url =
                 `${BASE_URL}/posts/organizacao?id_organizacao=${idPessoa}`;
-
-            console.log(
-                "🌐 URL dos posts:",
-                url
-            );
 
             const resposta =
                 await fetch(
@@ -622,11 +515,6 @@ export default function PerfilScreen() {
                     }
                 );
 
-            console.log(
-                "📡 Status:",
-                resposta.status
-            );
-
             if (!resposta.ok) {
                 throw new Error(
                     `Erro HTTP ${resposta.status}`
@@ -636,18 +524,8 @@ export default function PerfilScreen() {
             const data =
                 await resposta.json();
 
-            console.log(
-                "📦 Posts recebidos:",
-                data
-            );
-
             const listaPosts =
                 data?.posts || [];
-
-            console.log(
-                "📰 Lista final:",
-                listaPosts
-            );
 
             setPosts(
                 Array.isArray(
@@ -658,7 +536,7 @@ export default function PerfilScreen() {
             );
         } catch (error) {
             console.error(
-                "❌ Erro ao buscar posts:",
+                "Erro ao buscar posts:",
                 error
             );
 
@@ -667,12 +545,6 @@ export default function PerfilScreen() {
             setLoadingPosts(false);
         }
     }
-
-    /*
-     * =====================================================
-     * IMAGEM
-     * =====================================================
-     */
 
     function obterUrlImagem(
         nome?: string
@@ -708,35 +580,17 @@ export default function PerfilScreen() {
         return `${BASE_URL}/images/${nomeArquivo}`;
     }
 
-    /*
-     * =====================================================
-     * CRIAR AVALIAÇÃO
-     * =====================================================
-     */
-
     function criarAvaliacao() {
         navigate(
             `/criar-avaliacao/${idPessoa}`
         );
     }
 
-    /*
-     * =====================================================
-     * MUDAR ABA
-     * =====================================================
-     */
-
     function mudarAba(
         aba: Aba
     ) {
         setAbaSelecionada(aba);
     }
-
-    /*
-     * =====================================================
-     * LOADING
-     * =====================================================
-     */
 
     function Loading({
         texto,
@@ -754,12 +608,6 @@ export default function PerfilScreen() {
         );
     }
 
-    /*
-     * =====================================================
-     * SEM POSTS
-     * =====================================================
-     */
-
     function SemPosts({
         grande = false,
     }: {
@@ -773,22 +621,12 @@ export default function PerfilScreen() {
                         : "semPosts"
                 }
             >
-                <span className="iconeSemPosts">
-                    📰
-                </span>
-
                 <span className="semPostsTexto">
                     Nenhum post publicado.
                 </span>
             </div>
         );
     }
-
-    /*
-     * =====================================================
-     * POST CARD
-     * =====================================================
-     */
 
     function PostCard({
         post,
@@ -815,9 +653,7 @@ export default function PerfilScreen() {
                         }
                     />
                 ) : (
-                    <div className="imagemPostSemImagem">
-                        🖼️
-                    </div>
+                    <div className="imagemPostSemImagem" />
                 )}
 
                 <div className="conteudoPost">
@@ -835,12 +671,6 @@ export default function PerfilScreen() {
             </button>
         );
     }
-
-    /*
-     * =====================================================
-     * BOTÃO ABA
-     * =====================================================
-     */
 
     function BotaoAba({
         aba,
@@ -871,12 +701,6 @@ export default function PerfilScreen() {
         );
     }
 
-    /*
-     * =====================================================
-     * BOTÃO CRIAR AVALIAÇÃO
-     * =====================================================
-     */
-
     function BotaoCriarAvaliacao() {
         return (
             <button
@@ -896,12 +720,6 @@ export default function PerfilScreen() {
             </button>
         );
     }
-
-    /*
-     * =====================================================
-     * ESTATÍSTICA
-     * =====================================================
-     */
 
     function Estatistica({
         icon,
@@ -929,12 +747,6 @@ export default function PerfilScreen() {
         );
     }
 
-    /*
-     * =====================================================
-     * INFO LINHA
-     * =====================================================
-     */
-
     function InfoLinha({
         icon,
         texto,
@@ -955,18 +767,12 @@ export default function PerfilScreen() {
         );
     }
 
-    /*
-     * =====================================================
-     * ABA INÍCIO
-     * =====================================================
-     */
-
     function AbaInicio() {
         return (
             <div>
                 <div className="estatisticas">
                     <Estatistica
-                        icon="♡"
+                        icon=""
                         numero="0"
                         texto="Favoritado"
                     />
@@ -974,7 +780,7 @@ export default function PerfilScreen() {
                     <div className="divisor" />
 
                     <Estatistica
-                        icon="📰"
+                        icon=""
                         numero={String(
                             posts.length
                         )}
@@ -984,7 +790,7 @@ export default function PerfilScreen() {
                     <div className="divisor" />
 
                     <Estatistica
-                        icon="☆"
+                        icon=""
                         numero={String(
                             media
                         )}
@@ -1042,10 +848,6 @@ export default function PerfilScreen() {
                 {avaliacoes.length ===
                     0 && (
                     <div className="semAvaliacoesContainer">
-                        <span className="iconeSemAvaliacao">
-                            ☆
-                        </span>
-
                         <span className="semAvaliacoes">
                             Nenhuma avaliação
                             encontrada.
@@ -1092,12 +894,6 @@ export default function PerfilScreen() {
         );
     }
 
-    /*
-     * =====================================================
-     * LOADING DA PÁGINA
-     * =====================================================
-     */
-
     if (loading) {
         return (
             <div className="container">
@@ -1109,12 +905,6 @@ export default function PerfilScreen() {
             </div>
         );
     }
-
-    /*
-     * =====================================================
-     * ERRO
-     * =====================================================
-     */
 
     if (
         erro ||
@@ -1141,17 +931,6 @@ export default function PerfilScreen() {
                                 "center",
                         }}
                     >
-                        <div
-                            style={{
-                                fontSize:
-                                    "50px",
-                                marginBottom:
-                                    "15px",
-                            }}
-                        >
-                            🏢
-                        </div>
-
                         <h2>
                             {erro ||
                                 "Organização não encontrada"}
@@ -1181,19 +960,13 @@ export default function PerfilScreen() {
                                     "700",
                             }}
                         >
-                            ← Voltar para Home
+                            Voltar para Home
                         </button>
                     </div>
                 </div>
             </div>
         );
     }
-
-    /*
-     * =====================================================
-     * PÁGINA
-     * =====================================================
-     */
 
     return (
         <div className="container">
@@ -1212,9 +985,7 @@ export default function PerfilScreen() {
                     </button>
 
                     <div className="perfil">
-                        <div className="avatar">
-                            🏪
-                        </div>
+                        <div className="avatar" />
 
                         <div className="informacoes">
                             <h1 className="nomeLoja">
@@ -1227,12 +998,12 @@ export default function PerfilScreen() {
                             </span>
 
                             <InfoLinha
-                                icon="📍"
+                                icon=""
                                 texto={NA}
                             />
 
                             <InfoLinha
-                                icon="☎"
+                                icon=""
                                 texto={NA}
                             />
                         </div>
@@ -1265,12 +1036,6 @@ export default function PerfilScreen() {
 
                     <div className="linha" />
 
-                    {/*
-                     * =================================================
-                     * ABA INÍCIO
-                     * =================================================
-                     */}
-
                     {abaSelecionada ===
                         "inicio" && (
                         <div
@@ -1280,12 +1045,6 @@ export default function PerfilScreen() {
                             <AbaInicio />
                         </div>
                     )}
-
-                    {/*
-                     * =================================================
-                     * ABA PERFIL
-                     * =================================================
-                     */}
 
                     {abaSelecionada ===
                         "perfil" && (
@@ -1300,7 +1059,7 @@ export default function PerfilScreen() {
                             <div className="cardInformacoes">
 
                                 <InfoLinha
-                                    icon="🏪"
+                                    icon=""
                                     texto={
                                         organizacao.nome ||
                                         NA
@@ -1308,14 +1067,14 @@ export default function PerfilScreen() {
                                 />
 
                                 <InfoLinha
-                                    icon="🏷️"
+                                    icon=""
                                     texto={
                                         categoria
                                     }
                                 />
 
                                 <InfoLinha
-                                    icon="📄"
+                                    icon=""
                                     texto={
                                         organizacao.cnpj ||
                                         organizacao.cpf ||
@@ -1324,7 +1083,7 @@ export default function PerfilScreen() {
                                 />
 
                                 <InfoLinha
-                                    icon="📅"
+                                    icon=""
                                     texto={
                                         organizacao.data_criacao ||
                                         NA
@@ -1332,24 +1091,18 @@ export default function PerfilScreen() {
                                 />
 
                                 <InfoLinha
-                                    icon="📍"
+                                    icon=""
                                     texto={NA}
                                 />
 
                                 <InfoLinha
-                                    icon="☎"
+                                    icon=""
                                     texto={NA}
                                 />
 
                             </div>
                         </div>
                     )}
-
-                    {/*
-                     * =================================================
-                     * ABA POSTS
-                     * =================================================
-                     */}
 
                     {abaSelecionada ===
                         "posts" && (
@@ -1385,12 +1138,6 @@ export default function PerfilScreen() {
                         </div>
                     )}
 
-                    {/*
-                     * =================================================
-                     * ABA AVALIAÇÕES
-                     * =================================================
-                     */}
-
                     {abaSelecionada ===
                         "avaliacoes" && (
                         <div
@@ -1410,10 +1157,6 @@ export default function PerfilScreen() {
                                 </div>
 
                                 <div className="mediaAvaliacao">
-                                    <span>
-                                        ☆
-                                    </span>
-
                                     <strong>
                                         {
                                             media
@@ -1426,10 +1169,6 @@ export default function PerfilScreen() {
                             {avaliacoes.length ===
                             0 ? (
                                 <div className="semAvaliacoesContainer">
-                                    <span className="iconeSemAvaliacao">
-                                        ☆
-                                    </span>
-
                                     <span className="semAvaliacoes">
                                         Nenhuma avaliação encontrada.
                                     </span>
@@ -1488,10 +1227,6 @@ export default function PerfilScreen() {
                                             </div>
 
                                             <div className="nota">
-                                                <span>
-                                                    ★
-                                                </span>
-
                                                 {
                                                     avaliacao.csat
                                                 }
