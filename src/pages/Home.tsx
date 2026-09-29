@@ -1,369 +1,849 @@
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import { Heart, Menu, Plus, Search, X } from "lucide-react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Heart, ImagePlus, Menu, Plus, Search, Star, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/Logo.png";
-import { EmptyState } from "../components/feed/EmptyState";
-import { PostCard } from "../components/feed/PostCard";
-import type {
-  PostRegistro,
-  UsuarioLogado,
-} from "../components/feed/types";
-import { useAuth } from "../hooks/useAuth";
-import { apiFetch, getProfilePhoto } from "../services/api";
 import "../css/Feed.css";
+import { useAuth } from "../hooks/useAuth";
+import { apiFetch, getImageUrl } from "../services/api";
 
-export function Home() {
-  const navigate = useNavigate();
-  const { logout } = useAuth();
+type Post = {
+    id_post: number;
+    vincularImagem?: string | null;
+    titulo: string;
+    descricao?: string | null;
+    id_categoria: number;
+    id_organizacao: number;
+    nome_organizacao?: string;
+    foto_organizacao?: string | null;
+};
 
-  const [posts, setPosts] = useState<PostRegistro[]>([]);
-  const [search, setSearch] = useState("");
-  const [likedIds, setLikedIds] = useState<number[]>([]);
-  const [likeTotals, setLikeTotals] = useState<Record<number, number>>({});
-  const [user, setUser] = useState<UsuarioLogado | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [menuOpen, setMenuOpen] = useState(false);
+type Pessoa = {
+    id_pessoa?: number;
+    nome?: string;
+    tipo?: string;
+    foto?: string | null;
+    foto_perfil?: string | null;
+    imagem_perfil?: string | null;
+    imagem?: string | null;
+    avatar?: string | null;
+};
 
-  // useRef: foco direto no campo sem causar nova renderização.
-  const searchInputRef = useRef<HTMLInputElement>(null);
-  // useRef: evita atualizar estado se a tela já tiver sido desmontada.
-  const mountedRef = useRef(true);
+type Categoria = {
+    id_categoria: number;
+    descricao: string;
+};
 
-  useEffect(() => {
-    return () => {
-      mountedRef.current = false;
-    };
-  }, []);
+type LikeState = {
+    curtiu: boolean;
+    total: number;
+};
 
-  // useCallback: a função é reutilizada pelo efeito e pelo botão "Tentar novamente".
-  const loadFeed = useCallback(async () => {
-    setLoading(true);
-    setError("");
+type FavoritoState = {
+    favoritado: boolean;
+    id_favorito?: number;
+};
 
-    try {
-      const [meResponse, postsResponse, likesResponse, orgResponse] = await Promise.all([
-        apiFetch<{ user: UsuarioLogado }>("/auth/me"),
-        apiFetch<{ posts: PostRegistro[] }>("/posts"),
-        apiFetch<{ likes: Array<{ id_post: number }> }>("/likes/meus"),
-        apiFetch<any>("/pessoas?tipo=ORGANIZACAO"),
-      ]);
-
-      const organizations =
-        orgResponse?.funcionarios ?? orgResponse?.pessoas ?? orgResponse?.data ?? [];
-      const organizationMap = new Map(
-        organizations.map((org: any) => [Number(org.id_pessoa), org]),
-      );
-
-      const receivedPosts = (postsResponse?.posts ?? []).map((post) => {
-        const org: any = organizationMap.get(Number(post.id_organizacao));
-        return {
-          ...post,
-          id_pessoa_organizacao: Number(org?.id_pessoa ?? post.id_organizacao),
-          nome_organizacao: org?.nome ?? post.nome_organizacao,
-          foto_organizacao:
-            org?.foto ?? org?.foto_perfil ?? org?.imagem_perfil ??
-            org?.imagem ?? org?.avatar ?? post.foto_organizacao,
-        };
-      });
-
-      let completeUser: UsuarioLogado = meResponse?.user ?? ({} as UsuarioLogado);
-      if (completeUser?.id_pessoa_login) {
-        try {
-          const personResponse = await apiFetch<any>(
-            `/pessoas?id=${completeUser.id_pessoa_login}`,
-          );
-          const person = personResponse?.pessoaId?.[0];
-          if (person) {
-            completeUser = {
-              ...completeUser,
-              nome: person.nome ?? completeUser.username,
-              foto:
-                person.foto ?? person.foto_perfil ?? person.imagem_perfil ??
-                person.imagem ?? person.avatar ?? null,
-            };
-          }
-        } catch {}
-      }
-
-      const totals = await Promise.all(
-        receivedPosts.map(async (post) => {
-          try {
-            const response = await apiFetch<{ total: number }>(
-              `/likes/contar?id_post=${post.id_post}`,
-            );
-            return [post.id_post, Number(response.total) || 0] as const;
-          } catch {
-            return [post.id_post, 0] as const;
-          }
-        }),
-      );
-
-      if (!mountedRef.current) return;
-
-      setUser(completeUser ?? null);
-      setPosts(receivedPosts);
-      setLikedIds(
-        (likesResponse?.likes ?? []).map((like) => Number(like.id_post)),
-      );
-      setLikeTotals(Object.fromEntries(totals));
-    } catch (requestError) {
-      if (!mountedRef.current) return;
-      setError(
-        requestError instanceof Error
-          ? requestError.message
-          : "Não foi possível carregar as publicações.",
-      );
-    } finally {
-      if (mountedRef.current) setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    void loadFeed();
-  }, [loadFeed]);
-
-  // useCallback: mantém o handler estável ao ser enviado para cada PostCard.
-  const handleLike = useCallback(async (idPost: number) => {
-    try {
-      const response = await apiFetch<{
-        curtiu: boolean;
-        totalLikes: number;
-      }>("/likes/toggle", {
-        method: "POST",
-        body: JSON.stringify({ id_post: idPost }),
-      });
-
-      setLikedIds((current) =>
-        response.curtiu
-          ? current.includes(idPost)
-            ? current
-            : [...current, idPost]
-          : current.filter((id) => id !== idPost),
-      );
-
-      setLikeTotals((current) => ({
-        ...current,
-        [idPost]: Number(response.totalLikes) || 0,
-      }));
-    } catch (requestError) {
-      window.alert(
-        requestError instanceof Error
-          ? requestError.message
-          : "Não foi possível registrar a curtida.",
-      );
-    }
-  }, []);
-
-  const clearSearch = useCallback(() => {
-    setSearch("");
-    searchInputRef.current?.focus();
-  }, []);
-
-  // useMemo: busca e contagem só são recalculadas quando posts/search mudam.
-  const filteredPosts = useMemo(() => {
-    const term = search.toLowerCase().trim();
-
-    if (!term) return posts;
-
-    return posts.filter((post) =>
-      `${post.titulo} ${post.descricao ?? ""}`
-        .toLowerCase()
-        .includes(term),
-    );
-  }, [posts, search]);
-
-  const normalizedUserType = useMemo(
-    () =>
-      String(user?.tipo ?? "")
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toUpperCase()
-        .trim(),
-    [user?.tipo],
-  );
-
-  const canCreatePost = normalizedUserType === "ORGANIZACAO";
-
-  const handleLogout = useCallback(async () => {
-    await logout();
-    navigate("/login");
-  }, [logout, navigate]);
-
-  return (
-    <main className="feed-page">
-      <header className="feed-header">
-        <img className="feed-logo" src={logo} alt="TaDaKi" />
-
-        <div className="feed-header__actions">
-          <button
-            type="button"
-            className="user-profile-button"
-            title="Meu perfil"
-            aria-label="Abrir meu perfil"
-            onClick={() => user?.id_pessoa_login && navigate(`/perfil/${user.id_pessoa_login}`)}
-          >
-            <div className="org-avatar">
-              {getProfilePhoto(user) ? (
-                <img src={getProfilePhoto(user)} alt="" />
-              ) : (
-                <span>{(user?.nome || user?.username || "U").charAt(0).toUpperCase()}</span>
-              )}
-            </div>
-          </button>
-          {canCreatePost && (
-            <button
-              type="button"
-              className="icon-button icon-button--green"
-              title="Criar publicação"
-              aria-label="Criar publicação"
-              onClick={() =>
-                window.alert(
-                  "Perfil de organização identificado. A criação de post está habilitada.",
-                )
-              }
-            >
-              <Plus size={22} />
-            </button>
-          )}
-
-          <button
-            type="button"
-            className="icon-button"
-            title="Abrir menu"
-            aria-label="Abrir menu"
-            onClick={() => setMenuOpen(true)}
-          >
-            <Menu size={22} />
-          </button>
-        </div>
-      </header>
-
-      <section className="feed-shell">
-        <div className="feed-hero">
-          <div>
-            <p className="feed-eyebrow">Comunidade TaDaKi</p>
-            <h1>Olá, {user?.nome || user?.username || "usuário"}!</h1>
-            <p>Descubra as publicações mais recentes das organizações.</p>
-          </div>
-        </div>
-
-        <div className="feed-toolbar">
-          <label className="search-field">
-            <Search size={20} color="#6d7782" />
-            <input
-              ref={searchInputRef}
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Buscar por título ou descrição..."
-              aria-label="Buscar publicações"
-            />
-            {search && (
-              <button
-                type="button"
-                className="clear-search"
-                onClick={clearSearch}
-                aria-label="Limpar busca"
-              >
-                <X size={18} />
-              </button>
-            )}
-          </label>
-
-          <span className="result-count">
-            {filteredPosts.length}{" "}
-            {filteredPosts.length === 1 ? "publicação" : "publicações"}
-          </span>
-        </div>
-
-        {loading ? (
-          <EmptyState
-            title="Carregando publicações"
-            description="Buscando os dados mais recentes da API."
-          />
-        ) : error ? (
-          <EmptyState
-            title="Não foi possível carregar o feed"
-            description={error}
-            actionLabel="Tentar novamente"
-            onAction={() => void loadFeed()}
-          />
-        ) : filteredPosts.length === 0 ? (
-          <EmptyState
-            icon={<Search size={42} />}
-            title={search ? "Nenhum resultado encontrado" : "Nenhuma publicação disponível"}
-            description={
-              search
-                ? "Tente pesquisar usando outras palavras."
-                : "Quando houver novas publicações, elas aparecerão aqui."
-            }
-            actionLabel={search ? "Limpar busca" : undefined}
-            onAction={search ? clearSearch : undefined}
-          />
-        ) : (
-          <div className="post-list">
-            {filteredPosts.map((post) => (
-              <PostCard
-                key={post.id_post}
-                post={post}
-                liked={likedIds.includes(post.id_post)}
-                likeCount={likeTotals[post.id_post] ?? 0}
-                onLike={handleLike}
-                onOpenOrganization={(id) => navigate(`/perfil/${id}`)}
-              />
-            ))}
-          </div>
-        )}
-      </section>
-
-      {menuOpen && (
-        <div
-          className="menu-overlay"
-          role="presentation"
-          onMouseDown={(event) => {
-            if (event.currentTarget === event.target) setMenuOpen(false);
-          }}
-        >
-          <aside className="menu-panel" aria-label="Menu principal">
-            <div className="menu-panel__top">
-              <strong>Menu</strong>
-              <button
-                type="button"
-                onClick={() => setMenuOpen(false)}
-                aria-label="Fechar menu"
-              >
-                <X size={22} />
-              </button>
-            </div>
-            <nav>
-              <button type="button" onClick={() => navigate("/")}>
-                Início
-              </button>
-              <button
-                type="button"
-                onClick={() => user?.id_pessoa_login && navigate(`/perfil/${user.id_pessoa_login}`)}
-              >
-                Meu perfil
-              </button>
-              <button type="button" onClick={() => navigate("/likes")}>
-                Curtidos
-              </button>
-              <button type="button" onClick={() => navigate("/favoritos")}>
-                Favoritos
-              </button>
-              <button type="button" onClick={() => void handleLogout()}>
-                Sair
-              </button>
-            </nav>
-          </aside>
-        </div>
-      )}
-    </main>
-  );
+function fotoPessoa(pessoa?: Pessoa | null) {
+    return pessoa?.foto ?? pessoa?.foto_perfil ?? pessoa?.imagem_perfil ?? pessoa?.imagem ?? pessoa?.avatar ?? null;
 }
+
+export const Home: React.FC = () => {
+    const navigate = useNavigate();
+    const { user, loading: authLoading, logout } = useAuth();
+
+    const [posts, setPosts] = useState<Post[]>([]);
+    const [loadingPosts, setLoadingPosts] = useState(true);
+    const [erro, setErro] = useState("");
+    const [busca, setBusca] = useState("");
+    const [menuAberto, setMenuAberto] = useState(false);
+    const [modalPostAberto, setModalPostAberto] = useState(false);
+    const [usuarioCompleto, setUsuarioCompleto] = useState<Pessoa | null>(null);
+    const [categorias, setCategorias] = useState<Categoria[]>([]);
+    const [loadingCategorias, setLoadingCategorias] = useState(false);
+    const [titulo, setTitulo] = useState("");
+    const [descricao, setDescricao] = useState("");
+    const [categoriaSelecionada, setCategoriaSelecionada] = useState<number | null>(null);
+    const [imagem, setImagem] = useState<File | null>(null);
+    const [previewImagem, setPreviewImagem] = useState("");
+    const [publicando, setPublicando] = useState(false);
+    const [erroPublicacao, setErroPublicacao] = useState("");
+    const [likes, setLikes] = useState<Record<number, LikeState>>({});
+    const [favoritos, setFavoritos] = useState<Record<number, FavoritoState>>({});
+
+    const buscaRef = useRef<HTMLInputElement>(null);
+    const imagemRef = useRef<HTMLInputElement>(null);
+
+    const idPessoaLogada =
+        Number((user as any)?.id_pessoa_login) ||
+        Number((user as any)?.id_pessoa) ||
+        Number((user as any)?.id) ||
+        0;
+
+    const tipoUsuario = useMemo(() => {
+        return String((user as any)?.tipo ?? usuarioCompleto?.tipo ?? "")
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toUpperCase()
+            .trim();
+    }, [user, usuarioCompleto]);
+
+    const podeCriarPost = tipoUsuario === "ORGANIZACAO";
+
+    const carregarPosts = useCallback(async () => {
+        setLoadingPosts(true);
+        setErro("");
+
+        try {
+            const resposta = await apiFetch<any>("/posts");
+            const lista: Post[] = Array.isArray(resposta?.posts)
+                ? resposta.posts
+                : Array.isArray(resposta)
+                  ? resposta
+                  : [];
+
+            setPosts(lista);
+
+            try {
+                const respostaPessoas = await apiFetch<any>("/pessoas?tipo=ORGANIZACAO");
+                const organizacoes: Pessoa[] =
+                    respostaPessoas?.funcionarios ??
+                    respostaPessoas?.pessoas ??
+                    respostaPessoas?.data ??
+                    [];
+
+                if (Array.isArray(organizacoes)) {
+                    const mapa = new Map<number, Pessoa>();
+
+                    organizacoes.forEach((org) => {
+                        if (org.id_pessoa) {
+                            mapa.set(Number(org.id_pessoa), org);
+                        }
+                    });
+
+                    setPosts(
+                        lista.map((post) => {
+                            const org = mapa.get(Number(post.id_organizacao));
+
+                            return {
+                                ...post,
+                                nome_organizacao:
+                                    org?.nome ??
+                                    post.nome_organizacao ??
+                                    `Organização ${post.id_organizacao}`,
+                                foto_organizacao:
+                                    fotoPessoa(org) ??
+                                    post.foto_organizacao ??
+                                    null,
+                            };
+                        })
+                    );
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        } catch (error) {
+            console.error(error);
+            setPosts([]);
+            setErro(
+                error instanceof Error
+                    ? error.message
+                    : "Não foi possível carregar as publicações."
+            );
+        } finally {
+            setLoadingPosts(false);
+        }
+    }, []);
+
+    const carregarCategorias = useCallback(async () => {
+        setLoadingCategorias(true);
+
+        try {
+            const resposta = await apiFetch<any>("/categorias");
+            const lista: Categoria[] = Array.isArray(resposta?.categorias)
+                ? resposta.categorias
+                : [];
+
+            setCategorias(lista);
+
+            if (lista.length > 0) {
+                setCategoriaSelecionada((atual) => atual ?? Number(lista[0].id_categoria));
+            }
+        } catch (error) {
+            console.error(error);
+            setErroPublicacao(
+                error instanceof Error
+                    ? error.message
+                    : "Não foi possível carregar as categorias."
+            );
+        } finally {
+            setLoadingCategorias(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        carregarPosts();
+    }, [carregarPosts]);
+
+    useEffect(() => {
+        if (!idPessoaLogada) return;
+
+        apiFetch<any>(`/pessoas?id=${idPessoaLogada}`)
+            .then((resposta) => {
+                const pessoa =
+                    resposta?.pessoaId?.[0] ??
+                    resposta?.pessoa ??
+                    resposta?.data?.[0] ??
+                    null;
+
+                setUsuarioCompleto(pessoa);
+            })
+            .catch((error) => console.error(error));
+    }, [idPessoaLogada]);
+
+    useEffect(() => {
+        if (!modalPostAberto) return;
+        carregarCategorias();
+    }, [modalPostAberto, carregarCategorias]);
+
+    useEffect(() => {
+        if (!imagem) {
+            setPreviewImagem("");
+            return;
+        }
+
+        const url = URL.createObjectURL(imagem);
+        setPreviewImagem(url);
+
+        return () => URL.revokeObjectURL(url);
+    }, [imagem]);
+
+    useEffect(() => {
+        if (posts.length === 0) return;
+
+        Promise.all(
+            posts.map(async (post) => {
+                try {
+                    const [verificacao, contagem] = await Promise.all([
+                        apiFetch<any>(`/likes/verificar?id_post=${post.id_post}`),
+                        apiFetch<any>(`/likes/contar?id_post=${post.id_post}`),
+                    ]);
+
+                    return [
+                        post.id_post,
+                        {
+                            curtiu: Boolean(verificacao?.curtiu),
+                            total: Number(contagem?.total ?? contagem?.totalLikes ?? 0),
+                        },
+                    ] as const;
+                } catch {
+                    return [post.id_post, { curtiu: false, total: 0 }] as const;
+                }
+            })
+        ).then((resultado) => {
+            setLikes(Object.fromEntries(resultado));
+        });
+    }, [posts]);
+
+    const abrirModalPost = () => {
+        setTitulo("");
+        setDescricao("");
+        setCategoriaSelecionada(null);
+        setImagem(null);
+        setErroPublicacao("");
+        setModalPostAberto(true);
+    };
+
+    const fecharModalPost = () => {
+        if (publicando) return;
+        setModalPostAberto(false);
+        setTitulo("");
+        setDescricao("");
+        setCategoriaSelecionada(null);
+        setImagem(null);
+        setErroPublicacao("");
+    };
+
+    const publicar = async (event: React.FormEvent) => {
+        event.preventDefault();
+        setErroPublicacao("");
+
+        if (!titulo.trim()) {
+            setErroPublicacao("Digite o título da publicação.");
+            return;
+        }
+
+        if (!categoriaSelecionada) {
+            setErroPublicacao("Selecione uma categoria.");
+            return;
+        }
+
+        if (!idPessoaLogada) {
+            setErroPublicacao("Não foi possível identificar a organização autenticada.");
+            return;
+        }
+
+        if (!imagem) {
+            setErroPublicacao("Escolha uma imagem para a publicação.");
+            return;
+        }
+
+        if (!["image/png", "image/jpeg"].includes(imagem.type)) {
+            setErroPublicacao("A imagem precisa ser PNG ou JPEG.");
+            return;
+        }
+
+        if (imagem.size > 10 * 1024 * 1024) {
+            setErroPublicacao("A imagem deve ter no máximo 10 MB.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("titulo", titulo.trim());
+        formData.append("descricao", descricao.trim());
+        formData.append("id_categoria", String(categoriaSelecionada));
+        formData.append("id_organizacao", String(idPessoaLogada));
+        formData.append("image", imagem);
+
+        setPublicando(true);
+
+        try {
+            await apiFetch("/posts", {
+                method: "POST",
+                body: formData,
+            });
+
+            setModalPostAberto(false);
+            setTitulo("");
+            setDescricao("");
+            setCategoriaSelecionada(null);
+            setImagem(null);
+            await carregarPosts();
+        } catch (error) {
+            console.error(error);
+            setErroPublicacao(
+                error instanceof Error
+                    ? error.message
+                    : "Não foi possível publicar."
+            );
+        } finally {
+            setPublicando(false);
+        }
+    };
+
+    const alternarLike = useCallback(async (idPost: number) => {
+        try {
+            const resposta = await apiFetch<any>("/likes/toggle", {
+                method: "POST",
+                body: JSON.stringify({ id_post: idPost }),
+            });
+
+            setLikes((atual) => ({
+                ...atual,
+                [idPost]: {
+                    curtiu: Boolean(resposta?.curtiu),
+                    total: Number(
+                        resposta?.totalLikes ??
+                        resposta?.total ??
+                        atual[idPost]?.total ??
+                        0
+                    ),
+                },
+            }));
+        } catch (error) {
+            console.error(error);
+        }
+    }, []);
+
+    const alternarFavorito = useCallback(
+        async (idOrganizacao: number) => {
+            const atual = favoritos[idOrganizacao];
+
+            try {
+                if (atual?.favoritado && atual.id_favorito) {
+                    await apiFetch(`/Favoritos/${atual.id_favorito}`, {
+                        method: "DELETE",
+                    });
+
+                    setFavoritos((estado) => ({
+                        ...estado,
+                        [idOrganizacao]: { favoritado: false },
+                    }));
+
+                    return;
+                }
+
+                if (!idPessoaLogada) return;
+
+                const resposta = await apiFetch<any>("/Favoritos", {
+                    method: "POST",
+                    body: JSON.stringify({
+                        id_cliente: idPessoaLogada,
+                        id_organizacao: idOrganizacao,
+                    }),
+                });
+
+                const idFavorito = Number(
+                    resposta?.novoRegistro?.insertId ??
+                    resposta?.id_favorito ??
+                    resposta?.id ??
+                    0
+                );
+
+                setFavoritos((estado) => ({
+                    ...estado,
+                    [idOrganizacao]: {
+                        favoritado: true,
+                        id_favorito: idFavorito || undefined,
+                    },
+                }));
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        [favoritos, idPessoaLogada]
+    );
+
+    const postsFiltrados = useMemo(() => {
+        const termo = busca.trim().toLowerCase();
+
+        if (!termo) return posts;
+
+        return posts.filter((post) =>
+            [post.titulo, post.descricao, post.nome_organizacao]
+                .filter(Boolean)
+                .join(" ")
+                .toLowerCase()
+                .includes(termo)
+        );
+    }, [posts, busca]);
+
+    const abrirMeuPerfil = useCallback(() => {
+        if (idPessoaLogada) {
+            navigate(`/perfil/${idPessoaLogada}`);
+        }
+    }, [idPessoaLogada, navigate]);
+
+    const sair = useCallback(async () => {
+        await logout();
+        navigate("/login");
+    }, [logout, navigate]);
+
+    const nomeOrganizacao =
+        usuarioCompleto?.nome ??
+        (user as any)?.nome ??
+        (user as any)?.username ??
+        "Organização";
+
+    if (authLoading) {
+        return (
+            <main className="feed-page">
+                <div className="feed-state">
+                    <strong>Carregando...</strong>
+                </div>
+            </main>
+        );
+    }
+
+    return (
+        <main className="feed-page">
+            <header className="feed-header">
+                <img className="feed-logo" src={logo} alt="TaDaKi" />
+
+                <div className="feed-header__actions">
+                    {podeCriarPost && (
+                        <button
+                            type="button"
+                            className="icon-button icon-button--green"
+                            title="Criar publicação"
+                            aria-label="Criar publicação"
+                            onClick={abrirModalPost}
+                        >
+                            <Plus size={22} />
+                        </button>
+                    )}
+
+                    <button
+                        type="button"
+                        className="icon-button"
+                        title="Menu"
+                        aria-label="Abrir menu"
+                        onClick={() => setMenuAberto(true)}
+                    >
+                        <Menu size={22} />
+                    </button>
+                </div>
+            </header>
+
+            <section className="feed-shell">
+                <div className="feed-hero">
+                    <div>
+                        <p className="feed-eyebrow">TaDaKi</p>
+                        <h1>Publicações</h1>
+                        <p>Veja as publicações das organizações.</p>
+                    </div>
+                </div>
+
+                <div className="feed-toolbar">
+                    <label className="search-field">
+                        <Search size={19} />
+                        <input
+                            ref={buscaRef}
+                            value={busca}
+                            onChange={(event) => setBusca(event.target.value)}
+                            placeholder="Buscar publicação..."
+                        />
+
+                        {busca && (
+                            <button
+                                type="button"
+                                className="clear-search"
+                                onClick={() => {
+                                    setBusca("");
+                                    buscaRef.current?.focus();
+                                }}
+                                aria-label="Limpar busca"
+                            >
+                                <X size={18} />
+                            </button>
+                        )}
+                    </label>
+
+                    <span className="result-count">
+                        {postsFiltrados.length} publicação
+                        {postsFiltrados.length === 1 ? "" : "ões"}
+                    </span>
+                </div>
+
+                {loadingPosts ? (
+                    <div className="feed-state">
+                        <strong>Carregando publicações...</strong>
+                    </div>
+                ) : erro ? (
+                    <div className="feed-state">
+                        <strong>Não foi possível carregar as publicações</strong>
+                        <span>{erro}</span>
+                        <button
+                            type="button"
+                            className="primary-button"
+                            onClick={carregarPosts}
+                        >
+                            Tentar novamente
+                        </button>
+                    </div>
+                ) : postsFiltrados.length === 0 ? (
+                    <div className="feed-state">
+                        <strong>Nenhuma publicação encontrada</strong>
+                        <span>
+                            {busca
+                                ? "Tente outro termo de busca."
+                                : "Ainda não existem publicações disponíveis."}
+                        </span>
+                    </div>
+                ) : (
+                    <div className="post-list">
+                        {postsFiltrados.map((post) => (
+                            <article className="post-card" key={post.id_post}>
+                                <button
+                                    type="button"
+                                    className="post-card__header post-card__profile-link"
+                                    onClick={() => navigate(`/perfil/${post.id_organizacao}`)}
+                                >
+                                    <span className="org-avatar">
+                                        {post.foto_organizacao ? (
+                                            <img
+                                                src={getImageUrl(post.foto_organizacao)}
+                                                alt={post.nome_organizacao ?? "Organização"}
+                                            />
+                                        ) : (
+                                            (post.nome_organizacao ?? "O")
+                                                .charAt(0)
+                                                .toUpperCase()
+                                        )}
+                                    </span>
+
+                                    <span className="post-card__identity">
+                                        <strong>
+                                            {post.nome_organizacao ??
+                                                `Organização ${post.id_organizacao}`}
+                                        </strong>
+                                        <span>Categoria {post.id_categoria}</span>
+                                    </span>
+                                </button>
+
+                                <div className="post-card__copy">
+                                    <h2>{post.titulo}</h2>
+                                    {post.descricao && <p>{post.descricao}</p>}
+                                </div>
+
+                                {post.vincularImagem ? (
+                                    <div className="post-card__media">
+                                        <img
+                                            src={getImageUrl(post.vincularImagem)}
+                                            alt={post.titulo}
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="post-card__image-fallback">
+                                        <span>Publicação sem imagem</span>
+                                    </div>
+                                )}
+
+                                <div className="post-card__footer">
+                                    <div className="post-actions">
+                                        <button
+                                            type="button"
+                                            className={`like-button ${
+                                                likes[post.id_post]?.curtiu
+                                                    ? "is-liked"
+                                                    : ""
+                                            }`}
+                                            onClick={() => alternarLike(post.id_post)}
+                                        >
+                                            <Heart
+                                                size={19}
+                                                fill={
+                                                    likes[post.id_post]?.curtiu
+                                                        ? "currentColor"
+                                                        : "none"
+                                                }
+                                            />
+                                            <span>
+                                                {likes[post.id_post]?.curtiu
+                                                    ? "Curtido"
+                                                    : "Curtir"}
+                                            </span>
+                                            <b>{likes[post.id_post]?.total ?? 0}</b>
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            className={`favorite-button ${
+                                                favoritos[post.id_organizacao]?.favoritado
+                                                    ? "is-favorite"
+                                                    : ""
+                                            }`}
+                                            onClick={() =>
+                                                alternarFavorito(post.id_organizacao)
+                                            }
+                                        >
+                                            <Star
+                                                size={19}
+                                                fill={
+                                                    favoritos[post.id_organizacao]?.favoritado
+                                                        ? "currentColor"
+                                                        : "none"
+                                                }
+                                            />
+                                            <span>
+                                                {favoritos[post.id_organizacao]?.favoritado
+                                                    ? "Favoritada"
+                                                    : "Favoritar organização"}
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </article>
+                        ))}
+                    </div>
+                )}
+            </section>
+
+            {menuAberto && (
+                <div
+                    className="menu-overlay"
+                    onMouseDown={(event) => {
+                        if (event.target === event.currentTarget) {
+                            setMenuAberto(false);
+                        }
+                    }}
+                >
+                    <aside className="menu-panel">
+                        <div className="menu-panel__top">
+                            <strong>Menu</strong>
+                            <button
+                                type="button"
+                                onClick={() => setMenuAberto(false)}
+                                aria-label="Fechar menu"
+                            >
+                                <X size={22} />
+                            </button>
+                        </div>
+
+                        <nav>
+                            <button type="button" onClick={() => navigate("/")}>
+                                Início
+                            </button>
+                            <button type="button" onClick={abrirMeuPerfil}>
+                                Meu perfil
+                            </button>
+                            <button type="button" onClick={() => navigate("/likes")}>
+                                Curtidos
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => navigate("/favoritos")}
+                            >
+                                Favoritos
+                            </button>
+                            <button type="button" onClick={sair}>
+                                Sair da conta
+                            </button>
+                        </nav>
+                    </aside>
+                </div>
+            )}
+
+            {modalPostAberto && (
+                <div
+                    className="create-post-overlay"
+                    onMouseDown={(event) => {
+                        if (event.target === event.currentTarget) {
+                            fecharModalPost();
+                        }
+                    }}
+                >
+                    <form className="create-post-modal" onSubmit={publicar}>
+                        <div className="create-post-header">
+                            <div>
+                                <h2>Nova publicação</h2>
+                                <p>Compartilhe algo com a comunidade.</p>
+                            </div>
+
+                            <button
+                                type="button"
+                                className="create-post-close"
+                                onClick={fecharModalPost}
+                                disabled={publicando}
+                                aria-label="Fechar"
+                            >
+                                <X size={25} />
+                            </button>
+                        </div>
+
+                        <label className="create-post-field">
+                            <span>Título *</span>
+                            <input
+                                value={titulo}
+                                onChange={(event) => setTitulo(event.target.value)}
+                                placeholder="Digite o título da publicação"
+                                maxLength={150}
+                            />
+                        </label>
+
+                        <label className="create-post-field">
+                            <span>Descrição</span>
+                            <textarea
+                                value={descricao}
+                                onChange={(event) => setDescricao(event.target.value)}
+                                placeholder="Digite uma descrição"
+                                rows={5}
+                            />
+                        </label>
+
+                        <div className="create-post-field">
+                            <span>Categoria *</span>
+
+                            {loadingCategorias ? (
+                                <div className="create-post-loading">
+                                    Carregando categorias...
+                                </div>
+                            ) : categorias.length === 0 ? (
+                                <div className="create-post-loading">
+                                    Nenhuma categoria encontrada.
+                                </div>
+                            ) : (
+                                <div className="create-post-categories">
+                                    {categorias.map((categoria) => (
+                                        <button
+                                            key={categoria.id_categoria}
+                                            type="button"
+                                            className={
+                                                categoriaSelecionada ===
+                                                Number(categoria.id_categoria)
+                                                    ? "selected"
+                                                    : ""
+                                            }
+                                            onClick={() =>
+                                                setCategoriaSelecionada(
+                                                    Number(categoria.id_categoria)
+                                                )
+                                            }
+                                        >
+                                            {categoria.descricao}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="create-post-field">
+                            <span>Organização</span>
+                            <div className="create-post-organization">
+                                <strong>{nomeOrganizacao}</strong>
+                                <small>
+                                    O post será publicado automaticamente pela
+                                    organização autenticada.
+                                </small>
+                            </div>
+                        </div>
+
+                        <div className="create-post-field">
+                            <span>Imagem *</span>
+
+                            <input
+                                ref={imagemRef}
+                                className="create-post-file-input"
+                                type="file"
+                                accept="image/png,image/jpeg"
+                                onChange={(event) =>
+                                    setImagem(event.target.files?.[0] ?? null)
+                                }
+                            />
+
+                            <button
+                                type="button"
+                                className="create-post-image-picker"
+                                onClick={() => imagemRef.current?.click()}
+                            >
+                                {previewImagem ? (
+                                    <img src={previewImagem} alt="Prévia" />
+                                ) : (
+                                    <span className="create-post-image-icon">
+                                        <ImagePlus size={25} />
+                                    </span>
+                                )}
+
+                                <span className="create-post-image-copy">
+                                    <strong>
+                                        {imagem ? imagem.name : "Escolher imagem"}
+                                    </strong>
+                                    <small>PNG ou JPEG, até 10 MB</small>
+                                </span>
+
+                                <span className="create-post-image-arrow">›</span>
+                            </button>
+                        </div>
+
+                        {erroPublicacao && (
+                            <div className="create-post-error">
+                                {erroPublicacao}
+                            </div>
+                        )}
+
+                        <button
+                            type="submit"
+                            className="create-post-submit"
+                            disabled={
+                                publicando ||
+                                loadingCategorias ||
+                                categorias.length === 0
+                            }
+                        >
+                            {publicando ? "Publicando..." : "Publicar"}
+                        </button>
+                    </form>
+                </div>
+            )}
+        </main>
+    );
+};

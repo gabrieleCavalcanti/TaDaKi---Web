@@ -1,30 +1,59 @@
-export const BASE_URL =
+const BASE_URL =
   import.meta.env.VITE_API_URL || "http://localhost:8000";
 
-export function getImageUrl(image?: string | null): string {
-  if (!image) return "";
-  if (/^https?:\/\//i.test(image)) return image;
+const ACCESS_TOKEN_KEY = "tadaki_access_token";
+const REFRESH_TOKEN_KEY = "tadaki_refresh_token";
 
-  const normalized = image.replace(/\\/g, "/").replace(/^\/+/, "");
-
-  if (normalized.startsWith("images/")) {
-    return `${BASE_URL}/${normalized}`;
-  }
-
-  return `${BASE_URL}/images/${normalized}`;
+export function getBaseUrl() {
+  return BASE_URL;
 }
 
-export function getProfilePhoto(person: any): string {
-  const value =
-    person?.foto ??
-    person?.foto_perfil ??
-    person?.imagem_perfil ??
-    person?.imagem ??
-    person?.avatar ??
-    person?.url_foto ??
-    null;
+export function getImageUrl(image?: string | null) {
+  if (!image) return "";
 
-  return getImageUrl(value);
+  if (/^https?:\/\//i.test(image)) {
+    return image;
+  }
+
+  if (image.startsWith("/")) {
+    return `${BASE_URL}${image}`;
+  }
+
+  if (image.startsWith("images/")) {
+    return `${BASE_URL}/${image}`;
+  }
+
+  return `${BASE_URL}/images/${image}`;
+}
+
+export function saveAuthTokens(
+  accessToken?: string | null,
+  refreshToken?: string | null,
+) {
+  if (accessToken) {
+    localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+  }
+
+  if (refreshToken) {
+    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+  }
+}
+
+export function clearAuthTokens() {
+  localStorage.removeItem(ACCESS_TOKEN_KEY);
+  localStorage.removeItem(REFRESH_TOKEN_KEY);
+}
+
+function getAccessToken() {
+  return localStorage.getItem(ACCESS_TOKEN_KEY);
+}
+
+function getRefreshToken() {
+  return localStorage.getItem(REFRESH_TOKEN_KEY);
+}
+
+async function parseResponse(response: Response) {
+  return response.json().catch(() => ({}));
 }
 
 export async function apiFetch<T = any>(
@@ -33,12 +62,19 @@ export async function apiFetch<T = any>(
 ): Promise<T> {
   const url = `${BASE_URL}${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
 
-  const headers = {
-    "Content-Type": "application/json",
-    ...(options.headers || {}),
-  };
+  const token = getAccessToken();
 
-  const response = await fetch(url, {
+  const headers = new Headers(options.headers || {});
+
+  if (!(options.body instanceof FormData) && !headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
+  }
+
+  if (token) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+
+  let response = await fetch(url, {
     ...options,
     headers,
     credentials: "include",
@@ -47,41 +83,60 @@ export async function apiFetch<T = any>(
   if (
     response.status === 401 &&
     endpoint !== "/auth/login" &&
-    endpoint !== "/auth/refresh" &&
-    endpoint !== "/auth/me"
+    endpoint !== "/auth/refresh"
   ) {
-    const refreshRes = await fetch(`${BASE_URL}/auth/refresh`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-    });
+    const refreshToken = getRefreshToken();
 
-    if (refreshRes.ok) {
-      const retryRes = await fetch(url, {
-        ...options,
-        headers,
+    if (refreshToken) {
+      const refreshResponse = await fetch(`${BASE_URL}/auth/refresh`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         credentials: "include",
+        body: JSON.stringify({
+          refreshToken,
+        }),
       });
 
-      const retryData = await retryRes.json().catch(() => ({}));
+      if (refreshResponse.ok) {
+        const refreshData = await parseResponse(refreshResponse);
 
-      if (!retryRes.ok) {
-        throw new Error(
-          retryData.error || retryData.message || "Erro na requisição",
-        );
+        if (refreshData?.token_acesso) {
+          saveAuthTokens(refreshData.token_acesso, null);
+        }
+
+        const novoToken = getAccessToken();
+        const retryHeaders = new Headers(options.headers || {});
+
+        if (!(options.body instanceof FormData) && !retryHeaders.has("Content-Type")) {
+          retryHeaders.set("Content-Type", "application/json");
+        }
+
+        if (novoToken) {
+          retryHeaders.set("Authorization", `Bearer ${novoToken}`);
+        }
+
+        response = await fetch(url, {
+          ...options,
+          headers: retryHeaders,
+          credentials: "include",
+        });
       }
-
-      return retryData;
     }
   }
 
-  const data = await response.json().catch(() => ({}));
+  const data = await parseResponse(response);
 
   if (!response.ok) {
-    throw new Error(data.error || data.message || "Erro na requisição");
+    throw new Error(
+      data?.error ||
+      data?.message ||
+      `Erro ${response.status} na requisição`,
+    );
   }
 
-  return data;
+  return data as T;
 }
 
 export async function cadastrarPessoa(dados: any) {
