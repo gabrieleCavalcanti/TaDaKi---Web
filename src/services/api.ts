@@ -1,9 +1,32 @@
-// const BASE_URL = "http://localhost:8000";
-// const BASE_URL = "http://192.168.0.100:3000";
+export const BASE_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:8000";
 
-const BASE_URL = "http://10.87.169.143:3000";
+export function getImageUrl(image?: string | null): string {
+  if (!image) return "";
+  if (/^https?:\/\//i.test(image)) return image;
 
-// Essa é uma função "generica" nós vamos enviar o tipo na hora da requisição, caso não seja informado o tipo ela vai utilizar qualquer um.
+  const normalized = image.replace(/\\/g, "/").replace(/^\/+/, "");
+
+  if (normalized.startsWith("images/")) {
+    return `${BASE_URL}/${normalized}`;
+  }
+
+  return `${BASE_URL}/images/${normalized}`;
+}
+
+export function getProfilePhoto(person: any): string {
+  const value =
+    person?.foto ??
+    person?.foto_perfil ??
+    person?.imagem_perfil ??
+    person?.imagem ??
+    person?.avatar ??
+    person?.url_foto ??
+    null;
+
+  return getImageUrl(value);
+}
+
 export async function apiFetch<T = any>(
   endpoint: string,
   options: RequestInit = {},
@@ -18,7 +41,7 @@ export async function apiFetch<T = any>(
   const response = await fetch(url, {
     ...options,
     headers,
-    credentials: "include", // envia e recebe cookies HTTP-Only
+    credentials: "include",
   });
 
   if (
@@ -27,30 +50,28 @@ export async function apiFetch<T = any>(
     endpoint !== "/auth/refresh" &&
     endpoint !== "/auth/me"
   ) {
-    try {
-      const refreshRes = await fetch(`${BASE_URL}/auth/refresh`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+    const refreshRes = await fetch(`${BASE_URL}/auth/refresh`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    });
+
+    if (refreshRes.ok) {
+      const retryRes = await fetch(url, {
+        ...options,
+        headers,
         credentials: "include",
       });
 
-      if (refreshRes.ok) {
-        const retryRes = await fetch(url, {
-          ...options,
-          headers,
-          credentials: "include",
-        });
+      const retryData = await retryRes.json().catch(() => ({}));
 
-        if (!retryRes.ok) {
-          const errData = await retryRes.json().catch(() => ({}));
-          throw new Error(
-            errData.error || errData.message || "Erro na requisição",
-          );
-        }
-        return retryRes.json();
+      if (!retryRes.ok) {
+        throw new Error(
+          retryData.error || retryData.message || "Erro na requisição",
+        );
       }
-    } catch (error) {
-      console.error(error);
+
+      return retryData;
     }
   }
 
@@ -63,7 +84,6 @@ export async function apiFetch<T = any>(
   return data;
 }
 
-// CADASTRO DE PESSOA (Cliente ou Organização)
 export async function cadastrarPessoa(dados: any) {
   return apiFetch("/pessoas", {
     method: "POST",
