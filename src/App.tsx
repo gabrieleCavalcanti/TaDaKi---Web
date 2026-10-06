@@ -5,6 +5,8 @@ import { Cadastro } from "./pages/Cadastro";
 import { Home } from "./pages/Home";
 import { Likes } from "./pages/Likes";
 import { Login } from "./pages/Login";
+import Perfil from "./pages/Perfil";
+import PerfilPessoal from "./pages/PerfilPessoal";
 
 export const App: React.FC = () => {
   return (
@@ -16,6 +18,8 @@ export const App: React.FC = () => {
         <Route element={<PrivateRoute />}>
           <Route path="/" element={<Home />} />
           <Route path="/likes" element={<Likes />} />
+          <Route path="/perfil/:id_pessoa" element={<Perfil />} />
+          <Route path="/perfil-pessoal" element={<PerfilPessoal />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

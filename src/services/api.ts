@@ -1,5 +1,4 @@
-const BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:8000";
+export const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 const ACCESS_TOKEN_KEY = "tadaki_access_token";
 const REFRESH_TOKEN_KEY = "tadaki_refresh_token";
@@ -99,23 +98,43 @@ export async function apiFetch<T = any>(
         }),
       });
 
+      // if (refreshResponse.ok) {
+      //   const refreshData = await parseResponse(refreshResponse);
+
+      //   if (refreshData?.token_acesso) {
+      //     saveAuthTokens(refreshData.token_acesso, null);
+      //   }
+
+      //   const novoToken = getAccessToken();
+      //   const retryHeaders = new Headers(options.headers || {});
+
+      //   if (!(options.body instanceof FormData) && !retryHeaders.has("Content-Type")) {
+      //     retryHeaders.set("Content-Type", "application/json");
+      //   }
+
+      //   if (novoToken) {
+      //     retryHeaders.set("Authorization", `Bearer ${novoToken}`);
+      //   }
+
+      //   response = await fetch(url, {
+      //     ...options,
+      //     headers: retryHeaders,
+      //     credentials: "include",
+      //   });
+      // }
       if (refreshResponse.ok) {
-        const refreshData = await parseResponse(refreshResponse);
-
-        if (refreshData?.token_acesso) {
-          saveAuthTokens(refreshData.token_acesso, null);
-        }
-
-        const novoToken = getAccessToken();
         const retryHeaders = new Headers(options.headers || {});
 
-        if (!(options.body instanceof FormData) && !retryHeaders.has("Content-Type")) {
+        if (
+          !(options.body instanceof FormData) &&
+          !retryHeaders.has("Content-Type")
+        ) {
           retryHeaders.set("Content-Type", "application/json");
         }
 
-        if (novoToken) {
-          retryHeaders.set("Authorization", `Bearer ${novoToken}`);
-        }
+        // O novo Access Token está no cookie httpOnly.
+        // O navegador envia esse cookie automaticamente.
+        retryHeaders.delete("Authorization");
 
         response = await fetch(url, {
           ...options,
@@ -130,9 +149,7 @@ export async function apiFetch<T = any>(
 
   if (!response.ok) {
     throw new Error(
-      data?.error ||
-      data?.message ||
-      `Erro ${response.status} na requisição`,
+      data?.error || data?.message || `Erro ${response.status} na requisição`,
     );
   }
 
