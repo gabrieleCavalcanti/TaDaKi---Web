@@ -1,8 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import {
     apiFetch,
-    clearAuthTokens,
-    saveAuthTokens,
 } from "../services/api";
 
 export interface User {
@@ -66,10 +64,10 @@ export const AuthProvider = ({ children }: { children: any }) => {
                 body: JSON.stringify({ username, password }),
             });
 
-            saveAuthTokens(
-                response.token_acesso,
-                response.refresh_token
-            );
+            // saveAuthTokens(
+            //     response.token_acesso,
+            //     response.refresh_token
+            // );
 
             // O login da API não traz "tipo"; /auth/me traz.
             const me = await apiFetch<{ user: User }>("/auth/me");
@@ -82,7 +80,7 @@ export const AuthProvider = ({ children }: { children: any }) => {
                     : "Erro ao realizar login!";
 
             setError(mensagem);
-            clearAuthTokens();
+            // clearAuthTokens();
             throw error;
         }
     };
@@ -98,7 +96,7 @@ export const AuthProvider = ({ children }: { children: any }) => {
                 error
             );
         } finally {
-            clearAuthTokens();
+            // clearAuthTokens();
             setUser(null);
         }
     };
