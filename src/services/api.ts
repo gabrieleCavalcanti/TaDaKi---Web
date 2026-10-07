@@ -1,147 +1,96 @@
-const BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:8000";
-
+export const BASE_URL = (
+  import.meta.env.VITE_API_URL || "http://localhost:8000"
+).replace(/\/$/, "");
 const ACCESS_TOKEN_KEY = "tadaki_access_token";
 const REFRESH_TOKEN_KEY = "tadaki_refresh_token";
-
 export function getBaseUrl() {
   return BASE_URL;
 }
-
 export function getImageUrl(image?: string | null) {
   if (!image) return "";
-
-  if (/^https?:\/\//i.test(image)) {
-    return image;
-  }
-
-  if (image.startsWith("/")) {
-    return `${BASE_URL}${image}`;
-  }
-
-  if (image.startsWith("images/")) {
-    return `${BASE_URL}/${image}`;
-  }
-
-  return `${BASE_URL}/images/${image}`;
+  if (/^https?:\/\//i.test(image)) return image;
+  if (image.startsWith("/")) return `${BASE_URL}${image}`;
+  return `${BASE_URL}/${image.startsWith("images/") ? image : `images/${image}`}`;
 }
-
 export function saveAuthTokens(
   accessToken?: string | null,
   refreshToken?: string | null,
 ) {
-  if (accessToken) {
-    localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
-  }
-
-  if (refreshToken) {
-    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
-  }
+  if (accessToken) localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+  if (refreshToken) localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
 }
-
 export function clearAuthTokens() {
   localStorage.removeItem(ACCESS_TOKEN_KEY);
   localStorage.removeItem(REFRESH_TOKEN_KEY);
 }
-
-function getAccessToken() {
-  return localStorage.getItem(ACCESS_TOKEN_KEY);
-}
-
-function getRefreshToken() {
-  return localStorage.getItem(REFRESH_TOKEN_KEY);
-}
-
 async function parseResponse(response: Response) {
   return response.json().catch(() => ({}));
 }
-
+let refreshing: Promise<void> | null = null;
 export async function apiFetch<T = any>(
   endpoint: string,
   options: RequestInit = {},
 ): Promise<T> {
-  const url = `${BASE_URL}${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
-
-  const token = getAccessToken();
-
-  const headers = new Headers(options.headers || {});
-
-  if (!(options.body instanceof FormData) && !headers.has("Content-Type")) {
+  const path = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+  const headers = new Headers(options.headers);
+  if (!(options.body instanceof FormData) && !headers.has("Content-Type"))
     headers.set("Content-Type", "application/json");
-  }
-
-  if (token) {
-    headers.set("Authorization", `Bearer ${token}`);
-  }
-
-  let response = await fetch(url, {
-    ...options,
-    headers,
-    credentials: "include",
-  });
-
+  const token = localStorage.getItem(ACCESS_TOKEN_KEY);
+  if (token) headers.set("Authorization", `Bearer ${token}`);
+  const request = () =>
+    fetch(`${BASE_URL}${path}`, {
+      ...options,
+      headers,
+      credentials: "include",
+    });
+  let response = await request();
   if (
     response.status === 401 &&
-    endpoint !== "/auth/login" &&
-    endpoint !== "/auth/refresh"
+    !/^\/auth\/(login|refresh|logout)$/.test(path)
   ) {
-    const refreshToken = getRefreshToken();
-
+    const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
     if (refreshToken) {
-      const refreshResponse = await fetch(`${BASE_URL}/auth/refresh`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          refreshToken,
-        }),
-      });
-
-      if (refreshResponse.ok) {
-        const refreshData = await parseResponse(refreshResponse);
-
-        if (refreshData?.token_acesso) {
-          saveAuthTokens(refreshData.token_acesso, null);
-        }
-
-        const novoToken = getAccessToken();
-        const retryHeaders = new Headers(options.headers || {});
-
-        if (!(options.body instanceof FormData) && !retryHeaders.has("Content-Type")) {
-          retryHeaders.set("Content-Type", "application/json");
-        }
-
-        if (novoToken) {
-          retryHeaders.set("Authorization", `Bearer ${novoToken}`);
-        }
-
-        response = await fetch(url, {
-          ...options,
-          headers: retryHeaders,
+      if (!refreshing)
+        refreshing = fetch(`${BASE_URL}/auth/refresh`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           credentials: "include",
-        });
-      }
+          body: JSON.stringify({ refreshToken }),
+        })
+          .then(async (result) => {
+            const data = await parseResponse(result);
+            if (!result.ok) {
+              clearAuthTokens();
+              throw new Error(
+                "Sua sessão expirou. Entre novamente para continuar.",
+              );
+            }
+            if (data.token_acesso)
+              saveAuthTokens(data.token_acesso, data.refresh_token);
+            else localStorage.removeItem(ACCESS_TOKEN_KEY); // this API issues the replacement token as an httpOnly cookie
+          })
+          .finally(() => {
+            refreshing = null;
+          });
+      await refreshing;
+      const refreshedToken = localStorage.getItem(ACCESS_TOKEN_KEY);
+      if (refreshedToken)
+        headers.set("Authorization", `Bearer ${refreshedToken}`);
+      else headers.delete("Authorization");
+      response = await request();
     }
   }
-
   const data = await parseResponse(response);
-
-  if (!response.ok) {
+  if (!response.ok)
     throw new Error(
-      data?.error ||
-      data?.message ||
-      `Erro ${response.status} na requisição`,
+      response.status === 401
+        ? "Sua sessão expirou. Entre novamente para continuar."
+        : data?.error ||
+            data?.message ||
+            `Erro ${response.status} na requisição`,
     );
-  }
-
   return data as T;
 }
-
 export async function cadastrarPessoa(dados: any) {
-  return apiFetch("/pessoas", {
-    method: "POST",
-    body: JSON.stringify(dados),
-  });
+  return apiFetch("/pessoas", { method: "POST", body: JSON.stringify(dados) });
 }

@@ -1,92 +1,156 @@
-import { Heart, ImageOff } from "lucide-react";
+import { Heart, ImageOff, Star, ArrowUpRight } from "lucide-react";
 import { useState } from "react";
 import { getImageUrl } from "../../services/api";
-import type { PostRegistro } from "./types";
-
-interface PostCardProps {
-  post: PostRegistro;
-  liked: boolean;
-  likeCount?: number;
-  onLike: (idPost: number) => void;
-  compact?: boolean;
-  onOpenOrganization?: (idPessoa: number) => void;
-}
-
+import type { Post } from "./model";
 export function PostCard({
   post,
   liked,
-  likeCount = 0,
+  likeCount,
+  favorite,
+  busyLike,
+  busyFavorite,
+  canFavorite,
   onLike,
-  compact = false,
+  onFavorite,
   onOpenOrganization,
-}: PostCardProps) {
+  onOpenImage,
+}: {
+  post: Post;
+  liked: boolean;
+  likeCount?: number;
+  favorite: boolean;
+  busyLike: boolean;
+  busyFavorite: boolean;
+  canFavorite: boolean;
+  onLike: (id: number) => void;
+  onFavorite: (id: number) => void;
+  onOpenOrganization: (id: number) => void;
+  onOpenImage: (post: Post) => void;
+}) {
   const [imageFailed, setImageFailed] = useState(false);
   const [avatarFailed, setAvatarFailed] = useState(false);
-
-  const postImage = getImageUrl(post.vincularImagem);
-  const avatarImage = getImageUrl(post.foto_organizacao);
-
+  const [expanded, setExpanded] = useState(false);
+  const openOrg = () =>
+    post.id_pessoa_organizacao &&
+    onOpenOrganization(post.id_pessoa_organizacao);
   return (
-    <article className={`post-card ${compact ? "post-card--compact" : ""}`}>
-      <button
-        type="button"
-        className="post-card__header post-card__profile-link"
-        onClick={() => onOpenOrganization?.(Number(post.id_pessoa_organizacao || post.id_organizacao))}
-        aria-label={`Abrir perfil de ${post.nome_organizacao || "organização"}`}
-      >
-        <div className="org-avatar" aria-hidden="true">
-          {avatarImage && !avatarFailed ? (
-            <img
-              src={avatarImage}
-              alt=""
-              onError={() => setAvatarFailed(true)}
-            />
-          ) : (
-            <span>{(post.nome_organizacao || "O").charAt(0).toUpperCase()}</span>
-          )}
-        </div>
-
-        <div className="post-card__identity">
-          <strong>
-            {post.nome_organizacao || `Organização ${post.id_organizacao}`}
-          </strong>
-          <span>
-            {post.descricao_categoria || `Categoria ${post.id_categoria}`}
+    <article className="post-card">
+      <div className="post-card__header">
+        <button
+          className="org-link"
+          onClick={openOrg}
+          disabled={!post.id_pessoa_organizacao}
+          aria-label={`Abrir perfil de ${post.nome_organizacao}`}
+        >
+          <span className="org-avatar">
+            {post.foto_organizacao && !avatarFailed ? (
+              <img
+                src={getImageUrl(post.foto_organizacao)}
+                alt=""
+                onError={() => setAvatarFailed(true)}
+              />
+            ) : (
+              post.nome_organizacao?.charAt(0).toUpperCase() || "T"
+            )}
           </span>
-        </div>
-      </button>
-
-      <div className="post-card__copy">
-        <h2>{post.titulo}</h2>
-        {post.descricao && <p>{post.descricao}</p>}
+          <span className="post-card__identity">
+            <strong>{post.nome_organizacao}</strong>
+            <span>Pequenos negócios, grandes descobertas</span>
+          </span>
+        </button>
+          {canFavorite && (
+            <button
+              className={`social-button favorite-button ${favorite ? "is-favorite" : ""}`}
+              aria-label={
+                favorite
+                  ? "Remover organização dos favoritos"
+                  : "Favoritar organização"
+              }
+              aria-pressed={favorite}
+              disabled={busyFavorite}
+              onClick={() => onFavorite(post.id_organizacao)}
+            >
+              <Star size={23} fill={favorite ? "currentColor" : "none"} />
+              <span>{favorite ? "Organização favorita" : "Favoritar organização"}</span>
+            </button>
+          )}
+        <span className="category-badge">{post.descricao_categoria}</span>
       </div>
-
-      {postImage && !imageFailed ? (
-        <div className="post-card__media">
+      <button
+        className="post-card__media"
+        disabled={!post.vincularImagem || imageFailed}
+        onClick={() => onOpenImage(post)}
+        aria-label={`Ampliar imagem de ${post.titulo}`}
+      >
+        {post.vincularImagem && !imageFailed ? (
           <img
-            src={postImage}
-            alt={`Imagem da publicação ${post.titulo}`}
+            src={getImageUrl(post.vincularImagem)}
+            alt={post.titulo}
             loading="lazy"
             onError={() => setImageFailed(true)}
           />
-        </div>
-      ) : (
-        <div className="post-card__image-fallback">
-          <ImageOff size={30} />
-          <span>Imagem indisponível</span>
-        </div>
-      )}
-
+        ) : (
+          <span className="image-fallback">
+            <ImageOff size={30} />
+            Imagem indisponível
+          </span>
+        )}
+        {!imageFailed && post.vincularImagem && (
+          <span className="image-hint">Ampliar foto</span>
+        )}
+      </button>
       <div className="post-card__footer">
+        <div className="post-actions">
+          <button
+            className={`social-button ${liked ? "is-liked" : ""}`}
+            aria-label={
+              liked
+                ? `Remover curtida de ${post.titulo}`
+                : `Curtir ${post.titulo}`
+            }
+            aria-pressed={liked}
+            disabled={busyLike}
+            onClick={() => onLike(post.id_post)}
+          >
+            <Heart size={24} fill={liked ? "currentColor" : "none"} />
+            <span>
+              {likeCount === undefined
+                ? liked
+                  ? "Curtido"
+                  : "Curtir"
+                : `${likeCount} ${likeCount === 1 ? "curtida" : "curtidas"}`}
+            </span>
+          </button>
+
+        </div>
+        <div className="post-card__copy">
+          <h2>{post.titulo}</h2>
+          {post.descricao && (
+            <>
+              <p
+                className={
+                  expanded || post.descricao.length <= 160 ? "" : "clamped-copy"
+                }
+              >
+                {post.descricao}
+              </p>
+              {post.descricao.length > 160 && (
+                <button
+                  className="text-button"
+                  onClick={() => setExpanded(!expanded)}
+                >
+                  {expanded ? "Mostrar menos" : "Ver descrição completa"}
+                </button>
+              )}
+            </>
+          )}
+        </div>
         <button
-          type="button"
-          className={`like-button ${liked ? "is-liked" : ""}`}
-          aria-pressed={liked}
-          onClick={() => onLike(post.id_post)}
+          className="business-link"
+          disabled={!post.id_pessoa_organizacao}
+          onClick={openOrg}
         >
-          <Heart size={19} fill={liked ? "currentColor" : "none"} />
-          <span>{liked ? "Curtido" : "Curtir"}</span>
-          <b>{likeCount}</b>
+          Conhecer a empresa <ArrowUpRight size={17} />
         </button>
       </div>
     </article>
