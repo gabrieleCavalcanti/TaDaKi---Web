@@ -10,6 +10,10 @@ import { Home } from "./pages/Home";
 
 import { Cadastro } from "./pages/Cadastro";
 
+import { EsqueceuSenha } from "./pages/EsqueceuSenha";
+
+import { RedefinirSenha } from "./pages/RedefinirSenha";
+
 // import { AuthProvider } from "./context/AuthContext";
 
 import { PrivateRoute } from "./components/PrivateRoute";
@@ -28,6 +32,10 @@ export const App: React.FC = () => {
                 <Route path="/login" element={<Login />} />
 
                 <Route path="/cadastro" element={<Cadastro />} />
+
+                <Route path="/esqueceuSenha" element={<EsqueceuSenha />} />
+
+                <Route path="/redefinirSenha" element={<RedefinirSenha />} />
 
 
                 {/* Rotas Privadas */}

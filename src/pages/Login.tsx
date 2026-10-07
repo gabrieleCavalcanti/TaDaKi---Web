@@ -169,12 +169,12 @@ export const Login: React.FC = () => {
 
             </label>
 
-            <a
-              href="#"
+            <Link
+              to="/esqueceuSenha"
               className="forgot-password"
             >
               Esqueceu a senha?
-            </a>
+            </Link>
 
           </div>
 
