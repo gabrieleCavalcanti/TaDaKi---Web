@@ -1,4 +1,6 @@
-import {
+
+import React, {
+
     useEffect,
     useMemo,
     useRef,
@@ -21,7 +23,7 @@ import type {
     IAvaliacao,
 } from "../pages/Avaliacao";
 
-import { BASE_URL, apiFetch } from "../services/api";
+import { BASE_URL } from "../services/api";
 
 import "../css/Perfil.css";
 
@@ -214,14 +216,105 @@ export default function PerfilScreen() {
 
     async function buscarPessoaPorId(): Promise<IPessoa | null> {
         try {
-            const resposta = await apiFetch<any>(`/pessoas?id=${idPessoa}`);
-            const lista = resposta?.pessoaId ?? resposta?.pessoas ?? resposta?.data ?? [];
-            const pessoa = Array.isArray(lista)
-                ? lista.find((item: IPessoa) => Number(item.id_pessoa) === idPessoa)
-                : resposta?.pessoa;
-            return pessoa && Number(pessoa.id_pessoa) === idPessoa ? pessoa : null;
+
+            const resposta =
+                await fetch(
+                    `${BASE_URL}/pessoas/${idPessoa}`,
+                    {
+                        credentials: "include",
+                    }
+                );
+
+            if (resposta.ok) {
+                const data =
+                    await resposta.json();
+
+                const pessoa =
+                    data?.pessoa ||
+                    data?.organizacao ||
+                    data?.data ||
+                    data;
+
+                if (
+                    pessoa &&
+                    Number(
+                        pessoa.id_pessoa
+                    ) === idPessoa
+                ) {
+                    return pessoa;
+                }
+
+                const lista =
+                    data?.pessoas ||
+                    data?.funcionarios ||
+                    data?.dados ||
+                    [];
+
+                if (
+                    Array.isArray(lista)
+                ) {
+                    return (
+                        lista.find(
+                            (
+                                item: IPessoa
+                            ) =>
+                                Number(
+                                    item.id_pessoa
+                                ) === idPessoa
+                        ) || null
+                    );
+                }
+            }
         } catch (error) {
-            console.error("Erro ao buscar pessoa:", error);
+            console.warn(
+                "Erro ao buscar pessoa:",
+                error
+            );
+        }
+
+        try {
+            const resposta =
+                await fetch(
+                    `${BASE_URL}/pessoas`,
+                    {
+                        credentials: "include",
+                    }
+                );
+
+            if (!resposta.ok) {
+                throw new Error(
+                    `Erro HTTP ${resposta.status}`
+                );
+            }
+
+            const data =
+                await resposta.json();
+
+            const lista =
+                data?.pessoas ||
+                data?.funcionarios ||
+                data?.dados ||
+                data?.data ||
+                [];
+
+            if (!Array.isArray(lista)) {
+                return null;
+            }
+
+            return (
+                lista.find(
+                    (item: IPessoa) =>
+                        Number(
+                            item.id_pessoa
+                        ) === idPessoa
+                ) || null
+            );
+        } catch (error) {
+            console.error(
+                "Erro ao buscar pessoa:",
+                error
+            );
+
             return null;
         }
     }
@@ -413,13 +506,9 @@ export default function PerfilScreen() {
         try {
             setLoadingPosts(true);
 
-            const respostaOrganizacoes = await apiFetch<any>("/pessoas?tipo=ORGANIZACAO");
-            const organizacoes = respostaOrganizacoes?.funcionarios ?? respostaOrganizacoes?.pessoas ?? respostaOrganizacoes?.data ?? [];
-            const idOrganizacao = Number(organizacoes.find((item: IOrganizacao) => Number(item.id_pessoa) === idPessoa)?.id_organizacao);
-            if (!idOrganizacao) throw new Error("Organização não encontrada para este perfil.");
 
             const url =
-                `${BASE_URL}/posts/organizacao?id_organizacao=${idOrganizacao}`;
+                `${BASE_URL}/posts/organizacao?id_organizacao=${idPessoa}`;
 
             const resposta =
                 await fetch(
