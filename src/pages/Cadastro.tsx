@@ -22,6 +22,27 @@ import {
 
 import { Link } from "react-router-dom";
 
+const formatarTelefone = (valor: string) => {
+    const numeros = valor.replace(/\D/g, "").slice(0, 11);
+
+    if (numeros.length <= 2) {
+        return numeros.length > 0
+            ? `(${numeros}`
+            : "";
+    }
+
+    if (numeros.length <= 10) {
+        return `(${numeros.slice(0, 2)}) ${numeros.slice(2, 6)}${
+            numeros.length > 6
+                ? `-${numeros.slice(6, 10)}`
+                : ""
+        }`;
+    }
+
+    return `(${numeros.slice(0, 2)}) ${numeros.slice(2, 7)}-${numeros.slice(7, 11)}`;
+};
+
+
 const formatarDocumento = (valor: string, tipo: "cpf" | "cnpj") => {
     const numeros = valor.replace(/\D/g, "");
 
@@ -77,6 +98,8 @@ export const Cadastro: React.FC = () => {
 
     const [documento, setDocumento] = useState("");
 
+    // Telefone
+    const [telefone, setTelefone] = useState("");
 
     // ÁREA DE ATUAÇÃO
 
@@ -281,13 +304,17 @@ export const Cadastro: React.FC = () => {
                     ).trim();
 
 
-                const telefone =
-                    String(
-                        formData.get(
-                            "telefone"
-                        ) || ""
-                    ).trim();
+                // const telefone =
+                //     String(
+                //         formData.get(
+                //             "telefone"
+                //         ) || ""
+                //     ).trim();
 
+                const telefoneFormatado = telefone.trim();
+
+                const telefoneSemPontuacao =
+                    telefoneFormatado.replace(/\D/g, "");
 
                 const cep =
                     String(
@@ -388,7 +415,7 @@ export const Cadastro: React.FC = () => {
                     password: senha,
 
                     email,
-                    telefone,
+                    telefone: telefoneSemPontuacao,
 
                     cep,
                     numero,
@@ -739,7 +766,9 @@ export const Cadastro: React.FC = () => {
                                     type="text"
                                     id="telefone"
                                     name="telefone"
-                                    placeholder="Telefone"
+                                    placeholder="(11) 99999-9999"
+                                    value={telefone}
+                                    onChange={(e) => { setTelefone(formatarTelefone(e.target.value)); }} maxLength={15}
                                 />
 
                                 <Phone size={20} />
