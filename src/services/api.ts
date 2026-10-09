@@ -1,69 +1,154 @@
-// const BASE_URL = "http://localhost:8000";
-// const BASE_URL = "http://192.168.0.100:3000";
+export const BASE_URL = (
+  import.meta.env.VITE_API_URL || "http://localhost:8000"
+).replace(/\/$/, "");
 
-const BASE_URL = "http://10.87.169.55:3000";
+const ACCESS_TOKEN_KEY = "tadaki_access_token";
+const REFRESH_TOKEN_KEY = "tadaki_refresh_token";
 
-// Essa é uma função "generica" nós vamos enviar o tipo na hora da requisição, caso não seja informado o tipo ela vai utilizar qualquer um.
+export function getBaseUrl() {
+  return BASE_URL;
+}
+
+export function getImageUrl(image?: string | null) {
+  if (!image) return "";
+
+  if (/^https?:\/\//i.test(image)) return image;
+
+  if (image.startsWith("/")) {
+    return `${BASE_URL}${image}`;
+  }
+
+  return `${BASE_URL}/${
+    image.startsWith("images/") ? image : `images/${image}`
+  }`;
+}
+
+export function saveAuthTokens(
+  accessToken?: string | null,
+  refreshToken?: string | null,
+) {
+  if (accessToken) {
+    localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+  }
+
+  if (refreshToken) {
+    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+  }
+}
+
+export function clearAuthTokens() {
+  localStorage.removeItem(ACCESS_TOKEN_KEY);
+  localStorage.removeItem(REFRESH_TOKEN_KEY);
+}
+
+async function parseResponse(response: Response) {
+  return response.json().catch(() => ({}));
+}
+
+let refreshing: Promise<void> | null = null;
+
 export async function apiFetch<T = any>(
   endpoint: string,
   options: RequestInit = {},
 ): Promise<T> {
-  const url = `${BASE_URL}${endpoint.startsWith("/") ? endpoint : `/${endpoint}`}`;
+  const path = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+  const headers = new Headers(options.headers);
 
-  const headers = {
-    "Content-Type": "application/json",
-    ...(options.headers || {}),
-  };
+  if (
+    !(options.body instanceof FormData) &&
+    !headers.has("Content-Type")
+  ) {
+    headers.set("Content-Type", "application/json");
+  }
 
-  const response = await fetch(url, {
-    ...options,
-    headers,
-    credentials: "include", // envia e recebe cookies HTTP-Only
-  });
+  const token = localStorage.getItem(ACCESS_TOKEN_KEY);
+
+  if (token) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+
+  const request = () =>
+    fetch(`${BASE_URL}${path}`, {
+      ...options,
+      headers,
+      credentials: "include",
+    });
+
+  let response = await request();
 
   if (
     response.status === 401 &&
-    endpoint !== "/auth/login" &&
-    endpoint !== "/auth/refresh" &&
-    endpoint !== "/auth/me"
+    !/^\/auth\/(login|refresh|logout)\/?(?:\?.*)?$/.test(path)
   ) {
-    try {
-      const refreshRes = await fetch(`${BASE_URL}/auth/refresh`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-      });
+    const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
 
-      if (refreshRes.ok) {
-        const retryRes = await fetch(url, {
-          ...options,
-          headers,
+    if (refreshToken) {
+      if (!refreshing) {
+        refreshing = fetch(`${BASE_URL}/auth/refresh`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
           credentials: "include",
-        });
+          body: JSON.stringify({ refreshToken }),
+        })
+          .then(async (result) => {
+            const data = await parseResponse(result);
 
-        if (!retryRes.ok) {
-          const errData = await retryRes.json().catch(() => ({}));
-          throw new Error(
-            errData.error || errData.message || "Erro na requisição",
-          );
-        }
-        return retryRes.json();
+            if (!result.ok) {
+              clearAuthTokens();
+
+              throw new Error(
+                "Sua sessão expirou. Entre novamente para continuar.",
+              );
+            }
+
+            if (data.token_acesso) {
+              saveAuthTokens(data.token_acesso, data.refresh_token);
+            } else {
+              // Quando a API envia o acesso pelo cookie httpOnly,
+              // remove o token antigo do cabeçalho Authorization.
+              localStorage.removeItem(ACCESS_TOKEN_KEY);
+
+              if (data.refresh_token) {
+                saveAuthTokens(null, data.refresh_token);
+              }
+            }
+          })
+          .finally(() => {
+            refreshing = null;
+          });
       }
-    } catch (error) {
-      console.error(error);
+
+      await refreshing;
+
+      const refreshedToken = localStorage.getItem(ACCESS_TOKEN_KEY);
+
+      if (refreshedToken) {
+        headers.set("Authorization", `Bearer ${refreshedToken}`);
+      } else {
+        headers.delete("Authorization");
+      }
+
+      response = await request();
     }
   }
 
-  const data = await response.json().catch(() => ({}));
+  const data = await parseResponse(response);
 
   if (!response.ok) {
-    throw new Error(data.error || data.message || "Erro na requisição");
+    throw new Error(
+      response.status === 401
+        ? "Sua sessão expirou. Entre novamente para continuar."
+        : data?.error ||
+            data?.message ||
+            `Erro ${response.status} na requisição`,
+    );
   }
 
-  return data;
+  return data as T;
 }
 
-// CADASTRO DE PESSOA (Cliente ou Organização)
 export async function cadastrarPessoa(dados: any) {
   return apiFetch("/pessoas", {
     method: "POST",
