@@ -1,5 +1,5 @@
 export const BASE_URL = (
-  import.meta.env.VITE_API_URL || "http://localhost:8000"
+  import.meta.env.VITE_API_URL || "http://localhost:3000"
 ).replace(/\/$/, "");
 
 const ACCESS_TOKEN_KEY = "tadaki_access_token";
