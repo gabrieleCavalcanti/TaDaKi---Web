@@ -22,11 +22,28 @@ import {
 
 import { Link } from "react-router-dom";
 
+const formatarDocumento = (valor: string, tipo: "cpf" | "cnpj") => {
+    const numeros = valor.replace(/\D/g, "");
+
+    if (tipo === "cpf") {
+        return numeros
+            .slice(0, 11)
+            .replace(/(\d{3})(\d)/, "$1.$2")
+            .replace(/(\d{3})(\d)/, "$1.$2")
+            .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+    }
+
+    return numeros
+        .slice(0, 14)
+        .replace(/(\d{2})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d)/, "$1.$2")
+        .replace(/(\d{3})(\d)/, "$1/$2")
+        .replace(/(\d{4})(\d{1,2})$/, "$1-$2");
+};
+
 export const Cadastro: React.FC = () => {
 
-    // =========================================================
     // TIPO DE USUÁRIO
-    // =========================================================
 
     const [tipoUsuario, setTipoUsuario] = useState<
         "cliente" | "organizacao"
@@ -36,9 +53,7 @@ export const Cadastro: React.FC = () => {
         tipoUsuario === "organizacao";
 
 
-    // =========================================================
     // SENHAS - CLIENTE
-    // =========================================================
 
     const [mostrarSenhaCliente, setMostrarSenhaCliente] =
         useState(false);
@@ -47,10 +62,7 @@ export const Cadastro: React.FC = () => {
         useState(false);
 
 
-    // =========================================================
     // SENHAS - ORGANIZAÇÃO
-    // =========================================================
-
     const [mostrarSenhaOrganizacao, setMostrarSenhaOrganizacao] =
         useState(false);
 
@@ -58,18 +70,15 @@ export const Cadastro: React.FC = () => {
         useState(false);
 
 
-    // =========================================================
     // CPF / CNPJ
-    // =========================================================
-
     const [tipoDocumento, setTipoDocumento] = useState<
         "cpf" | "cnpj"
     >("cnpj");
 
+    const [documento, setDocumento] = useState("");
 
-    // =========================================================
+
     // ÁREA DE ATUAÇÃO
-    // =========================================================
 
     const [areasAtuacao, setAreasAtuacao] =
         useState<any[]>([]);
@@ -85,9 +94,7 @@ export const Cadastro: React.FC = () => {
     const dataNascimentoRef = useRef<HTMLInputElement>(null);
 
 
-    // =========================================================
     // MENSAGENS
-    // =========================================================
 
     const [loadingSubmit, setLoadingSubmit] =
         useState(false);
@@ -99,9 +106,7 @@ export const Cadastro: React.FC = () => {
         useState<string | null>(null);
 
 
-    // =========================================================
     // CARREGAR ÁREAS DE ATUAÇÃO
-    // =========================================================
 
     useEffect(() => {
         async function carregarAreas() {
@@ -139,9 +144,8 @@ export const Cadastro: React.FC = () => {
         carregarAreas();
     }, []);
 
-    // =========================================================
+
     // SUBMIT
-    // =========================================================
 
     const handleSubmit = async (
         e: React.FormEvent<HTMLFormElement>
@@ -159,10 +163,7 @@ export const Cadastro: React.FC = () => {
             const formData =
                 new FormData(e.currentTarget);
 
-
-            // =================================================
             // CLIENTE
-            // =================================================
 
             if (tipoUsuario === "cliente") {
 
@@ -191,9 +192,7 @@ export const Cadastro: React.FC = () => {
                 );
 
 
-                // ---------------------------------------------
                 // VALIDAÇÃO
-                // ---------------------------------------------
 
                 if (
                     !nome ||
@@ -224,9 +223,7 @@ export const Cadastro: React.FC = () => {
                 }
 
 
-                // ---------------------------------------------
                 // DADOS
-                // ---------------------------------------------
 
                 const dados = {
 
@@ -256,10 +253,7 @@ export const Cadastro: React.FC = () => {
 
             }
 
-
-            // =================================================
             // ORGANIZAÇÃO
-            // =================================================
 
             else {
 
@@ -327,12 +321,13 @@ export const Cadastro: React.FC = () => {
                     );
 
 
-                const documento =
-                    String(
-                        formData.get(
-                            tipoDocumento
-                        ) || ""
-                    ).trim();
+                // const documento =
+                //     String(
+                //         formData.get(
+                //             tipoDocumento
+                //         ) || ""
+                //     ).trim();
+                const documentoSemPontuacao = documento.replace(/\D/g, "");
 
 
                 const dataCriacao =
@@ -346,9 +341,7 @@ export const Cadastro: React.FC = () => {
                 const idAreaAtuacao = areaAtuacao;
 
 
-                // ---------------------------------------------
                 // VALIDAÇÃO
-                // ---------------------------------------------
 
                 if (
                     !nomeOrganizacao ||
@@ -385,10 +378,7 @@ export const Cadastro: React.FC = () => {
 
                 }
 
-
-                // ---------------------------------------------
                 // DADOS PARA O BACKEND
-                // ---------------------------------------------
 
                 const dados: any = {
                     nome: nomeOrganizacao,
@@ -405,8 +395,13 @@ export const Cadastro: React.FC = () => {
 
                     // Envia sempre os dois campos.
                     // O documento que não foi escolhido vai como null.
-                    cpf: tipoDocumento === "cpf" ? documento : null,
-                    cnpj: tipoDocumento === "cnpj" ? documento : null,
+                    cpf: tipoDocumento === "cpf"
+                        ? documentoSemPontuacao
+                        : null,
+
+                    cnpj: tipoDocumento === "cnpj"
+                        ? documentoSemPontuacao
+                        : null,
 
 
                     data_criacao: dataCriacao,
@@ -427,9 +422,7 @@ export const Cadastro: React.FC = () => {
             }
 
 
-            // =================================================
             // SUCESSO
-            // =================================================
 
             setSuccessMessage(
                 "Cadastro realizado com sucesso!"
@@ -461,9 +454,9 @@ export const Cadastro: React.FC = () => {
     };
 
 
-    // =========================================================
+
     // JSX
-    // =========================================================
+
 
     return (
 
@@ -959,11 +952,19 @@ export const Cadastro: React.FC = () => {
                         {/* DOCUMENTO */}
 
                         <div className="input-box documento-input">
-
                             <input
                                 type="text"
                                 id="documentoOrganizacao"
                                 name={tipoDocumento}
+                                value={documento}
+                                onChange={(e) => {
+                                    setDocumento(
+                                        formatarDocumento(
+                                            e.target.value,
+                                            tipoDocumento
+                                        )
+                                    );
+                                }}
                                 placeholder={
                                     tipoDocumento === "cnpj"
                                         ? "00.000.000/0000-00"
@@ -971,10 +972,7 @@ export const Cadastro: React.FC = () => {
                                 }
                             />
 
-                            <CreditCard
-                                size={20}
-                            />
-
+                            <CreditCard size={20} />
                         </div>
 
 

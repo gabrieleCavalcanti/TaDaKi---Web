@@ -1,5 +1,11 @@
 import React from "react";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+
+import { EsqueceuSenha } from "./pages/EsqueceuSenha";
+
+import { RedefinirSenha } from "./pages/RedefinirSenha";
+
 import { PrivateRoute } from "./components/PrivateRoute";
 import { Cadastro } from "./pages/Cadastro";
 import { Home } from "./pages/Home";
@@ -14,6 +20,10 @@ export const App: React.FC = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
+         <Route path="/esqueceuSenha" element={<EsqueceuSenha />} />
+
+         <Route path="/redefinirSenha" element={<RedefinirSenha />} />
+
         <Route path="/cadastro" element={<Cadastro />} />
 
         <Route element={<PrivateRoute />}>
