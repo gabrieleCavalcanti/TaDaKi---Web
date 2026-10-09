@@ -1,55 +1,166 @@
+/* =========================================================
+   TA-DA-KI — PERFIL
+   Paleta inspirada no Feed
+   ========================================================= */
+
+:root {
+    --vermelho: #B01013;
+    --vermelho-escuro: #7f2a2a;
+    --vermelho-claro: #d9232e;
+
+    --azul: #A2B9D5;
+    --azul-claro: #DCE6F1;
+    --azul-fundo: #EEF3F8;
+
+    --branco: #FFFFFF;
+
+    --fundo: #F4F2E2;
+    --fundo-claro: #F7F8FA;
+
+    --cinza: #70757C;
+    --cinza-claro: #F5F6F8;
+    --cinza-medio: #D6DDE5;
+    --cinza-escuro: #292D32;
+
+    --borda: #D6DDE5;
+}
+
+/* =========================================================
+   RESET
+========================================================= */
+
 * {
     box-sizing: border-box;
 }
 
 body {
     margin: 0;
-    background-color: #f4f2e2;
-    font-family: Arial, Helvetica, sans-serif;
-    color: #222;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--fundo) 0%,
+            var(--fundo-claro) 50%,
+            #e8eef5 100%
+        );
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    color: var(--cinza-escuro);
 }
 
-/* =========================
+/* =========================================================
    CONTAINER
-========================= */
+========================================================= */
 
 .container {
     min-height: 100vh;
+
     background:
-        linear-gradient(180deg,
+        radial-gradient(
+            circle at 90% 5%,
+            rgba(162, 185, 213, 0.35) 0,
+            rgba(162, 185, 213, 0) 28%
+        ),
+        linear-gradient(
+            180deg,
             #f4f2e2 0%,
-            #f7f5e9 100%);
+            #f7f8fa 100%
+        );
+
+    position: relative;
+    overflow-x: hidden;
 }
 
 .scrollContent {
     width: 100%;
     max-width: 1100px;
+
     margin: 0 auto;
+
     padding-bottom: 50px;
+
+    position: relative;
+    z-index: 1;
 }
 
-/* =========================
+/* =========================================================
    TOPO
-========================= */
+========================================================= */
 
 .topo {
     position: relative;
 
     min-height: 245px;
 
+    padding: 25px 45px 35px;
+
     background:
-        linear-gradient(135deg,
-            #acd5b7 0%,
-            #9fc8aa 100%);
+        linear-gradient(
+            135deg,
+            var(--vermelho) 0%,
+            #8f0d10 100%
+        );
 
     border-bottom-left-radius: 90px;
     border-bottom-right-radius: 90px;
 
-    padding: 25px 45px 35px;
-
     box-shadow:
-        0 8px 25px rgba(71, 93, 75, 0.12);
+        0 10px 30px rgba(176, 16, 19, 0.20);
+
+    overflow: hidden;
 }
+
+/* Círculo azul decorativo */
+
+.topo::before {
+    content: "";
+
+    position: absolute;
+
+    width: 300px;
+    height: 300px;
+
+    right: -100px;
+    top: -170px;
+
+    background: var(--azul);
+
+    border-radius: 50%;
+
+    opacity: 0.85;
+
+    pointer-events: none;
+}
+
+/* Círculo branco decorativo */
+
+.topo::after {
+    content: "";
+
+    position: absolute;
+
+    width: 170px;
+    height: 170px;
+
+    right: 120px;
+    bottom: -115px;
+
+    background: #ffffff;
+
+    border-radius: 50%;
+
+    opacity: 0.10;
+
+    pointer-events: none;
+}
+
+/* =========================================================
+   BOTÃO VOLTAR
+========================================================= */
 
 .botaoVoltar {
     position: absolute;
@@ -60,29 +171,41 @@ body {
     width: 45px;
     height: 45px;
 
-    border: none;
+    border: 2px solid rgba(255, 255, 255, 0.25);
+
     border-radius: 50%;
 
-    background-color: rgba(255, 255, 255, 0.45);
+    background-color: rgba(255, 255, 255, 0.16);
 
     display: flex;
     align-items: center;
     justify-content: center;
 
     font-size: 27px;
-    color: #263329;
+
+    color: #ffffff;
 
     cursor: pointer;
 
     transition:
         background-color 0.2s,
-        transform 0.2s;
+        transform 0.2s,
+        border-color 0.2s;
+
+    z-index: 5;
 }
 
 .botaoVoltar:hover {
-    background-color: rgba(255, 255, 255, 0.75);
+    background-color: rgba(255, 255, 255, 0.28);
+
+    border-color: rgba(255, 255, 255, 0.5);
+
     transform: translateX(-2px);
 }
+
+/* =========================================================
+   PERFIL
+========================================================= */
 
 .perfil {
     display: flex;
@@ -91,7 +214,14 @@ body {
     padding-top: 45px;
 
     gap: 22px;
+
+    position: relative;
+    z-index: 2;
 }
+
+/* =========================================================
+   AVATAR
+========================================================= */
 
 .avatar {
     width: 105px;
@@ -101,9 +231,14 @@ body {
 
     border-radius: 50%;
 
-    background-color: #f1f1eb;
+    background:
+        linear-gradient(
+            135deg,
+            #ffffff,
+            var(--azul-claro)
+        );
 
-    border: 5px solid rgba(255, 255, 255, 0.55);
+    border: 5px solid rgba(255, 255, 255, 0.75);
 
     display: flex;
     align-items: center;
@@ -111,12 +246,32 @@ body {
 
     font-size: 48px;
 
+    color: var(--vermelho);
+
     box-shadow:
-        0 6px 18px rgba(0, 0, 0, 0.12);
+        0 6px 20px rgba(0, 0, 0, 0.18),
+        0 0 0 3px rgba(162, 185, 213, 0.65);
 }
+
+/* =========================================================
+   INFORMAÇÕES
+========================================================= */
 
 .informacoes {
     flex: 1;
+
+    min-width: 0;
+}
+
+.linhaNomeFavorito {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 16px;
+
+    width: 100%;
 }
 
 .nomeLoja {
@@ -128,9 +283,10 @@ body {
         serif;
 
     font-size: 30px;
-    font-weight: 600;
 
-    color: #18231b;
+    font-weight: 700;
+
+    color: #ffffff;
 
     letter-spacing: -0.5px;
 }
@@ -138,19 +294,23 @@ body {
 .categoria {
     display: inline-block;
 
-    margin-top: 5px;
+    margin-top: 7px;
     margin-bottom: 15px;
 
-    padding: 5px 12px;
+    padding: 6px 13px;
 
     border-radius: 20px;
 
-    background-color: rgba(255, 255, 255, 0.45);
+    background-color: var(--azul);
+
+    color: var(--vermelho);
 
     font-size: 13px;
-    font-weight: 600;
 
-    color: #304536;
+    font-weight: 800;
+
+    box-shadow:
+        0 3px 8px rgba(0, 0, 0, 0.08);
 }
 
 .infoLinha {
@@ -161,10 +321,10 @@ body {
 
     font-size: 13px;
 
-    color: #344438;
+    color: rgba(255, 255, 255, 0.88);
 }
 
-.infoLinha>span:first-child {
+.infoLinha > span:first-child {
     width: 24px;
 
     font-size: 15px;
@@ -174,9 +334,9 @@ body {
     margin-left: 3px;
 }
 
-/* =========================
+/* =========================================================
    MENU
-========================= */
+========================================================= */
 
 .areaMenu {
     padding: 0 35px;
@@ -196,7 +356,8 @@ body {
     width: 55px;
     height: 55px;
 
-    border: none;
+    border: 2px solid transparent;
+
     border-radius: 50%;
 
     background-color: transparent;
@@ -205,48 +366,73 @@ body {
     align-items: center;
     justify-content: center;
 
-    color: #8b8e88;
+    color: var(--cinza);
 
     font-size: 28px;
 
     cursor: pointer;
 
     transition:
-        all 0.2s ease;
+        background-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease,
+        border-color 0.2s ease;
 }
 
 .iconeMenu:hover {
-    background-color: #e3e9df;
-    color: #3d5142;
+    background-color: var(--azul-claro);
+
+    border-color: var(--azul);
+
+    color: var(--vermelho);
 
     transform: translateY(-2px);
 }
 
 .iconeMenuSelecionado {
-    background-color: #acd5b7;
+    background-color: var(--vermelho);
 
-    color: #1d3023;
+    color: #ffffff;
+
+    border-color: var(--vermelho);
 
     box-shadow:
-        0 4px 10px rgba(91, 122, 96, 0.2);
+        0 5px 13px rgba(176, 16, 19, 0.25);
 }
+
+.iconeMenuSelecionado:hover {
+    background-color: var(--vermelho);
+
+    color: #ffffff;
+}
+
+/* =========================================================
+   LINHA
+========================================================= */
 
 .linha {
-    height: 1px;
+    height: 2px;
 
-    background-color: #d2d0c3;
+    background-color: var(--azul);
 
     margin: 0 5px 25px;
+
+    opacity: 0.65;
 }
 
-/* =========================
+/* =========================================================
    ESTATÍSTICAS
-========================= */
+========================================================= */
 
 .estatisticas {
     min-height: 105px;
 
-    background-color: #A2B9D5;
+    background:
+        linear-gradient(
+            135deg,
+            var(--azul) 0%,
+            #b9cbe0 100%
+        );
 
     border-radius: 25px;
 
@@ -257,8 +443,10 @@ body {
 
     padding: 12px;
 
+    border: 2px solid rgba(162, 185, 213, 0.75);
+
     box-shadow:
-        0 5px 18px rgba(0, 0, 0, 0.10);
+        0 7px 20px rgba(117, 8, 10, 0.10);
 }
 
 .estatistica {
@@ -272,19 +460,14 @@ body {
     text-align: center;
 }
 
-.iconeEstatistica {
-    font-size: 25px;
-
-    color: #38513e;
-}
-
 .numero {
     margin-top: 3px;
 
     font-size: 21px;
-    font-weight: 700;
 
-    color: #1e3024;
+    font-weight: 800;
+
+    color: var(--vermelho);
 }
 
 .label {
@@ -292,23 +475,24 @@ body {
 
     font-size: 12px;
 
-    color: #536258;
+    color: #4f5f70;
 }
 
 .divisor {
-    width: 1px;
+    width: 2px;
     height: 55px;
 
-    background-color: rgba(78, 112, 87, 0.25);
+    background-color: rgba(176, 16, 19, 0.20);
 }
 
-/* =========================
+/* =========================================================
    TÍTULOS
-========================= */
+========================================================= */
 
 .tituloLinha,
 .tituloAvaliacaoLinha {
     display: flex;
+
     align-items: center;
     justify-content: space-between;
 
@@ -326,9 +510,10 @@ body {
         serif;
 
     font-size: 21px;
-    font-weight: 600;
 
-    color: #222;
+    font-weight: 700;
+
+    color: var(--cinza-escuro);
 }
 
 .tituloAba {
@@ -340,9 +525,10 @@ body {
         serif;
 
     font-size: 22px;
-    font-weight: 600;
 
-    color: #222;
+    font-weight: 700;
+
+    color: var(--cinza-escuro);
 }
 
 .subtituloAba {
@@ -350,12 +536,12 @@ body {
 
     font-size: 13px;
 
-    color: #777;
+    color: var(--cinza);
 }
 
-/* =========================
-   BOTÃO AVALIAÇÃO
-========================= */
+/* =========================================================
+   BOTÃO CRIAR AVALIAÇÃO
+========================================================= */
 
 .botaoCriarAvaliacao {
     min-height: 42px;
@@ -363,9 +549,10 @@ body {
     padding: 0 16px;
 
     border: none;
+
     border-radius: 22px;
 
-    background-color: #acd5b7;
+    background-color: var(--vermelho);
 
     display: flex;
     align-items: center;
@@ -373,24 +560,30 @@ body {
 
     gap: 6px;
 
-    color: #26382b;
+    color: #ffffff;
 
     font-size: 12px;
-    font-weight: 700;
+
+    font-weight: 800;
 
     cursor: pointer;
 
     box-shadow:
-        0 3px 8px rgba(76, 103, 83, 0.14);
+        0 4px 10px rgba(176, 16, 19, 0.18);
 
     transition:
-        all 0.2s ease;
+        background-color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .botaoCriarAvaliacao:hover {
-    background-color: #99c9a5;
+    background-color: var(--vermelho-escuro);
 
     transform: translateY(-1px);
+
+    box-shadow:
+        0 7px 16px rgba(176, 16, 19, 0.22);
 }
 
 .botaoCriarAvaliacao:active {
@@ -401,9 +594,9 @@ body {
     font-size: 18px;
 }
 
-/* =========================
+/* =========================================================
    POSTS
-========================= */
+========================================================= */
 
 .destaques {
     display: flex;
@@ -417,6 +610,10 @@ body {
     padding: 4px 3px 12px;
 
     scrollbar-width: thin;
+
+    scrollbar-color:
+        var(--vermelho)
+        var(--azul-claro);
 }
 
 .cardPost {
@@ -425,30 +622,34 @@ body {
 
     padding: 0;
 
-    border: none;
+    border: 2px solid rgba(162, 185, 213, 0.55);
+
     border-radius: 18px;
 
     overflow: hidden;
 
-    background-color: #fff;
+    background-color: #ffffff;
 
     text-align: left;
 
     cursor: pointer;
 
     box-shadow:
-        0 4px 14px rgba(0, 0, 0, 0.07);
+        0 5px 16px rgba(117, 8, 10, 0.07);
 
     transition:
         transform 0.2s ease,
-        box-shadow 0.2s ease;
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
 }
 
 .cardPost:hover {
     transform: translateY(-4px);
 
+    border-color: var(--azul);
+
     box-shadow:
-        0 8px 22px rgba(0, 0, 0, 0.11);
+        0 10px 24px rgba(117, 8, 10, 0.13);
 }
 
 .imagemPost {
@@ -459,14 +660,19 @@ body {
 
     object-fit: cover;
 
-    background-color: #deded7;
+    background-color: var(--azul-claro);
 }
 
 .imagemPostSemImagem {
     width: 100%;
     height: 145px;
 
-    background-color: #e4e3da;
+    background:
+        linear-gradient(
+            135deg,
+            var(--azul-claro),
+            #eef2f6
+        );
 
     display: flex;
     align-items: center;
@@ -474,7 +680,7 @@ body {
 
     font-size: 38px;
 
-    color: #888;
+    color: var(--vermelho);
 }
 
 .conteudoPost {
@@ -483,14 +689,17 @@ body {
 
 .tituloPost {
     font-size: 15px;
-    font-weight: 700;
 
-    color: #252525;
+    font-weight: 800;
+
+    color: var(--cinza-escuro);
 
     line-height: 20px;
 
     display: -webkit-box;
+
     -webkit-line-clamp: 2;
+
     -webkit-box-orient: vertical;
 
     overflow: hidden;
@@ -500,48 +709,60 @@ body {
     margin-top: 7px;
 
     font-size: 12px;
+
     line-height: 17px;
 
-    color: #777;
+    color: var(--cinza);
 
     display: -webkit-box;
+
     -webkit-line-clamp: 2;
+
     -webkit-box-orient: vertical;
 
     overflow: hidden;
 }
 
-/* =========================
+/* =========================================================
    AVALIAÇÕES
-========================= */
+========================================================= */
 
 .cardAvaliacao {
     min-height: 95px;
 
     margin-bottom: 13px;
+
     padding: 17px 20px;
 
     border-radius: 18px;
 
-    background-color: #fff;
+    background-color: #ffffff;
+
+    border: 2px solid rgba(162, 185, 213, 0.45);
 
     display: flex;
+
     align-items: center;
     justify-content: space-between;
 
+    gap: 15px;
+
     box-shadow:
-        0 3px 12px rgba(0, 0, 0, 0.06);
+        0 4px 13px rgba(117, 8, 10, 0.06);
 
     transition:
         transform 0.2s,
-        box-shadow 0.2s;
+        box-shadow 0.2s,
+        border-color 0.2s;
 }
 
 .cardAvaliacao:hover {
     transform: translateY(-2px);
 
+    border-color: var(--azul);
+
     box-shadow:
-        0 6px 17px rgba(0, 0, 0, 0.08);
+        0 7px 18px rgba(117, 8, 10, 0.09);
 }
 
 .dadosAvaliacao {
@@ -552,45 +773,53 @@ body {
 
 .nomeCliente {
     font-size: 14px;
-    font-weight: 700;
 
-    color: #252525;
+    font-weight: 800;
+
+    color: var(--vermelho);
 
     margin-bottom: 4px;
 }
 
 .tituloAvaliacao {
     font-size: 13px;
-    font-weight: 500;
+
+    font-weight: 600;
 
     color: #555;
 }
 
-/* =========================
+/* =========================================================
    COMENTÁRIO
-========================= */
+========================================================= */
 
 .comentarioAvaliacao {
     display: flex;
+
     align-items: center;
 
     width: fit-content;
+
     max-width: 90%;
 
     margin-top: 9px;
+
     padding: 9px 13px;
 
-    background-color: #ffffff;
+    background-color: var(--azul-fundo);
+
+    border: 1px solid rgba(162, 185, 213, 0.7);
 
     border-radius: 14px;
 
     font-size: 12px;
+
     line-height: 17px;
 
-    color: #777;
+    color: #656b72;
 
     box-shadow:
-        0 2px 8px rgba(0, 0, 0, 0.05);
+        0 2px 8px rgba(117, 8, 10, 0.04);
 }
 
 .bolinhaComentario {
@@ -603,7 +832,7 @@ body {
 
     border-radius: 50%;
 
-    background-color: #B01013;
+    background-color: var(--vermelho);
 
     display: flex;
     align-items: center;
@@ -618,9 +847,9 @@ body {
     min-width: 0;
 }
 
-/* =========================
+/* =========================================================
    NOTA
-========================= */
+========================================================= */
 
 .nota {
     min-width: 55px;
@@ -629,7 +858,7 @@ body {
 
     border-radius: 12px;
 
-    background-color: #f1f5eb;
+    background-color: var(--azul-claro);
 
     display: flex;
     align-items: center;
@@ -638,9 +867,12 @@ body {
     gap: 4px;
 
     font-size: 18px;
-    font-weight: 700;
 
-    color: #304a35;
+    font-weight: 800;
+
+    color: var(--vermelho);
+
+    border: 1px solid rgba(162, 185, 213, 0.8);
 }
 
 .nota span {
@@ -649,9 +881,9 @@ body {
     font-size: 17px;
 }
 
-/* =========================
+/* =========================================================
    CABEÇALHO AVALIAÇÕES
-========================= */
+========================================================= */
 
 .cabecalhoAvaliacoes {
     display: flex;
@@ -669,26 +901,35 @@ body {
 
     border-radius: 16px;
 
-    background-color: #acd5b7;
+    background:
+        linear-gradient(
+            135deg,
+            var(--vermelho),
+            #8f0d10
+        );
 
     display: flex;
+
     align-items: center;
     justify-content: center;
 
     gap: 5px;
 
-    color: #26382b;
+    color: #ffffff;
 
     font-size: 18px;
+
+    box-shadow:
+        0 5px 12px rgba(176, 16, 19, 0.18);
 }
 
 .mediaAvaliacao span {
-    color: #d3a928;
+    color: #ffd76b;
 }
 
-/* =========================
+/* =========================================================
    ABAS
-========================= */
+========================================================= */
 
 .abaConteudo {
     padding-bottom: 30px;
@@ -699,16 +940,24 @@ body {
 
     border-radius: 22px;
 
-    background-color: #fff;
+    background-color: #ffffff;
+
+    border: 2px solid rgba(162, 185, 213, 0.45);
 
     box-shadow:
-        0 3px 12px rgba(0, 0, 0, 0.05);
+        0 4px 14px rgba(117, 8, 10, 0.05);
 }
 
 .cardInformacoes .infoLinha {
     padding: 12px 0;
 
-    border-bottom: 1px solid #eeeeea;
+    border-bottom: 1px solid var(--azul-claro);
+
+    color: var(--cinza-escuro);
+}
+
+.cardInformacoes .infoLinha > span:first-child {
+    color: var(--vermelho);
 }
 
 .cardInformacoes .infoLinha:last-child {
@@ -735,26 +984,32 @@ body {
     padding-bottom: 30px;
 }
 
-/* =========================
+/* =========================================================
    SEM CONTEÚDO
-========================= */
+========================================================= */
 
 .semPosts,
 .semPostsGrande,
 .semAvaliacoesContainer {
-    background-color: #ebe9dd;
+    background:
+        linear-gradient(
+            135deg,
+            #eef3f8,
+            #f7f8fa
+        );
 
-    border: 1px dashed #c9c6b8;
+    border: 2px dashed var(--azul);
 
     border-radius: 22px;
 
     display: flex;
+
     flex-direction: column;
 
     align-items: center;
     justify-content: center;
 
-    color: #777;
+    color: var(--cinza);
 }
 
 .semPosts {
@@ -779,6 +1034,8 @@ body {
 .iconeSemAvaliacao {
     font-size: 40px;
 
+    color: var(--vermelho);
+
     opacity: 0.55;
 }
 
@@ -788,17 +1045,18 @@ body {
 
     font-size: 14px;
 
-    color: #777;
+    color: var(--cinza);
 }
 
-/* =========================
+/* =========================================================
    LOADING
-========================= */
+========================================================= */
 
 .carregando {
     min-height: 150px;
 
     display: flex;
+
     flex-direction: column;
 
     align-items: center;
@@ -809,9 +1067,9 @@ body {
     width: 35px;
     height: 35px;
 
-    border: 4px solid #ddd;
+    border: 4px solid var(--azul-claro);
 
-    border-top-color: #7eaa88;
+    border-top-color: var(--vermelho);
 
     border-radius: 50%;
 
@@ -824,7 +1082,7 @@ body {
 
     font-size: 13px;
 
-    color: #777;
+    color: var(--cinza);
 }
 
 @keyframes spin {
@@ -833,19 +1091,517 @@ body {
     }
 }
 
-/* =========================
-   RESPONSIVO
-========================= */
+/* =========================================================
+   FAVORITO
+========================================================= */
+
+.botaoFavoritar {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    min-width: 125px;
+    height: 42px;
+
+    padding: 0 16px;
+
+    border: 2px solid var(--azul);
+
+    border-radius: 22px;
+
+    background-color: #ffffff;
+
+    color: var(--vermelho);
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.15s ease,
+        box-shadow 0.2s ease;
+}
+
+.botaoFavoritar svg {
+    flex-shrink: 0;
+
+    display: block;
+}
+
+.botaoFavoritar:hover {
+    background-color: var(--azul-claro);
+
+    border-color: var(--vermelho);
+
+    color: var(--vermelho);
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 4px 10px rgba(117, 8, 10, 0.14);
+}
+
+.botaoFavoritar:active {
+    transform: scale(0.97);
+}
+
+.botaoFavoritar:disabled {
+    opacity: 0.6;
+
+    cursor: not-allowed;
+
+    transform: none;
+
+    box-shadow: none;
+}
+
+.botaoFavoritado {
+    background-color: var(--vermelho);
+
+    border-color: var(--vermelho);
+
+    color: #ffffff;
+}
+
+.botaoFavoritado:hover {
+    background-color: var(--vermelho-escuro);
+
+    border-color: var(--vermelho-escuro);
+
+    color: #ffffff;
+}
+
+/* =========================================================
+   MODAL DE AVALIAÇÃO
+========================================================= */
+
+.modalOverlay {
+    position: fixed;
+
+    inset: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(41, 45, 50, 0.58);
+
+    z-index: 200;
+
+    overflow-y: auto;
+}
+
+.modalAvaliacao {
+    width: min(600px, 100%);
+
+    max-height: calc(100vh - 40px);
+
+    overflow-y: auto;
+
+    padding: 28px;
+
+    background: #ffffff;
+
+    border-top: 7px solid var(--vermelho);
+
+    border-radius: 20px;
+
+    box-shadow:
+        0 25px 60px rgba(0, 0, 0, 0.22);
+}
+
+.modalCabecalho {
+    display: flex;
+
+    align-items: flex-start;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 25px;
+}
+
+.modalTitulo {
+    margin: 0;
+
+    color: var(--vermelho);
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: 25px;
+
+    font-weight: 700;
+}
+
+.modalSubtitulo {
+    margin: 6px 0 0;
+
+    color: var(--cinza);
+
+    font-size: 13px;
+
+    line-height: 1.5;
+}
+
+.modalFechar {
+    width: 39px;
+    height: 39px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: var(--azul-claro);
+
+    color: var(--vermelho);
+
+    font-size: 25px;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.modalFechar:hover {
+    background: var(--azul);
+
+    transform: rotate(3deg);
+}
+
+/* =========================================================
+   FORMULÁRIO
+========================================================= */
+
+.formAvaliacao {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 18px;
+}
+
+.campoAvaliacao {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+.labelAvaliacao {
+    color: var(--vermelho);
+
+    font-size: 13px;
+
+    font-weight: 800;
+}
+
+.inputAvaliacao,
+.textareaAvaliacao {
+    width: 100%;
+
+    padding: 12px 13px;
+
+    border: 2px solid var(--azul);
+
+    border-radius: 10px;
+
+    outline: none;
+
+    background: #ffffff;
+
+    color: var(--cinza-escuro);
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.inputAvaliacao:focus,
+.textareaAvaliacao:focus {
+    border-color: var(--vermelho);
+
+    box-shadow:
+        0 0 0 3px rgba(176, 16, 19, 0.08);
+}
+
+.textareaAvaliacao {
+    min-height: 110px;
+
+    resize: vertical;
+}
+
+.contadorCaracteres {
+    align-self: flex-end;
+
+    margin-top: -3px;
+
+    color: var(--cinza);
+
+    font-size: 11px;
+}
+
+/* =========================================================
+   ESTRELAS
+========================================================= */
+
+.estrelasAvaliacao {
+    display: flex;
+
+    align-items: center;
+
+    gap: 5px;
+}
+
+.estrelaBotao {
+    padding: 0;
+
+    border: none;
+
+    background: transparent;
+
+    color: #cfd5dc;
+
+    font-size: 34px;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        color 0.15s ease,
+        transform 0.15s ease;
+}
+
+.estrelaBotao:hover {
+    color: #d3a928;
+
+    transform: scale(1.08);
+}
+
+.estrelaSelecionada {
+    color: #d3a928;
+}
+
+.textoNota {
+    color: var(--vermelho);
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+/* =========================================================
+   CHECKBOX ANÔNIMO
+========================================================= */
+
+.checkboxAnonimo {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    cursor: pointer;
+
+    color: var(--cinza-escuro);
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+.checkboxAnonimo input {
+    width: 17px;
+    height: 17px;
+
+    accent-color: var(--vermelho);
+
+    cursor: pointer;
+}
+
+.textoAnonimo {
+    color: var(--cinza-escuro);
+}
+
+/* =========================================================
+   MENSAGENS
+========================================================= */
+
+.mensagemErroAvaliacao {
+    padding: 12px 14px;
+
+    border-radius: 10px;
+
+    background: #fbeeee;
+
+    border: 1px solid #e6b7b8;
+
+    color: var(--vermelho);
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+.mensagemSucessoAvaliacao {
+    padding: 12px 14px;
+
+    border-radius: 10px;
+
+    background: #eef3f8;
+
+    border: 1px solid var(--azul);
+
+    color: var(--vermelho);
+
+    font-size: 13px;
+
+    font-weight: 700;
+}
+
+/* =========================================================
+   RODAPÉ DO MODAL
+========================================================= */
+
+.modalRodape {
+    display: flex;
+
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 10px;
+
+    margin-top: 5px;
+}
+
+.botaoCancelarAvaliacao,
+.botaoEnviarAvaliacao {
+    min-height: 45px;
+
+    padding: 0 18px;
+
+    border-radius: 10px;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.botaoCancelarAvaliacao {
+    border: 2px solid var(--azul);
+
+    background: #ffffff;
+
+    color: var(--vermelho);
+}
+
+.botaoCancelarAvaliacao:hover {
+    background: var(--azul-claro);
+
+    transform: translateY(-1px);
+}
+
+.botaoEnviarAvaliacao {
+    border: none;
+
+    background: var(--vermelho);
+
+    color: #ffffff;
+
+    box-shadow:
+        0 5px 12px rgba(176, 16, 19, 0.20);
+}
+
+.botaoEnviarAvaliacao:hover:not(:disabled) {
+    background: var(--vermelho-escuro);
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 8px 17px rgba(176, 16, 19, 0.25);
+}
+
+.botaoEnviarAvaliacao:disabled,
+.botaoCancelarAvaliacao:disabled {
+    opacity: 0.55;
+
+    cursor: not-allowed;
+}
+
+.spinnerBotao {
+    display: inline-block;
+
+    width: 15px;
+    height: 15px;
+
+    margin-right: 7px;
+
+    border: 2px solid rgba(255, 255, 255, 0.45);
+
+    border-top-color: #ffffff;
+
+    border-radius: 50%;
+
+    animation:
+        spin 0.7s linear infinite;
+
+    vertical-align: middle;
+}
+
+/* =========================================================
+   RESPONSIVO — 700px
+========================================================= */
 
 @media (max-width: 700px) {
 
     .topo {
-        min-height: 220px;
+        min-height: 225px;
 
         padding: 20px 22px 30px;
 
         border-bottom-left-radius: 65px;
         border-bottom-right-radius: 65px;
+    }
+
+    .topo::before {
+        width: 190px;
+        height: 190px;
+
+        right: -90px;
+        top: -100px;
     }
 
     .botaoVoltar {
@@ -905,10 +1661,6 @@ body {
         min-height: 90px;
     }
 
-    .iconeEstatistica {
-        font-size: 21px;
-    }
-
     .numero {
         font-size: 17px;
     }
@@ -943,7 +1695,42 @@ body {
     .comentarioAvaliacao {
         max-width: 88%;
     }
+
+    .modalAvaliacao {
+        padding: 22px;
+
+        border-radius: 16px;
+    }
 }
+
+/* =========================================================
+   RESPONSIVO — 600px
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .linhaNomeFavorito {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 10px;
+    }
+
+    .botaoFavoritar {
+        min-width: 115px;
+
+        height: 40px;
+
+        padding: 0 14px;
+
+        font-size: 13px;
+    }
+}
+
+/* =========================================================
+   RESPONSIVO — 450px
+========================================================= */
 
 @media (max-width: 450px) {
 
@@ -1012,13 +1799,26 @@ body {
         flex-shrink: 0;
 
         margin-right: 10px;
+    }
 
-        border-radius: 50%;
+    .modalOverlay {
+        padding: 10px;
+    }
 
-        background-color: #B01013;
+    .modalAvaliacao {
+        max-height: calc(100vh - 20px);
 
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        padding: 18px;
+    }
+
+    .modalRodape {
+        flex-direction: column-reverse;
+
+        align-items: stretch;
+    }
+
+    .botaoCancelarAvaliacao,
+    .botaoEnviarAvaliacao {
+        width: 100%;
     }
 }
