@@ -22,7 +22,7 @@ export const App: React.FC = () => {
         <Route path="/login" element={<Login />} />
          <Route path="/esqueceuSenha" element={<EsqueceuSenha />} />
 
-         <Route path="/redefinirSenha" element={<RedefinirSenha />} />
+         <Route path="/redefinir-senha" element={<RedefinirSenha />} />
 
         <Route path="/cadastro" element={<Cadastro />} />
 

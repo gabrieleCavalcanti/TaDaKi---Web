@@ -1,0 +1,348 @@
+
+/* =========================================
+   PÁGINA ESQUECEU A SENHA
+========================================= */
+
+.recovery-page {
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+
+  padding: 40px 10% 40px 15%;
+  box-sizing: border-box;
+
+  font-family: sans-serif;
+
+  background-image: url("../assets/fundo1.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* =========================================
+   LATERAL VERMELHA
+========================================= */
+
+.recovery-red-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 40%;
+  height: 100%;
+
+  background: rgba(117, 8, 10, 1);
+
+  border-top-right-radius: 170px;
+  border-bottom-right-radius: 170px;
+
+  z-index: 10;
+}
+
+/* =========================================
+   TEXTO LATERAL
+========================================= */
+
+.recovery-side-content {
+  position: absolute;
+  top: 30%;
+  left: 15%;
+
+  width: 400px;
+  max-width: 80%;
+
+  color: #fff;
+  z-index: 11;
+}
+
+.recovery-side-content h2 {
+  margin: 0 0 18px;
+  font-size: 32px;
+  line-height: 1.4;
+  font-weight: 700;
+}
+
+.recovery-side-content p {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+/* =========================================
+   CARD
+========================================= */
+
+.recovery-card {
+  width: 52%;
+  max-width: 600px;
+  min-width: 350px;
+
+  min-height: 480px;
+  padding: 36px;
+
+  box-sizing: border-box;
+  position: relative;
+  z-index: 20;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  background: #f0f2f4;
+  border-radius: 25px;
+}
+
+/* =========================================
+   LOGO
+========================================= */
+
+.recovery-logo-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.recovery-logo {
+  width: 150px;
+  height: auto;
+  object-fit: contain;
+}
+
+/* =========================================
+   TÍTULO E DESCRIÇÃO
+========================================= */
+
+.recovery-heading {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.recovery-heading h1 {
+  margin: 0 0 12px;
+  color: #374151;
+  font-size: 25px;
+  font-weight: 700;
+}
+
+.recovery-heading p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* =========================================
+   FORMULÁRIO
+========================================= */
+
+.recovery-card form {
+  width: 100%;
+}
+
+.recovery-form-group {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.recovery-form-group label {
+  display: block;
+  margin-bottom: 7px;
+
+  color: #374151;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* =========================================
+   CAMPO DE E-MAIL
+========================================= */
+
+.recovery-input-container {
+  position: relative;
+  width: 100%;
+}
+
+.recovery-input {
+  width: 100%;
+  height: 45px;
+
+  box-sizing: border-box;
+  padding: 13px 42px 13px 20px;
+
+  background-color: #fafafa;
+  border: none;
+  outline: none;
+  border-radius: 15px;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: #000;
+
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+.recovery-input:focus {
+  box-shadow:
+    inset 0 0 0 1px #d2272a,
+    0 0 0 2px rgba(210, 39, 42, 0.12);
+}
+
+.recovery-input-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+/* =========================================
+   MENSAGENS
+========================================= */
+
+.recovery-error,
+.recovery-success {
+  margin: 0 0 15px;
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.recovery-error {
+  color: #b91c1c;
+}
+
+.recovery-success {
+  color: #166534;
+}
+
+/* =========================================
+   BOTÃO
+========================================= */
+
+.recovery-button {
+  width: 100%;
+  margin-top: 5px;
+  padding: 13px 16px;
+
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 15px;
+
+  background-color: rgb(210, 39, 42);
+  color: #fff;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.recovery-button:hover:not(:disabled) {
+  background-color: #b91f24;
+}
+
+.recovery-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* =========================================
+   VOLTAR AO LOGIN
+========================================= */
+
+.recovery-footer {
+  display: flex;
+  justify-content: center;
+  margin-top: 22px;
+}
+
+.recovery-link {
+  color: #d2272a;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.recovery-link:hover {
+  text-decoration: underline;
+}
+
+/* =========================================
+   RESPONSIVIDADE
+========================================= */
+
+@media screen and (max-width: 800px) {
+  .recovery-page {
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  .recovery-red-background {
+    width: 100%;
+    height: 35%;
+
+    border-radius: 0 0 70px 70px;
+  }
+
+  .recovery-side-content {
+    top: 35px;
+    left: 8%;
+    width: 84%;
+    max-width: none;
+    text-align: center;
+  }
+
+  .recovery-side-content h2 {
+    margin-bottom: 8px;
+    font-size: 25px;
+  }
+
+  .recovery-side-content p {
+    font-size: 15px;
+    line-height: 1.4;
+  }
+
+  .recovery-card {
+    width: 100%;
+    max-width: 460px;
+    min-width: 0;
+    min-height: 0;
+
+    margin-top: 100px;
+    padding: 30px 24px;
+  }
+
+  .recovery-logo {
+    width: 130px;
+  }
+
+  .recovery-heading h1 {
+    font-size: 23px;
+  }
+}
+
+@media screen and (max-width: 380px) {
+  .recovery-page {
+    padding: 30px 12px;
+  }
+
+  .recovery-card {
+    padding: 25px 18px;
+  }
+
+  .recovery-side-content h2 {
+    font-size: 22px;
+  }
+
+  .recovery-side-content p {
+    font-size: 13px;
+  }
+}
+
