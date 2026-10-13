@@ -16,8 +16,8 @@
 
   font-family: sans-serif;
 
-  background-color: #a2b9d5;
-  /* background-image: url("../assets/Mapa\ imagem\ de\ fundo.png"); */
+  /* background-color: #a2b9d5; */
+  background-image: url("../assets/fundo1.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -48,14 +48,50 @@
    ÍCONE DA LOJA
 ========================================= */
 
-.login-store-icon {
+/* .login-store-icon {
   position: absolute;
 
   left: -30px;
   bottom: 10px;
 
   opacity: 0.45;
+} */
+
+/* =========================================
+TEXTO DA LATERAL VERMELHA
+========================================= */
+
+.login-store-icon {
+position: absolute;
+top: 30%;
+left: 15%;
+
+width: 400px;
+max-width: 80%;
+
+color: #ffffff;
+opacity: 1;
+
+z-index: 11;
 }
+
+.login-store-icon h2 {
+margin: 0 0 18px;
+
+font-size: 32px;
+line-height: 1.4;
+font-weight: 700;
+
+white-space: normal;
+}
+
+.login-store-icon p {
+margin: 0;
+font-size: 20px;
+line-height: 1.4;
+font-weight: 400;
+}
+
 
 /* =========================================
    CARD

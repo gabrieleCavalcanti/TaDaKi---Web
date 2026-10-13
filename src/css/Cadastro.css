@@ -8,7 +8,7 @@
   min-height: 100vh;
   padding: 20px;
 
-  /* background-image: url("../assets/imagem_fundo.jpg"); */
+  background-image: url("../assets/fundo1.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -1270,6 +1270,19 @@
     color: #75080a !important;
     text-decoration: none !important;
   }
+}
+
+/* LINK PARA IR À PÁGINA DE LOGIN */
+.login-link a {
+color: #C9434D;
+font-weight: 600;
+text-decoration: none;
+transition: color 0.3s ease;
+}
+
+.login-link a {
+color: #A52D37;
+text-decoration: underline;
 }
 
 /* REMOVENDO ICONE PADRÃO DO CAMPO DATE */
