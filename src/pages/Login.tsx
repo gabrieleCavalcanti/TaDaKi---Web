@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 
 import { CircleUser, Eye, EyeOff } from "lucide-react";
@@ -43,9 +42,7 @@ export const Login: React.FC = () => {
     } catch (error) {
       console.error("ERRO REAL DO LOGIN:", error);
 
-      setErrorMessage(
-        "Falha na autenticação. Verifique seus dados."
-      );
+      setErrorMessage("Falha na autenticação. Verifique seus dados.");
     } finally {
       setLoadingSubmit(false);
     }
@@ -53,50 +50,48 @@ export const Login: React.FC = () => {
 
   return (
     <section className="login-page">
-
       {/* FUNDO VERMELHO */}
       <div className="login-red-background">
-
-        <IoStorefront
+        {/* <IoStorefront
           size={390}
           color="#8f1725"
           strokeWidth={1}
           className="login-store-icon"
-        />
+        /> */}
 
+        <div className="login-store-icon">
+          <h2>
+            Conectando pessoas
+            <br />
+            a microempresas
+            <br />
+            perto de você.
+          </h2>
+
+          <p>
+            Encontre negócios locais,
+            <br />
+            valorize quem está pertinho
+            <br />e faça a diferença na sua região.
+          </p>
+        </div>
       </div>
 
       {/* CARD */}
       <div className="login-card">
-
         {/* LOGO */}
         <div className="login-logo-container">
-
-          <img
-            src={logo}
-            alt="Logo"
-            className="login-logo"
-          />
-
+          <img src={logo} alt="Logo" className="login-logo" />
         </div>
 
         {/* FORMULÁRIO */}
         <form onSubmit={handleSubmit}>
-
           {/* USERNAME */}
           <div className="form-group">
-
-            <label htmlFor="username">
-              Username
-            </label>
+            <label htmlFor="username">Username</label>
 
             <div className="login-input-container">
-
-              <CircleUser
-                size={18}
-                color="#64748b"
-                className="username-icon"
-              />
+              <CircleUser size={18} color="#64748b" className="username-icon" />
 
               <input
                 id="username"
@@ -107,21 +102,14 @@ export const Login: React.FC = () => {
                 onChange={(e) => setUsername(e.target.value)}
                 required
               />
-
             </div>
-
           </div>
-
 
           {/* PASSWORD */}
           <div className="form-group password-group">
-
-            <label htmlFor="password">
-              Password
-            </label>
+            <label htmlFor="password">Password</label>
 
             <div className="login-input-container">
-
               <input
                 id="password"
                 type={showPassword ? "text" : "password"}
@@ -138,46 +126,25 @@ export const Login: React.FC = () => {
                 onClick={() => setShowPassword(!showPassword)}
                 className="password-toggle"
               >
-                {showPassword ? (
-                  <EyeOff size={18} />
-                ) : (
-                  <Eye size={18} />
-                )}
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
-
             </div>
-
           </div>
 
-
           {/* ERRO */}
-          {errorMessage && (
-            <p className="login-error">
-              {errorMessage}
-            </p>
-          )}
-
+          {errorMessage && <p className="login-error">{errorMessage}</p>}
 
           {/* LEMBRE-ME / ESQUECEU A SENHA */}
           <div className="login-options">
-
             <label className="remember-label">
-
               <input type="checkbox" />
-
               Lembre-me
-
             </label>
 
-            <a
-              href="#"
-              className="forgot-password"
-            >
+            <Link to="/esqueceuSenha" className="forgot-password">
               Esqueceu a senha?
-            </a>
-
+            </Link>
           </div>
-
 
           {/* BOTÃO */}
           <button
@@ -187,42 +154,26 @@ export const Login: React.FC = () => {
           >
             {loadingSubmit ? "Entrando..." : "Entrar"}
           </button>
-
         </form>
-
 
         {/* DIVISOR */}
         <div className="login-divider">
-
           <div className="login-divider-line" />
 
-          <span className="login-divider-text">
-            ou
-          </span>
+          <span className="login-divider-text">ou</span>
 
           <div className="login-divider-line" />
-
         </div>
-
 
         {/* CADASTRO */}
         <div className="login-register">
+          <span className="login-register-text">Não tem uma conta?</span>
 
-          <span className="login-register-text">
-            Não tem uma conta?
-          </span>
-
-          <Link
-            to="/cadastro"
-            className="login-register-link"
-          >
+          <Link to="/cadastro" className="login-register-link">
             Registre-se
           </Link>
-
         </div>
-
       </div>
-
     </section>
   );
 };
