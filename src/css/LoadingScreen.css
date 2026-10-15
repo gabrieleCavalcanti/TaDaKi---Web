@@ -1,0 +1,173 @@
+.tadaki-loading {
+  min-height: 100dvh;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: #ffffff;
+  color: #292d32;
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.tadaki-loading-card {
+  position: relative;
+  z-index: 1;
+  width: min(480px, 100%);
+  padding: 44px 32px;
+  border: 1px solid #a2b9d5;
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 22px 75px rgba(162, 185, 213, 0.25);
+  text-align: center;
+  animation: tadaki-loading-enter 0.5s ease both;
+}
+
+.tadaki-loading-logo {
+  width: 150px;
+  height: 72px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto 26px;
+}
+
+.tadaki-loading-card h1 {
+  font-size: 24px;
+  line-height: 1.4;
+  letter-spacing: -0.7px;
+  margin: 24px 0 12px;
+}
+
+.tadaki-loading-card p {
+  font-size: 13px;
+  line-height: 1.7;
+  color: #292d32;
+  margin: 0;
+}
+
+.tadaki-loading-card small {
+  display: block;
+  color: #292d32;
+  font-size: 11px;
+  margin-top: 24px;
+}
+
+.tadaki-loading-bars {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 28px;
+}
+
+.tadaki-loading-bars span {
+  width: 5px;
+  height: 22px;
+  border-radius: 5px;
+  background: #a2b9d5;
+  animation: tadaki-loading-bar 1s ease-in-out infinite;
+}
+
+.tadaki-loading-bars span:nth-child(2) {
+  background: #b01013;
+  animation-delay: 0.12s;
+}
+
+.tadaki-loading-bars span:nth-child(3) {
+  animation-delay: 0.24s;
+}
+
+.tadaki-loading-bars span:nth-child(4) {
+  animation-delay: 0.36s;
+}
+
+.tadaki-loading-track {
+  width: 160px;
+  height: 3px;
+  margin: 24px auto 0;
+  overflow: hidden;
+  background: #a2b9d5;
+  border-radius: 8px;
+}
+
+.tadaki-loading-track span {
+  display: block;
+  height: 100%;
+  width: 45%;
+  background: #b01013;
+  border-radius: 8px;
+  animation: tadaki-loading-progress 1.5s ease-in-out infinite;
+}
+
+.tadaki-loading-orbit {
+  position: absolute;
+  width: 65vw;
+  height: 65vw;
+  min-width: 550px;
+  min-height: 550px;
+  border: 1px solid #a2b9d5;
+  border-radius: 42%;
+  animation: tadaki-loading-orbit 24s linear infinite;
+}
+
+@keyframes tadaki-loading-bar {
+  0%,
+  100% {
+    transform: scaleY(0.4);
+    opacity: 0.5;
+  }
+
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+@keyframes tadaki-loading-progress {
+  from {
+    transform: translateX(-110%);
+  }
+
+  to {
+    transform: translateX(330%);
+  }
+}
+
+@keyframes tadaki-loading-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes tadaki-loading-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 480px) {
+  .tadaki-loading-card {
+    padding: 32px 22px;
+  }
+
+  .tadaki-loading-card h1 {
+    font-size: 21px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tadaki-loading * {
+    animation: none !important;
+  }
+
+  .tadaki-loading-track span {
+    width: 100%;
+  }
+}

@@ -26,6 +26,7 @@ import { proximity, proximityLabels } from "./recommendations";
 import { useDialog } from "./useDialog";
 import { CreatePostModal } from "./CreatePostModal";
 import { PostCard } from "./PostCard";
+import { ScrollReveal } from "./ScrollReveal";
 import "../../css/Feed.css";
 
 export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
@@ -59,7 +60,7 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
   const closeComposer = useCallback(() => setComposerOpen(false), []);
   useDialog(menuOpen, menuRef, closeMenu);
   useDialog(Boolean(imagePost), imageRef, closeImage);
-  const type = userType(feed.person ?? user);
+  const type = userType(feed.person) || userType(user);
   const canCreate = type === "ORGANIZACAO";
   const canFavorite = type === "CLIENTE";
   const filtered = useMemo(
@@ -89,8 +90,23 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
   const timelineError = favoritesOnly && feed.favoritesError ? "Não foi possível carregar sua timeline. Atualize os favoritos para tentar novamente." : "";
   const goProfile = () => {
     closeMenu();
-    const id = Number(user?.id_pessoa ?? user?.id_pessoa_login);
-    navigate(canCreate ? `/perfil/${id}` : "/perfil-pessoal");
+    if (type === "CLIENTE") {
+      navigate("/perfil-pessoal");
+      return;
+    }
+    if (type === "ORGANIZACAO") {
+      const id = Number(
+        user?.id_pessoa ?? user?.id_pessoa_login ??
+        feed.person?.id_pessoa ?? feed.person?.id_pessoa_login,
+      );
+      if (Number.isSafeInteger(id) && id > 0) {
+        navigate(`/perfil/${id}`);
+      } else {
+        feed.setNotice("Não foi possível identificar seu perfil. Atualize a página e tente novamente.");
+      }
+      return;
+    }
+    feed.setNotice("Não foi possível identificar o tipo da sua conta. Atualize a página e tente novamente.");
   };
   return (
     <main className="feed-page">
@@ -365,7 +381,7 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
             ) : (
               <div className="post-list">
                 {filtered.slice(0, limit).map((post) => (
-                  <div key={post.id_post}>
+                  <ScrollReveal key={post.id_post}>
                     {!onlyLikes &&
                       !favoritesOnly &&
                       !discovery.locating &&
@@ -395,6 +411,7 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
                         `favorite:${post.id_organizacao}`,
                       )}
                       canFavorite={canFavorite}
+                      favoriteError={feed.favoriteErrors[post.id_organizacao]}
                       onLike={(id) => void feed.toggleLike(id)}
                       onFavorite={(id) => void feed.toggleFavorite(id)}
                       onOpenOrganization={(id) => {
@@ -407,7 +424,7 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
                         setImagePost(post);
                       }}
                     />
-                  </div>
+                  </ScrollReveal>
                 ))}
                 {filtered.length > limit && (
                   <button
