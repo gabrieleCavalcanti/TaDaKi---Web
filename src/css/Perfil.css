@@ -14,8 +14,8 @@
 
     --branco: #FFFFFF;
 
-    --fundo: #F4F2E2;
-    --fundo-claro: #F7F8FA;
+    --fundo: #FFFFFF;
+    --fundo-claro: #FFFFFF;
 
     --cinza: #70757C;
     --cinza-claro: #F5F6F8;
@@ -37,12 +37,10 @@ body {
     margin: 0;
 
     background:
-        linear-gradient(
-            135deg,
+        linear-gradient(135deg,
             var(--fundo) 0%,
             var(--fundo-claro) 50%,
-            #e8eef5 100%
-        );
+            #FFFFFF 100%);
 
     font-family:
         Arial,
@@ -60,16 +58,12 @@ body {
     min-height: 100vh;
 
     background:
-        radial-gradient(
-            circle at 90% 5%,
-            rgba(162, 185, 213, 0.35) 0,
-            rgba(162, 185, 213, 0) 28%
-        ),
-        linear-gradient(
-            180deg,
-            #f4f2e2 0%,
-            #f7f8fa 100%
-        );
+        radial-gradient(circle at 90% 5%,
+            rgba(162, 185, 213, 0.25) 0,
+            rgba(162, 185, 213, 0) 28%),
+        linear-gradient(180deg,
+            #FFFFFF 0%,
+            #FFFFFF 100%);
 
     position: relative;
     overflow-x: hidden;
@@ -99,11 +93,9 @@ body {
     padding: 25px 45px 35px;
 
     background:
-        linear-gradient(
-            135deg,
+        linear-gradient(135deg,
             var(--vermelho) 0%,
-            #8f0d10 100%
-        );
+            #8f0d10 100%);
 
     border-bottom-left-radius: 90px;
     border-bottom-right-radius: 90px;
@@ -232,11 +224,9 @@ body {
     border-radius: 50%;
 
     background:
-        linear-gradient(
-            135deg,
+        linear-gradient(135deg,
             #ffffff,
-            var(--azul-claro)
-        );
+            var(--azul-claro));
 
     border: 5px solid rgba(255, 255, 255, 0.75);
 
@@ -324,7 +314,7 @@ body {
     color: rgba(255, 255, 255, 0.88);
 }
 
-.infoLinha > span:first-child {
+.infoLinha>span:first-child {
     width: 24px;
 
     font-size: 15px;
@@ -428,11 +418,9 @@ body {
     min-height: 105px;
 
     background:
-        linear-gradient(
-            135deg,
+        linear-gradient(135deg,
             var(--azul) 0%,
-            #b9cbe0 100%
-        );
+            #b9cbe0 100%);
 
     border-radius: 25px;
 
@@ -612,8 +600,7 @@ body {
     scrollbar-width: thin;
 
     scrollbar-color:
-        var(--vermelho)
-        var(--azul-claro);
+        var(--vermelho) var(--azul-claro);
 }
 
 .cardPost {
@@ -668,11 +655,9 @@ body {
     height: 145px;
 
     background:
-        linear-gradient(
-            135deg,
+        linear-gradient(135deg,
             var(--azul-claro),
-            #eef2f6
-        );
+            #eef2f6);
 
     display: flex;
     align-items: center;
@@ -902,11 +887,9 @@ body {
     border-radius: 16px;
 
     background:
-        linear-gradient(
-            135deg,
+        linear-gradient(135deg,
             var(--vermelho),
-            #8f0d10
-        );
+            #8f0d10);
 
     display: flex;
 
@@ -956,7 +939,7 @@ body {
     color: var(--cinza-escuro);
 }
 
-.cardInformacoes .infoLinha > span:first-child {
+.cardInformacoes .infoLinha>span:first-child {
     color: var(--vermelho);
 }
 
@@ -992,11 +975,9 @@ body {
 .semPostsGrande,
 .semAvaliacoesContainer {
     background:
-        linear-gradient(
-            135deg,
+        linear-gradient(135deg,
             #eef3f8,
-            #f7f8fa
-        );
+            #f7f8fa);
 
     border: 2px dashed var(--azul);
 
@@ -1096,73 +1077,20 @@ body {
 ========================================================= */
 
 .botaoFavoritar {
-    display: inline-flex;
-
-    align-items: center;
-    justify-content: center;
-
-    gap: 7px;
-
-    min-width: 125px;
-    height: 42px;
-
-    padding: 0 16px;
-
-    border: 2px solid var(--azul);
-
-    border-radius: 22px;
-
-    background-color: #ffffff;
-
-    color: var(--vermelho);
-
-    font-family: inherit;
-
-    font-size: 14px;
-
-    font-weight: 800;
-
-    cursor: pointer;
-
-    transition:
-        background-color 0.2s ease,
-        color 0.2s ease,
-        border-color 0.2s ease,
-        transform 0.15s ease,
-        box-shadow 0.2s ease;
+    color: #666666;
 }
 
 .botaoFavoritar svg {
-    flex-shrink: 0;
-
-    display: block;
+    transition: color 0.2s ease, fill 0.2s ease;
 }
 
-.botaoFavoritar:hover {
-    background-color: var(--azul-claro);
-
-    border-color: var(--vermelho);
-
-    color: var(--vermelho);
-
-    transform: translateY(-1px);
-
-    box-shadow:
-        0 4px 10px rgba(117, 8, 10, 0.14);
+.botaoFavoritado {
+    color: #e53945;
 }
 
-.botaoFavoritar:active {
-    transform: scale(0.97);
-}
-
-.botaoFavoritar:disabled {
-    opacity: 0.6;
-
-    cursor: not-allowed;
-
-    transform: none;
-
-    box-shadow: none;
+.botaoFavoritado svg {
+    color: #e53945;
+    fill: #e53945;
 }
 
 .botaoFavoritado {
@@ -1820,5 +1748,109 @@ body {
     .botaoCancelarAvaliacao,
     .botaoEnviarAvaliacao {
         width: 100%;
+    }
+}
+
+.botaoFavoritar {
+    min-width: 115px;
+    height: 42px;
+    padding: 0 16px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    background-color: #F4F2E2;
+    border: 1.5px solid var(--azul);
+    border-radius: 22px;
+
+    color: var(--vermelho);
+
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+
+    white-space: nowrap;
+    cursor: pointer;
+
+    box-shadow: 0 2px 6px rgba(41, 45, 50, 0.06);
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+/* Efeito ao passar o mouse */
+
+.botaoFavoritar:hover {
+    background-color: #ffffff;
+    border-color: var(--azul);
+    transform: translateY(-1px);
+
+    box-shadow: 0 4px 10px rgba(41, 45, 50, 0.10);
+}
+
+/* Ícone do coração */
+
+.botaoFavoritar svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+
+    color: var(--vermelho);
+    fill: transparent;
+
+    transition:
+        fill 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+/* Quando estiver favoritado: continua claro */
+
+.botaoFavoritar.botaoFavoritado,
+.botaoFavoritado {
+    background-color: #ffffff;
+    border-color: #ffffff;
+    color: var(--vermelho);
+}
+
+/* Coração preenchido, sem deixar o botão vermelho */
+
+.botaoFavoritado svg {
+    color: var(--vermelho);
+    fill: var(--vermelho);
+}
+
+/* Hover quando já estiver favoritado */
+
+.botaoFavoritado:hover {
+    background-color: #E8E5D4;
+    border-color: #C9B98C;
+    color: var(--vermelho);
+}
+
+.botaoFavoritado:hover svg {
+    transform: scale(1.08);
+}
+
+/* Acessibilidade: navegação por teclado */
+
+.botaoFavoritar:focus-visible {
+    outline: 3px solid var(--azul);
+    outline-offset: 3px;
+}
+
+/* Ajuste para celulares */
+
+@media (max-width: 600px) {
+    .botaoFavoritar {
+        min-width: 115px;
+        height: 40px;
+        padding: 0 14px;
+        font-size: 13px;
     }
 }
