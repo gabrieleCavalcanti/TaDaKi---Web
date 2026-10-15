@@ -9,17 +9,19 @@
   position: relative;
 
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
+  padding-right: 10%;
+  padding-left: 15%;
 
   font-family: sans-serif;
 
-  background-image: url("../assets/imagem_fundo.jpg");
+  /* background-color: #a2b9d5; */
+  background-image: url("../assets/fundo1.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
-
 
 /* =========================================
    FUNDO VERMELHO
@@ -42,18 +44,52 @@
   z-index: 10;
 }
 
-
 /* =========================================
    ÍCONE DA LOJA
 ========================================= */
 
-.login-store-icon {
+/* .login-store-icon {
   position: absolute;
 
   left: -30px;
   bottom: 10px;
 
   opacity: 0.45;
+} */
+
+/* =========================================
+TEXTO DA LATERAL VERMELHA
+========================================= */
+
+.login-store-icon {
+position: absolute;
+top: 30%;
+left: 15%;
+
+width: 400px;
+max-width: 80%;
+
+color: #ffffff;
+opacity: 1;
+
+z-index: 11;
+}
+
+.login-store-icon h2 {
+margin: 0 0 18px;
+
+font-size: 32px;
+line-height: 1.4;
+font-weight: 700;
+
+white-space: normal;
+}
+
+.login-store-icon p {
+margin: 0;
+font-size: 20px;
+line-height: 1.4;
+font-weight: 400;
 }
 
 
@@ -62,13 +98,13 @@
 ========================================= */
 
 .login-card {
-  width: 38%;
-  height: 65%;
+  width: 52%;
+  height: 72%;
 
   min-width: 350px;
   min-height: 450px;
 
-  background: #ffffff;
+  background: #f0f2f4;
 
   padding: 36px;
 
@@ -87,7 +123,6 @@
   z-index: 20;
 }
 
-
 /* =========================================
    LOGO
 ========================================= */
@@ -95,7 +130,7 @@
 .login-logo-container {
   display: flex;
   justify-content: center;
-
+  transform: translateY(15px);
   margin-bottom: 30px;
 }
 
@@ -106,7 +141,6 @@
   transform: translateY(-30px);
 }
 
-
 /* =========================================
    FORMULÁRIO
 ========================================= */
@@ -114,7 +148,6 @@
 .login-card form {
   width: 100%;
 }
-
 
 /* =========================================
    CAMPOS
@@ -139,7 +172,6 @@
   color: #374151;
 }
 
-
 /* =========================================
    ÁREA DO INPUT
 ========================================= */
@@ -147,7 +179,6 @@
 .login-input-container {
   position: relative;
 }
-
 
 /* =========================================
    INPUT
@@ -161,7 +192,7 @@
 
   padding: 13px 42px 13px 20px;
 
-  background-color: #FAFAFA;
+  background-color: #fafafa;
 
   border: none;
   outline: none;
@@ -178,7 +209,6 @@
   box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
 }
 
-
 /* =========================================
    ÍCONE DO USERNAME
 ========================================= */
@@ -193,7 +223,6 @@
 
   pointer-events: none;
 }
-
 
 /* =========================================
    BOTÃO MOSTRAR SENHA
@@ -220,7 +249,6 @@
   font-family: inherit;
 }
 
-
 /* =========================================
    MENSAGEM DE ERRO
 ========================================= */
@@ -230,7 +258,6 @@
 
   margin-top: 15px;
 }
-
 
 /* =========================================
    LEMBRE-ME / ESQUECEU A SENHA
@@ -247,7 +274,6 @@
   margin-top: 10px;
 }
 
-
 .remember-label {
   display: flex;
 
@@ -260,7 +286,6 @@
   color: #374151;
 }
 
-
 .forgot-password {
   font-size: 14px;
 
@@ -268,7 +293,6 @@
 
   text-decoration: none;
 }
-
 
 /* =========================================
    BOTÃO ENTRAR
@@ -296,7 +320,6 @@
   cursor: pointer;
 }
 
-
 /* =========================================
    DIVISOR "OU"
 ========================================= */
@@ -313,20 +336,17 @@
   margin-top: 15px;
 }
 
-
 .login-divider-line {
   flex: 1;
 
   border-top: 1px solid #d1d5db;
 }
 
-
 .login-divider-text {
   font-size: 13px;
 
   color: #374151;
 }
-
 
 /* =========================================
    CADASTRO
@@ -343,13 +363,11 @@
   margin-top: 10px;
 }
 
-
 .login-register-text {
   font-size: 14px;
 
   color: #374151;
 }
-
 
 .login-register-link {
   font-size: 14px;
@@ -359,13 +377,11 @@
   text-decoration: none;
 }
 
-
 /* =========================================
    RESPONSIVIDADE
 ========================================= */
 
 @media screen and (max-width: 800px) {
-
   .login-red-background {
     width: 100%;
 
@@ -395,5 +411,4 @@
   .login-logo {
     width: 130px;
   }
-
 }
