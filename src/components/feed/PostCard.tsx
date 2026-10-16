@@ -60,25 +60,24 @@ export function PostCard({
             <span>Pequenos negócios, grandes descobertas</span>
           </span>
         </button>
+        {canFavorite && (
             <button
               className={`social-button favorite-button ${favorite ? "is-favorite" : ""}`}
               aria-label={
-                !canFavorite
-                  ? "Favoritar organização — disponível para contas de cliente"
-                  : favorite
+                favorite
                   ? `Remover ${post.nome_organizacao} dos favoritos`
                   : `Favoritar ${post.nome_organizacao}`
               }
               aria-pressed={favorite}
-              disabled={busyFavorite || !canFavorite}
-              title={!canFavorite ? "Use uma conta de cliente para favoritar organizações" : undefined}
+              disabled={busyFavorite}
               onClick={() => onFavorite(post.id_organizacao)}
             >
               <Star size={16} fill={favorite ? "currentColor" : "none"} />
               <span>{busyFavorite ? "Salvando…" : favorite ? "Favoritada" : "Favoritar"}</span>
             </button>
+        )}
         <span className="category-badge">{post.descricao_categoria}</span>
-        {favoriteError && <p className="post-favorite-error" role="alert">{favoriteError}</p>}
+        {canFavorite && favoriteError && <p className="post-favorite-error" role="alert">{favoriteError}</p>}
       </div>
       <button
         className="post-card__media"

@@ -44,13 +44,12 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
   const [imagePost, setImagePost] = useState<Post | null>(null);
   const [limit, setLimit] = useState(12);
   const [imageFailed, setImageFailed] = useState(false);
-  const [explore, setExplore] = useState(false);
   const discovery = useDiscovery(
     Number(feed.person?.id_pessoa ?? feed.person?.id_pessoa_login ?? 0),
     feed.allPosts,
     feed.likedIds,
     feed.favorites,
-    !explore && !onlyLikes && !favoritesOnly && !search.trim() && !category,
+    !onlyLikes && !favoritesOnly && !search.trim() && !category,
   );
 
   const menuRef = useRef<HTMLElement>(null);
@@ -184,27 +183,16 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
           <div className="discovery-controls">
             <div className="category-filters" aria-label="Modo da vitrine">
               <button
-                className={!explore && !favoritesOnly ? "selected" : ""}
-                aria-pressed={!explore && !favoritesOnly}
+                className={!favoritesOnly ? "selected" : ""}
+                aria-pressed={!favoritesOnly}
                 onClick={() => {
-                  setExplore(false);
                   setFavoritesOnly(false);
                   setLimit(12);
                 }}
               >
                 Para você
               </button>
-              <button
-                className={explore && !favoritesOnly ? "selected" : ""}
-                aria-pressed={explore && !favoritesOnly}
-                onClick={() => {
-                  setExplore(true);
-                  setFavoritesOnly(false);
-                  setLimit(12);
-                }}
-              >
-                Explorar
-              </button>
+
               {canFavorite && (
                 <button
                   className={favoritesOnly ? "selected" : ""}
@@ -238,7 +226,7 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
                   initial={discovery.locations.user[0]}
                   save={discovery.saveReference}
                 />
-                {!explore && !favoritesOnly && !discovery.hasInterests && (
+                {!favoritesOnly && !discovery.hasInterests && (
                   <p>
                     Curta produtos, amplie fotos ou visite empresas para
                     personalizar sua vitrine.
@@ -361,7 +349,7 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
                 <p>
                   {onlyLikes
                     ? "Curta uma publicação no feed e reencontre o produto aqui."
-                    : favoritesOnly ? "Favorite uma empresa na aba Explorar para acompanhar as publicações dela aqui." : "Explore outros termos ou volte para todas as publicações."}
+                    : favoritesOnly ? "Favorite uma organização no Para você para acompanhar as publicações dela aqui." : "Explore outros termos ou volte para todas as publicações."}
                 </p>
                 <button
                   className="primary-button"
@@ -371,7 +359,6 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
                       setSearch("");
                       setCategory(0);
                       setFavoritesOnly(false);
-                      setExplore(true);
                     }
                   }}
                 >
@@ -505,7 +492,6 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
                   closeMenu();
                   navigate("/");
                   setFavoritesOnly(false);
-                  setExplore(false);
                 }}
               >
                 <Home size={19} />
@@ -601,7 +587,7 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
           person={feed.person}
           categories={feed.categories}
           onPublished={async () => {
-            setExplore(true);
+            setFavoritesOnly(false);
             await feed.load();
           }}
         />
