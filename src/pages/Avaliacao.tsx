@@ -43,6 +43,22 @@ export async function buscarAvaliacoes(): Promise<IAvaliacao[]> {
     }
 }
 
+export async function buscarAvaliacoesPorCliente(
+    idCliente: number
+): Promise<IAvaliacao[]> {
+    const id = Number(idCliente);
+
+    if (!Number.isInteger(id) || id <= 0) {
+        throw new Error("ID do cliente inválido.");
+    }
+
+    const avaliacoes = await buscarAvaliacoes();
+
+    return avaliacoes.filter(
+        (avaliacao) => Number(avaliacao.id_cliente) === id
+    );
+}
+
 export async function buscarAvaliacoesPorOrganizacao(
     idOrganizacao: number
 ): Promise<IAvaliacao[]> {

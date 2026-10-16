@@ -55,10 +55,6 @@ export default function PerfilPessoal() {
             const resposta =
                 await apiFetch<any>("/auth/me");
 
-            console.log(
-                "Usuário logado:",
-                resposta
-            );
 
             const dadosUsuario =
                 resposta?.user ||
@@ -399,7 +395,7 @@ export default function PerfilPessoal() {
                             type="button"
                             className="metricaCard metricaAvaliacoes"
                             onClick={() =>
-                                navigate("/avaliacoes")
+                                navigate("/avaliacoes-cliente")
                             }
                         >
 

@@ -58,6 +58,7 @@ interface ISemPostsProps {
 
 interface IPostCardProps {
     post: IPost;
+    idOrganizacao: number;
 }
 
 interface IInfoLinhaProps {
@@ -121,11 +122,27 @@ function obterUrlImagem(nome?: string): string {
         : "";
 }
 
-function PostCard({ post }: IPostCardProps) {
+function PostCard({
+    post,
+    idOrganizacao,
+}: IPostCardProps) {
     const imagem = obterUrlImagem(post.vincularImagem);
+    const navigate = useNavigate();
+
+    function abrirPost() {
+        if (!post.id_post || !idOrganizacao) return;
+
+        navigate(
+            `/visualizar-post/${post.id_post}?id_organizacao=${idOrganizacao}`
+        );
+    }
 
     return (
-        <button type="button" className="cardPost">
+        <button
+            type="button"
+            className="cardPost"
+            onClick={abrirPost}
+        >
             {imagem ? (
                 <img
                     src={imagem}
@@ -150,7 +167,6 @@ function PostCard({ post }: IPostCardProps) {
         </button>
     );
 }
-
 export default function PerfilScreen() {
     const navigate = useNavigate();
     const { user } = useAuth();
@@ -231,9 +247,14 @@ export default function PerfilScreen() {
                 }
             );
 
+
             if (resposta.ok) {
                 const data = await resposta.json();
 
+                console.log(
+                    "[Perfil] Dados retornados:",
+                    data
+                );
                 const possiveisPessoas = [
                     data?.pessoa,
                     data?.organizacao,
@@ -493,6 +514,7 @@ export default function PerfilScreen() {
                 return;
             }
 
+
             const resposta = await fetch(
                 `${BASE_URL}/posts/organizacao?id_organizacao=${idOrganizacao}`,
                 { credentials: "include" }
@@ -508,6 +530,7 @@ export default function PerfilScreen() {
                 data?.data ??
                 data?.dados ??
                 data;
+            console.log("Posts recebidos da API:", lista);
 
             if (!Array.isArray(lista)) {
                 setPosts([]);
@@ -1023,6 +1046,7 @@ export default function PerfilScreen() {
                             <PostCard
                                 key={post.id_post ?? index}
                                 post={post}
+                                idOrganizacao={Number(organizacao?.id_organizacao ?? 0)}
                             />
                         ))}
                     </div>
@@ -1197,6 +1221,7 @@ export default function PerfilScreen() {
                                     <PostCard
                                         key={post.id_post ?? index}
                                         post={post}
+                                        idOrganizacao={Number(organizacao?.id_organizacao ?? 0)}
                                     />
                                 ))
                             )}
