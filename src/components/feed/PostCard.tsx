@@ -10,6 +10,7 @@ export function PostCard({
   busyLike,
   busyFavorite,
   canFavorite,
+  favoriteError,
   onLike,
   onFavorite,
   onOpenOrganization,
@@ -22,6 +23,7 @@ export function PostCard({
   busyLike: boolean;
   busyFavorite: boolean;
   canFavorite: boolean;
+  favoriteError?: string;
   onLike: (id: number) => void;
   onFavorite: (id: number) => void;
   onOpenOrganization: (id: number) => void;
@@ -58,23 +60,24 @@ export function PostCard({
             <span>Pequenos negócios, grandes descobertas</span>
           </span>
         </button>
-          {canFavorite && (
+        {canFavorite && (
             <button
               className={`social-button favorite-button ${favorite ? "is-favorite" : ""}`}
               aria-label={
                 favorite
-                  ? "Remover organização dos favoritos"
-                  : "Favoritar organização"
+                  ? `Remover ${post.nome_organizacao} dos favoritos`
+                  : `Favoritar ${post.nome_organizacao}`
               }
               aria-pressed={favorite}
               disabled={busyFavorite}
               onClick={() => onFavorite(post.id_organizacao)}
             >
-              <Star size={23} fill={favorite ? "currentColor" : "none"} />
-              <span>{favorite ? "Organização favorita" : "Favoritar organização"}</span>
+              <Star size={16} fill={favorite ? "currentColor" : "none"} />
+              <span>{busyFavorite ? "Salvando…" : favorite ? "Favoritada" : "Favoritar"}</span>
             </button>
-          )}
+        )}
         <span className="category-badge">{post.descricao_categoria}</span>
+        {canFavorite && favoriteError && <p className="post-favorite-error" role="alert">{favoriteError}</p>}
       </div>
       <button
         className="post-card__media"

@@ -26,6 +26,7 @@ import { proximity, proximityLabels } from "./recommendations";
 import { useDialog } from "./useDialog";
 import { CreatePostModal } from "./CreatePostModal";
 import { PostCard } from "./PostCard";
+import { ScrollReveal } from "./ScrollReveal";
 import "../../css/Feed.css";
 
 export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
@@ -43,13 +44,12 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
   const [imagePost, setImagePost] = useState<Post | null>(null);
   const [limit, setLimit] = useState(12);
   const [imageFailed, setImageFailed] = useState(false);
-  const [explore, setExplore] = useState(false);
   const discovery = useDiscovery(
     Number(feed.person?.id_pessoa ?? feed.person?.id_pessoa_login ?? 0),
     feed.allPosts,
     feed.likedIds,
     feed.favorites,
-    !explore && !onlyLikes && !favoritesOnly && !search.trim() && !category,
+    !onlyLikes && !favoritesOnly && !search.trim() && !category,
   );
 
   const menuRef = useRef<HTMLElement>(null);
@@ -59,7 +59,7 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
   const closeComposer = useCallback(() => setComposerOpen(false), []);
   useDialog(menuOpen, menuRef, closeMenu);
   useDialog(Boolean(imagePost), imageRef, closeImage);
-  const type = userType(feed.person ?? user);
+  const type = userType(feed.person) || userType(user);
   const canCreate = type === "ORGANIZACAO";
   const canFavorite = type === "CLIENTE";
   const filtered = useMemo(
@@ -89,8 +89,23 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
   const timelineError = favoritesOnly && feed.favoritesError ? "Não foi possível carregar sua timeline. Atualize os favoritos para tentar novamente." : "";
   const goProfile = () => {
     closeMenu();
-    const id = Number(user?.id_pessoa ?? user?.id_pessoa_login);
-    navigate(canCreate ? `/perfil/${id}` : "/perfil-pessoal");
+    if (type === "CLIENTE") {
+      navigate("/perfil-pessoal");
+      return;
+    }
+    if (type === "ORGANIZACAO") {
+      const id = Number(
+        user?.id_pessoa ?? user?.id_pessoa_login ??
+        feed.person?.id_pessoa ?? feed.person?.id_pessoa_login,
+      );
+      if (Number.isSafeInteger(id) && id > 0) {
+        navigate(`/perfil/${id}`);
+      } else {
+        feed.setNotice("Não foi possível identificar seu perfil. Atualize a página e tente novamente.");
+      }
+      return;
+    }
+    feed.setNotice("Não foi possível identificar o tipo da sua conta. Atualize a página e tente novamente.");
   };
   return (
     <main className="feed-page">
@@ -168,27 +183,16 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
           <div className="discovery-controls">
             <div className="category-filters" aria-label="Modo da vitrine">
               <button
-                className={!explore && !favoritesOnly ? "selected" : ""}
-                aria-pressed={!explore && !favoritesOnly}
+                className={!favoritesOnly ? "selected" : ""}
+                aria-pressed={!favoritesOnly}
                 onClick={() => {
-                  setExplore(false);
                   setFavoritesOnly(false);
                   setLimit(12);
                 }}
               >
                 Para você
               </button>
-              <button
-                className={explore && !favoritesOnly ? "selected" : ""}
-                aria-pressed={explore && !favoritesOnly}
-                onClick={() => {
-                  setExplore(true);
-                  setFavoritesOnly(false);
-                  setLimit(12);
-                }}
-              >
-                Explorar
-              </button>
+
               {canFavorite && (
                 <button
                   className={favoritesOnly ? "selected" : ""}
@@ -222,7 +226,7 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
                   initial={discovery.locations.user[0]}
                   save={discovery.saveReference}
                 />
-                {!explore && !favoritesOnly && !discovery.hasInterests && (
+                {!favoritesOnly && !discovery.hasInterests && (
                   <p>
                     Curta produtos, amplie fotos ou visite empresas para
                     personalizar sua vitrine.
@@ -345,7 +349,7 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
                 <p>
                   {onlyLikes
                     ? "Curta uma publicação no feed e reencontre o produto aqui."
-                    : favoritesOnly ? "Favorite uma empresa na aba Explorar para acompanhar as publicações dela aqui." : "Explore outros termos ou volte para todas as publicações."}
+                    : favoritesOnly ? "Favorite uma organização no Para você para acompanhar as publicações dela aqui." : "Explore outros termos ou volte para todas as publicações."}
                 </p>
                 <button
                   className="primary-button"
@@ -355,7 +359,6 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
                       setSearch("");
                       setCategory(0);
                       setFavoritesOnly(false);
-                      setExplore(true);
                     }
                   }}
                 >
@@ -365,7 +368,7 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
             ) : (
               <div className="post-list">
                 {filtered.slice(0, limit).map((post) => (
-                  <div key={post.id_post}>
+                  <ScrollReveal key={post.id_post}>
                     {!onlyLikes &&
                       !favoritesOnly &&
                       !discovery.locating &&
@@ -395,6 +398,7 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
                         `favorite:${post.id_organizacao}`,
                       )}
                       canFavorite={canFavorite}
+                      favoriteError={feed.favoriteErrors[post.id_organizacao]}
                       onLike={(id) => void feed.toggleLike(id)}
                       onFavorite={(id) => void feed.toggleFavorite(id)}
                       onOpenOrganization={(id) => {
@@ -407,7 +411,7 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
                         setImagePost(post);
                       }}
                     />
-                  </div>
+                  </ScrollReveal>
                 ))}
                 {filtered.length > limit && (
                   <button
@@ -488,7 +492,6 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
                   closeMenu();
                   navigate("/");
                   setFavoritesOnly(false);
-                  setExplore(false);
                 }}
               >
                 <Home size={19} />
@@ -584,7 +587,7 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
           person={feed.person}
           categories={feed.categories}
           onPublished={async () => {
-            setExplore(true);
+            setFavoritesOnly(false);
             await feed.load();
           }}
         />
