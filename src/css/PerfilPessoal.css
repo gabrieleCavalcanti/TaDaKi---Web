@@ -1,6 +1,6 @@
-
 /* =========================================================
-   TA-DA-KI - PERFIL PESSOAL
+   TA-DA-KI — PERFIL PESSOAL
+   Paleta: vermelho, azul-claro e branco
 ========================================================= */
 
 :root {
@@ -15,6 +15,7 @@
   --cinza-escuro: #292D32;
   --borda: #D6DDE5;
   --preto: #111111;
+  --fundo: #EEF3F8;
 }
 
 /* RESET */
@@ -25,27 +26,23 @@
 
 body {
   margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 /* PÁGINA */
 
 .perfilPessoal {
   min-height: 100vh;
+  overflow-x: clip;
+  color: var(--cinza-escuro);
+  font-family: Arial, Helvetica, sans-serif;
   background:
     radial-gradient(
       circle at 90% 5%,
-      rgba(162, 185, 213, 0.65) 0,
+      rgba(162, 185, 213, 0.28) 0,
       transparent 28%
     ),
-    linear-gradient(
-      135deg,
-      #eef3f8 0%,
-      #f7f8fa 50%,
-      #e8eef5 100%
-    );
-  color: var(--cinza-escuro);
-  font-family: Arial, Helvetica, sans-serif;
-  overflow-x: hidden;
+    linear-gradient(135deg, #EEF3F8 0%, #F7F8FA 50%, #E8EEF5 100%);
 }
 
 .perfilPessoalConteudo {
@@ -64,12 +61,12 @@ body {
   padding: 10px 15px;
   border: 1px solid var(--borda);
   border-radius: 10px;
-  background: white;
+  background: var(--branco);
   color: var(--cinza-escuro);
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
-  transition: background 0.2s, border-color 0.2s;
+  transition: background 0.2s, border-color 0.2s, transform 0.2s;
 }
 
 .botaoVoltarFeed:hover {
@@ -77,63 +74,72 @@ body {
   border-color: var(--azul);
 }
 
+.botaoVoltarFeed:focus-visible,
+.botaoEditarPessoal:focus-visible,
+.botaoCancelarEdicao:focus-visible,
+.botaoAdicionarEmail:focus-visible,
+.botaoExcluirEmail:focus-visible,
+.cabecalhoFavoritos button:focus-visible,
+.metricaCard:focus-visible,
+.itemFavoritoPerfil:focus-visible {
+  outline: 3px solid var(--azul);
+  outline-offset: 3px;
+}
+
 /* CARD PRINCIPAL */
 
 .cardPerfilPessoal {
   position: relative;
-  padding: 38px 40px;
+  padding: 38px 32px;
+  overflow: visible;
   background: var(--branco);
-  border: 2px solid rgba(162, 185, 213, 0.65);
-  border-radius: 24px;
-  box-shadow: 0 10px 30px rgba(117, 8, 10, 0.08);
-  overflow: hidden;
+  border: 1px solid rgba(162, 185, 213, 0.7);
+  border-radius: 22px;
+  box-shadow: 0 8px 24px rgba(41, 45, 50, 0.06);
 }
 
+/* A tira vermelha lateral foi removida.
+   Mantido o seletor para compatibilidade com o JSX. */
+
 .detalheVermelho {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 8px;
-  height: 100%;
-  background: var(--vermelho);
+  display: none;
 }
 
 /* CABEÇALHO DO PERFIL */
 
 .topoPerfilPessoal {
   display: grid;
-  grid-template-columns: 150px minmax(0, 1fr) 190px;
+  grid-template-columns: 130px minmax(0, 1fr) 160px;
   align-items: center;
-  gap: 28px;
-  padding: 12px 10px 32px;
+  gap: 26px;
+  padding: 4px 0 28px;
   border-bottom: 1px solid var(--borda);
 }
 
 /* FOTO */
 
 .avatarPessoal {
-  width: 140px;
-  height: 140px;
-  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 120px;
+  height: 120px;
+  flex-shrink: 0;
   overflow: hidden;
+  border: 4px solid var(--branco);
   border-radius: 50%;
   background: var(--azul);
-  border: 5px solid white;
-  box-shadow:
-    0 0 0 3px var(--vermelho),
-    0 8px 20px rgba(117, 8, 10, 0.15);
+  box-shadow: 0 0 0 2px var(--azul), 0 6px 16px rgba(41, 45, 50, 0.12);
 }
 
 .avatarPessoal img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-/* NOME E USUÁRIO */
+/* NOME, USUÁRIO E CAMPOS DE EDIÇÃO */
 
 .nomePerfilPessoal {
   display: flex;
@@ -154,16 +160,14 @@ body {
 
 .nomePerfilPessoal span {
   color: var(--cinza);
-  font-size: 15px;
+  font-size: 14px;
 }
-
-/* CAMPOS DE EDIÇÃO */
 
 .nomePerfilPessoal label {
   display: block;
   margin: 0;
   color: #465365;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -171,21 +175,21 @@ body {
   display: block;
   width: 100%;
   min-width: 0;
-  height: 44px;
-  padding: 0 13px;
+  height: 42px;
+  padding: 0 12px;
   border: 1px solid var(--borda);
-  border-radius: 10px;
-  background: #f8fafc;
+  border-radius: 9px;
+  outline: none;
+  background: #F8FAFC;
   color: var(--cinza-escuro);
   font-family: inherit;
   font-size: 14px;
-  outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
 }
 
 .nomePerfilPessoal input:focus {
   border-color: var(--vermelho);
-  background: white;
+  background: var(--branco);
   box-shadow: 0 0 0 3px rgba(142, 8, 8, 0.1);
 }
 
@@ -195,7 +199,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 10px;
+  gap: 9px;
   width: 100%;
   min-width: 0;
 }
@@ -205,43 +209,40 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 9px;
+  gap: 8px;
   width: 100%;
-  min-height: 46px;
+  min-height: 42px;
   margin: 0;
-  padding: 11px 14px;
-  border-radius: 11px;
+  padding: 10px 13px;
+  border-radius: 10px;
   font-family: inherit;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
   cursor: pointer;
-  transition:
-    background 0.2s,
-    border-color 0.2s,
-    transform 0.2s;
+  transition: background 0.2s, border-color 0.2s, transform 0.2s;
 }
 
 .botaoEditarPessoal {
   border: 1px solid var(--vermelho);
   background: var(--vermelho);
-  color: white;
+  color: var(--branco);
 }
 
 .botaoEditarPessoal:hover:not(:disabled) {
-  background: var(--vermelho-hover);
   border-color: var(--vermelho-hover);
+  background: var(--vermelho-hover);
   transform: translateY(-1px);
 }
 
 .botaoCancelarEdicao {
   border: 1px solid var(--borda);
-  background: white;
+  background: var(--branco);
   color: #505866;
 }
 
 .botaoCancelarEdicao:hover:not(:disabled) {
-  background: #f1f3f6;
-  border-color: #b9c4d1;
+  border-color: #B9C4D1;
+  background: #F1F3F6;
 }
 
 .botaoEditarPessoal:disabled,
@@ -253,74 +254,71 @@ body {
 /* INFORMAÇÕES PESSOAIS */
 
 .informacoesPessoais {
-  padding-top: 30px;
+  padding-top: 28px;
+  overflow: visible;
 }
 
 .informacoesPessoais h2 {
-  margin: 0 0 24px;
+  margin: 0 0 20px;
   color: var(--cinza-escuro);
-  font-size: 23px;
+  font-size: 22px;
   font-weight: 800;
 }
-
-/* GRID DAS INFORMAÇÕES */
 
 .informacoesGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  gap: 14px;
+  overflow: visible;
 }
 
-/* CARD DE INFORMAÇÃO */
+/* CARDS DE INFORMAÇÃO */
 
 .informacaoItem {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
   min-width: 0;
-  min-height: 110px;
-  padding: 20px;
-  background: #fafbfc;
-  border: 2px solid var(--borda);
-  border-radius: 15px;
-  transition: border-color 0.2s;
+  min-height: 96px;
+  padding: 16px;
+  border: 1px solid var(--borda);
+  border-radius: 14px;
+  background: #FAFBFC;
+  transition: border-color 0.2s, background 0.2s;
 }
 
 .informacaoItem:hover {
   border-color: var(--azul);
 }
 
-/* ÍCONES */
-
 .iconeInformacao {
-  width: 53px;
-  height: 53px;
-  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 13px;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 12px;
   background: var(--azul-claro);
+  color: var(--vermelho);
 }
-
-/* TEXTO DAS INFORMAÇÕES */
 
 .informacaoItem > div:last-child {
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 6px;
   min-width: 0;
 }
 
 .informacaoItem span {
   color: var(--cinza);
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .informacaoItem strong {
   color: var(--cinza-escuro);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   overflow-wrap: anywhere;
 }
@@ -331,16 +329,16 @@ body {
   display: block;
   width: 100%;
   max-width: 220px;
-  min-height: 44px;
+  min-height: 40px;
   margin-top: 2px;
-  padding: 8px 12px;
+  padding: 7px 10px;
   border: 1px solid var(--borda);
-  border-radius: 10px;
-  background: #f8fafc;
+  border-radius: 9px;
+  outline: none;
+  background: #F8FAFC;
   color: var(--cinza-escuro);
   font-family: inherit;
-  font-size: 14px;
-  outline: none;
+  font-size: 13px;
 }
 
 .informacaoItem input[type="date"]:focus {
@@ -348,41 +346,8 @@ body {
   box-shadow: 0 0 0 3px rgba(142, 8, 8, 0.1);
 }
 
-/* SEÇÃO DE ATIVIDADES */
+/* E-MAILS */
 
-.secaoMetricas {
-  margin-top: 30px;
-  padding: 30px;
-  background: white;
-  border: 2px solid rgba(162, 185, 213, 0.65);
-  border-radius: 22px;
-  box-shadow: 0 8px 24px rgba(41, 45, 50, 0.05);
-}
-
-.tituloMetricas {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 22px;
-}
-
-.tituloMetricas h2 {
-  margin: 0;
-  color: var(--cinza-escuro);
-  font-size: 23px;
-  font-weight: 800;
-}
-
-.tituloMetricas span {
-  color: var(--cinza);
-  font-size: 14px;
-}
-
-/* Email */
-
-/* Cartão de e-mail compacto */
 .informacaoEmails {
   position: relative;
   z-index: 2;
@@ -404,22 +369,22 @@ body {
 }
 
 /* Lista suspensa de e-mails */
+
 .listaEmails {
   position: absolute;
-  top: calc(100% + 14px);
-  left: -12px;
-  right: -12px;
-  z-index: 10;
-
+  top: calc(100% + 12px);
+  left: -10px;
+  right: -10px;
+  z-index: 20;
   display: flex;
   flex-direction: column;
   gap: 0;
-
-  padding: 8px 12px;
-  background: #fff;
-  border: 1px solid #d7dfe9;
-  border-radius: 0 0 10px 10px;
-  box-shadow: 0 5px 12px rgba(25, 40, 60, 0.08);
+  margin: 0;
+  padding: 7px 10px;
+  border: 1px solid #D7DFE9;
+  border-radius: 10px;
+  background: var(--branco);
+  box-shadow: 0 8px 20px rgba(25, 40, 60, 0.12);
 }
 
 .itemEmail {
@@ -427,8 +392,10 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  min-height: 28px;
-  border-bottom: 1px solid #edf0f4;
+  min-width: 0;
+  min-height: 34px;
+  padding: 5px 0;
+  border-bottom: 1px solid #EDF0F4;
 }
 
 .itemEmail:last-child {
@@ -445,185 +412,83 @@ body {
 
 .selecaoEmail input {
   flex-shrink: 0;
-  accent-color: #8e0808;
-}
-
-.selecaoEmail span {
-  overflow-wrap: anywhere;
-  font-size: 12px;
-  color: #263448;
-}
-
-.botaoExcluirEmail {
-  flex-shrink: 0;
-  padding: 3px;
-  border: none;
-  background: transparent;
-  color: #8e0808;
-  cursor: pointer;
-}
-
-.botaoExcluirEmail:disabled {
-  color: #aaa;
-  cursor: not-allowed;
-}
-
-.botaoAdicionarEmail {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 3px;
-  width: 100%;
-  margin-top: 9px;
-  padding: 0;
-  border: none;
-  background: transparent;
-  color: #6685a8;
-  font-size: 12px;
-  cursor: pointer;
-}
-
-.formAdicionarEmail {
-  position: relative;
-  z-index: 11;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 8px;
-}
-
-.formAdicionarEmail input {
-  box-sizing: border-box;
-  width: 100%;
-  min-width: 0;
-  padding: 8px;
-  border: 1px solid #d5dce6;
-  border-radius: 7px;
-}
-
-.formAdicionarEmail button {
-  padding: 7px 10px;
-  border: none;
-  border-radius: 6px;
-  background: #8e0808;
-  color: #fff;
-  cursor: pointer;
-}
-
-/* Evita que o cartão de e-mail seja cortado */
-.informacoesGrid {
-  overflow: visible;
-}
-
-.informacoesPessoais {
-  overflow: visible;
-}
-
-.cardPerfilPessoal {
-  overflow: visible;
-}
-
-@media (max-width: 600px) {
-  .listaEmails {
-    left: -8px;
-    right: -8px;
-  }
-}
-
-
-
-.informacaoEmails {
-  align-items: flex-start;
-}
-
-.conteudoEmails {
-  flex: 1;
-  min-width: 0;
-}
-
-.emailPrincipal {
-  display: block;
-  overflow-wrap: anywhere;
-}
-
-.listaEmails {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 12px;
-}
-
-.itemEmail {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 8px 0;
-  border-bottom: 1px solid #e4e8ed;
-}
-
-.selecaoEmail {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  min-width: 0;
-  cursor: pointer;
-}
-
-.selecaoEmail input {
-  flex-shrink: 0;
-  accent-color: #8e0808;
+  accent-color: var(--vermelho);
 }
 
 .selecaoEmail span {
   overflow-wrap: anywhere;
   color: #263448;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .botaoExcluirEmail {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  padding: 4px;
   border: none;
+  border-radius: 5px;
   background: transparent;
-  color: #8e0808;
+  color: var(--vermelho);
   cursor: pointer;
 }
 
+.botaoExcluirEmail:hover:not(:disabled) {
+  background: #FBEDEE;
+}
+
 .botaoExcluirEmail:disabled {
-  color: #aaa;
+  color: #AAA;
   cursor: not-allowed;
 }
 
 .botaoAdicionarEmail {
   display: inline-flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 4px;
-  margin-top: 12px;
+  width: 100%;
+  margin-top: 10px;
   padding: 0;
   border: none;
   background: transparent;
-  color: #6685a8;
-  font-size: 13px;
+  color: #6685A8;
+  font-size: 12px;
   cursor: pointer;
 }
 
+.botaoAdicionarEmail:hover {
+  color: var(--vermelho);
+}
+
 .formAdicionarEmail {
+  position: relative;
+  z-index: 21;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 12px;
+  min-width: 0;
+  margin-top: 10px;
 }
 
 .formAdicionarEmail input {
-  flex: 1 1 180px;
+  flex: 1 1 160px;
+  width: 100%;
   min-width: 0;
   padding: 9px;
-  border: 1px solid #d5dce6;
+  border: 1px solid var(--borda);
   border-radius: 8px;
-  outline-color: #a2b9d5;
+  outline: none;
+  background: var(--branco);
+  color: var(--cinza-escuro);
+  font: inherit;
+  font-size: 13px;
+}
+
+.formAdicionarEmail input:focus {
+  border-color: var(--azul);
+  box-shadow: 0 0 0 3px rgba(162, 185, 213, 0.2);
 }
 
 .formAdicionarEmail button {
@@ -633,14 +498,24 @@ body {
   padding: 8px 12px;
   border: none;
   border-radius: 7px;
-  background: #8e0808;
-  color: white;
+  background: var(--vermelho);
+  color: var(--branco);
+  font: inherit;
+  font-size: 12px;
   cursor: pointer;
 }
 
+.formAdicionarEmail button:hover:not(:disabled) {
+  background: var(--vermelho-hover);
+}
+
 .formAdicionarEmail .botaoCancelarEmail {
-  background: #e8edf3;
+  background: #E8EDF3;
   color: #263448;
+}
+
+.formAdicionarEmail .botaoCancelarEmail:hover:not(:disabled) {
+  background: #DCE4ED;
 }
 
 .formAdicionarEmail button:disabled {
@@ -648,31 +523,114 @@ body {
   cursor: not-allowed;
 }
 
-@media (max-width: 600px) {
-  .informacaoEmails {
-    min-width: 0;
-  }
+/* SEÇÃO DE ATIVIDADES */
 
-  .formAdicionarEmail {
-    flex-direction: column;
-  }
-
-  .formAdicionarEmail input,
-  .formAdicionarEmail button {
-    width: 100%;
-    box-sizing: border-box;
-  }
+.secaoMetricas {
+  margin-top: 26px;
+  padding: 26px;
+  border: 1px solid rgba(162, 185, 213, 0.7);
+  border-radius: 20px;
+  background: var(--branco);
+  box-shadow: 0 7px 20px rgba(41, 45, 50, 0.05);
 }
 
-/* favoritos */
+.tituloMetricas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.tituloMetricas h2 {
+  margin: 0;
+  color: var(--cinza-escuro);
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.tituloMetricas span {
+  color: var(--cinza);
+  font-size: 13px;
+}
+
+/* CARDS DE ATIVIDADE */
+
+.metricasPessoal {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 13px;
+}
+
+.metricaCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 17px;
+  border: 1px solid var(--borda);
+  border-radius: 13px;
+  background: #FAFBFC;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.metricaCard:hover {
+  transform: translateY(-2px);
+  border-color: var(--azul);
+  box-shadow: 0 6px 16px rgba(41, 45, 50, 0.07);
+}
+
+.iconeMetrica {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 11px;
+  background: var(--azul-claro);
+  color: var(--vermelho);
+}
+
+.textoMetrica {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.textoMetrica strong {
+  color: var(--cinza-escuro);
+  font-size: 21px;
+  font-weight: 800;
+}
+
+.textoMetrica span {
+  color: var(--cinza);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.setaMetrica {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--cinza);
+  font-size: 20px;
+}
+
+/* FAVORITOS */
 
 .listaFavoritosPerfil {
-  margin-top: 24px;
-  padding: 24px;
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid #E1E5EA;
+  border-radius: 15px;
+  background: var(--branco);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
 }
 
 .cabecalhoFavoritos {
@@ -680,37 +638,44 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .cabecalhoFavoritos h2 {
-  margin: 0 0 6px;
-  color: #75080a;
-  font-size: 1.25rem;
+  margin: 0 0 5px;
+  color: var(--vermelho);
+  font-size: 18px;
 }
 
 .cabecalhoFavoritos span {
-  color: #6b7280;
-  font-size: 0.9rem;
+  color: var(--cinza);
+  font-size: 12px;
 }
 
 .cabecalhoFavoritos button {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
   border: none;
   border-radius: 50%;
-  background: #f3f4f6;
+  background: #F3F4F6;
   color: #444;
   cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.cabecalhoFavoritos button:hover {
+  background: var(--azul-claro);
+  color: var(--vermelho);
 }
 
 .gradeFavoritos {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 14px;
+  gap: 12px;
 }
 
 .itemFavoritoPerfil {
@@ -718,24 +683,25 @@ body {
   align-items: center;
   gap: 12px;
   min-width: 0;
-  padding: 14px;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  background: #fff;
+  padding: 12px;
+  border: 1px solid #E1E5EA;
+  border-radius: 11px;
+  background: var(--branco);
+  color: inherit;
   text-align: left;
   cursor: pointer;
   transition: border-color 0.2s, transform 0.2s;
 }
 
 .itemFavoritoPerfil:hover {
-  border-color: #a2b9d5;
-  transform: translateY(-2px);
+  transform: translateY(-1px);
+  border-color: var(--azul);
 }
 
 .imagemFavoritoPerfil {
+  width: 44px;
+  height: 44px;
   flex-shrink: 0;
-  width: 48px;
-  height: 48px;
   border-radius: 50%;
   object-fit: cover;
 }
@@ -744,8 +710,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #eef3f8;
-  color: #6685a8;
+  background: var(--fundo);
+  color: #6685A8;
 }
 
 .dadosFavoritoPerfil {
@@ -765,106 +731,27 @@ body {
 
 .dadosFavoritoPerfil small {
   overflow: hidden;
-  color: #777;
+  color: var(--cinza);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .mensagemFavoritos {
   padding: 20px 0;
-  color: #6b7280;
+  color: var(--cinza);
   text-align: center;
-}
-
-@media (max-width: 600px) {
-  .listaFavoritosPerfil {
-    padding: 16px;
-  }
-
-  .gradeFavoritos {
-    grid-template-columns: 1fr;
-  }
-}
-
-
-
-/* CARDS DE ATIVIDADE */
-
-.metricasPessoal {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-}
-
-.metricaCard {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  min-width: 0;
-  padding: 20px;
-  border: 1px solid var(--borda);
-  border-radius: 15px;
-  background: #fafbfc;
-  text-align: left;
-  cursor: pointer;
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s,
-    border-color 0.2s;
-}
-
-.metricaCard:hover {
-  transform: translateY(-3px);
-  border-color: var(--azul);
-  box-shadow: 0 8px 20px rgba(41, 45, 50, 0.08);
-}
-
-.iconeMetrica {
-  width: 50px;
-  height: 50px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 13px;
-  background: var(--azul-claro);
-}
-
-.textoMetrica {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  min-width: 0;
-}
-
-.textoMetrica strong {
-  color: var(--cinza-escuro);
-  font-size: 23px;
-  font-weight: 800;
-}
-
-.textoMetrica span {
-  color: var(--cinza);
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.setaMetrica {
-  margin-left: auto;
-  color: var(--cinza);
-  font-size: 20px;
 }
 
 /* CARREGAMENTO */
 
 .perfilPessoalLoading {
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 14px;
-  background: #f3f6fa;
+  min-height: 100vh;
+  background: #F3F6FA;
   color: var(--cinza-escuro);
   font-family: Arial, Helvetica, sans-serif;
 }
@@ -896,13 +783,13 @@ body {
   }
 
   .topoPerfilPessoal {
-    grid-template-columns: 115px minmax(0, 1fr);
-    gap: 22px;
+    grid-template-columns: 105px minmax(0, 1fr);
+    gap: 20px;
   }
 
   .avatarPessoal {
-    width: 105px;
-    height: 105px;
+    width: 100px;
+    height: 100px;
   }
 
   .botoesEdicaoPessoal {
@@ -928,21 +815,21 @@ body {
   }
 
   .cardPerfilPessoal {
-    padding: 24px 20px;
-    border-radius: 18px;
+    padding: 22px 18px;
+    border-radius: 17px;
   }
 
   .topoPerfilPessoal {
     grid-template-columns: minmax(0, 1fr);
     justify-items: stretch;
-    gap: 18px;
-    padding: 8px 0 25px;
+    gap: 17px;
+    padding: 8px 0 22px;
   }
 
   .avatarPessoal {
     justify-self: center;
-    width: 115px;
-    height: 115px;
+    width: 108px;
+    height: 108px;
   }
 
   .nomePerfilPessoal {
@@ -950,7 +837,7 @@ body {
   }
 
   .nomePerfilPessoal h1 {
-    font-size: 25px;
+    font-size: 24px;
   }
 
   .botoesEdicaoPessoal {
@@ -963,7 +850,7 @@ body {
   }
 
   .informacoesPessoais {
-    padding-top: 24px;
+    padding-top: 22px;
   }
 
   .informacoesPessoais h2,
@@ -976,12 +863,12 @@ body {
   }
 
   .informacaoItem {
-    padding: 16px;
+    padding: 15px;
   }
 
   .secaoMetricas {
-    padding: 22px 18px;
-    border-radius: 18px;
+    padding: 20px 16px;
+    border-radius: 17px;
   }
 
   .tituloMetricas {
@@ -990,6 +877,39 @@ body {
   }
 
   .metricaCard {
+    padding: 15px;
+  }
+
+  .listaFavoritosPerfil {
     padding: 16px;
+  }
+
+  .gradeFavoritos {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .listaEmails {
+    left: -6px;
+    right: -6px;
+  }
+
+  .formAdicionarEmail {
+    flex-direction: column;
+  }
+
+  .formAdicionarEmail input,
+  .formAdicionarEmail button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
