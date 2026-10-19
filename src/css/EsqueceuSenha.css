@@ -17,7 +17,7 @@
 
   font-family: sans-serif;
 
-  background-image: url("../assets/fundo1.png");
+  background-image: url("../assets/Mapa.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -93,7 +93,7 @@
   flex-direction: column;
   justify-content: center;
 
-  background: #f0f2f4;
+  background: rgba(255, 255, 255, 0.9);
   border-radius: 25px;
 }
 

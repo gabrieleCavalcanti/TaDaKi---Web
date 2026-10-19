@@ -8,7 +8,7 @@
   min-height: 100vh;
   padding: 20px;
 
-  background-image: url("../assets/fundo1.png");
+  background-image: url("../assets/Mapa.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -30,7 +30,7 @@
 
   height: 550px;
 
-  background-color: #e1e6eb;
+  background: rgba(255, 255, 255, 0.8);
 
   border-radius: 25px;
 
@@ -51,7 +51,7 @@
 
   box-sizing: border-box;
 
-  background-color: #e1e6eb;
+  background: rgba(255, 255, 255, 0.3);
 
   padding: 40px;
 
@@ -949,18 +949,14 @@
 
 .toggle-box::before {
   content: "";
-
   position: absolute;
-
   left: -250%;
-
   width: 300%;
   height: 100%;
 
-  background-color: #a2b9d5;
+  background-color: #8E0808;
 
   border-radius: 150px;
-
   z-index: 2;
 
   transition: left 1.8s ease-in-out;

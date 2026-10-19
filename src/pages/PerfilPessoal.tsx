@@ -553,13 +553,6 @@ export default function PerfilPessoal() {
   return (
     <div className="perfilPessoal">
       <div className="perfilPessoalConteudo">
-        <button
-          type="button"
-          className="botaoVoltarFeed"
-          onClick={() => navigate("/")}
-        >
-          ← Voltar para o Feed
-        </button>
 
         <section className="cardPerfilPessoal">
           <div className="detalheVermelho" />
