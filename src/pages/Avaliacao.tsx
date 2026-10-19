@@ -43,6 +43,35 @@ export async function buscarAvaliacoes(): Promise<IAvaliacao[]> {
     }
 }
 
+
+export async function buscarAvaliacoesPorCliente(
+    idCliente: number
+): Promise<IAvaliacao[]> {
+    const id = Number(idCliente);
+
+    if (!Number.isInteger(id) || id <= 0) {
+        throw new Error("ID do cliente inválido.");
+    }
+
+    const avaliacoes = await buscarAvaliacoes();
+
+    console.log("ID do cliente logado:", id);
+    console.log("Total de avaliações da API:", avaliacoes.length);
+    console.log(
+        "IDs dos clientes nas avaliações:",
+        [...new Set(avaliacoes.map(a => a.id_cliente))]
+    );
+
+    const minhasAvaliacoes = avaliacoes.filter(
+        (avaliacao) => Number(avaliacao.id_cliente) === id
+    );
+
+    console.log("Minhas avaliações:", minhasAvaliacoes);
+
+    return minhasAvaliacoes;
+}
+
+
 export async function buscarAvaliacoesPorOrganizacao(
     idOrganizacao: number
 ): Promise<IAvaliacao[]> {

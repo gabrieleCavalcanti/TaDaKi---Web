@@ -821,7 +821,7 @@ export default function PerfilPessoal() {
             <button
               type="button"
               className="metricaCard metricaAvaliacoes"
-              onClick={() => navigate("/avaliacoes")}
+              onClick={() => navigate("/avaliacoes-cliente")}
             >
               <div className="iconeMetrica">
                 <User size={27} color="#666" />

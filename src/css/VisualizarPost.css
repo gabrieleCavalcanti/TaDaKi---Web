@@ -1,0 +1,595 @@
+/* =========================================================
+   TA-DA-KI — VISUALIZAÇÃO DOS POSTS
+   Paleta azul, vermelho e branco inspirada no perfil
+========================================================= */
+
+.visualizarPostPagina {
+    --vermelho: #B01013;
+    --vermelho-escuro: #7f2a2a;
+    --vermelho-claro: #d9232e;
+
+    --azul: #A2B9D5;
+    --azul-claro: #DCE6F1;
+    --azul-fundo: #EEF3F8;
+
+    --branco: #FFFFFF;
+
+    --cinza: #70757C;
+    --cinza-claro: #F5F6F8;
+    --cinza-medio: #D6DDE5;
+    --cinza-escuro: #292D32;
+
+    --borda: #D6DDE5;
+
+    min-height: 100vh;
+    padding: 24px 16px 60px;
+    box-sizing: border-box;
+
+    background:
+        radial-gradient(circle at 90% 5%,
+            rgba(162, 185, 213, 0.22),
+            transparent 28%),
+        #FFFFFF;
+
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--cinza-escuro);
+}
+
+/* =========================================================
+   CABEÇALHO
+========================================================= */
+
+.visualizarPostTopo {
+    max-width: 760px;
+    margin: 0 auto 28px;
+}
+
+.visualizarPostVoltar {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 10px 0;
+    margin-bottom: 24px;
+
+    border: none;
+    background: transparent;
+
+    color: var(--vermelho);
+
+    font-size: 15px;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.visualizarPostVoltar:hover {
+    color: var(--vermelho-escuro);
+}
+
+/* =========================================================
+   CABEÇALHO DA EMPRESA
+========================================================= */
+
+.visualizarPostCabecalho {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    padding: 22px;
+
+    background: #FFFFFF;
+    border: 1px solid var(--borda);
+    border-radius: 18px;
+
+    box-shadow: 0 3px 12px rgba(41, 45, 50, 0.035);
+}
+
+.visualizarPostLogo,
+.visualizarPostMiniLogo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    color: var(--vermelho);
+    background: var(--azul-claro);
+
+    border-radius: 50%;
+}
+
+.visualizarPostLogo {
+    width: 58px;
+    height: 58px;
+}
+
+.visualizarPostEyebrow {
+    color: var(--cinza);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.visualizarPostCabecalho h1 {
+    margin: 4px 0;
+    font-size: 23px;
+    overflow-wrap: anywhere;
+}
+
+.visualizarPostCabecalho p {
+    margin: 0;
+    color: var(--cinza);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* =========================================================
+   FEED DE POSTS
+========================================================= */
+
+.visualizarPostFeed {
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+
+    max-width: 680px;
+    margin: 0 auto;
+}
+
+/* =========================================================
+   CARD DO POST
+========================================================= */
+
+.visualizarPostConteudo {
+    overflow: hidden;
+
+    background: #FFFFFF;
+
+    border: 1px solid rgba(162, 185, 213, 0.7);
+    border-radius: 18px;
+
+    box-shadow: 0 5px 20px rgba(41, 45, 50, 0.055);
+
+    scroll-margin-top: 24px;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+/* Destaque do post selecionado */
+
+.visualizarPostSelecionado {
+    border-color: var(--vermelho);
+
+    box-shadow:
+        0 0 0 3px rgba(176, 16, 19, 0.10),
+        0 6px 22px rgba(41, 45, 50, 0.07);
+}
+
+/* =========================================================
+   TOPO DO CARD
+========================================================= */
+
+.visualizarPostCardTopo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 16px 18px;
+}
+
+.visualizarPostMiniLogo {
+    width: 42px;
+    height: 42px;
+}
+
+.visualizarPostDadosEmpresa {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 4px;
+
+    min-width: 0;
+}
+
+.visualizarPostDadosEmpresa strong {
+    color: var(--cinza-escuro);
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
+
+.visualizarPostDadosEmpresa span {
+    color: var(--cinza);
+    font-size: 12px;
+}
+
+.visualizarPostPonto {
+    color: var(--cinza);
+    letter-spacing: 2px;
+}
+
+/* =========================================================
+   ÁREA DA IMAGEM
+========================================================= */
+
+.visualizarPostAreaImagem {
+    width: 100%;
+    height: 360px;
+
+    background: var(--azul-fundo);
+}
+
+.visualizarPostImagem {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+
+    background: var(--azul-fundo);
+}
+
+/* =========================================================
+   IMAGEM INDISPONÍVEL
+========================================================= */
+
+.visualizarPostSemImagem {
+    display: flex;
+
+    width: 100%;
+    height: 100%;
+
+    box-sizing: border-box;
+    padding: 24px;
+
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 10px;
+
+    text-align: center;
+
+    color: var(--cinza);
+
+    background:
+        linear-gradient(135deg,
+            #DCE6F1,
+            #F8FAFC);
+}
+
+.visualizarPostIconeImagem {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 68px;
+    height: 68px;
+
+    margin-bottom: 4px;
+
+    color: var(--vermelho);
+    background: var(--azul-claro);
+
+    border: 2px dashed var(--azul);
+    border-radius: 50%;
+}
+
+.visualizarPostSemImagem strong {
+    color: var(--vermelho);
+    font-size: 16px;
+}
+
+.visualizarPostSemImagem span {
+    max-width: 280px;
+
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+/* =========================================================
+   TEXTO DO POST
+========================================================= */
+
+.visualizarPostTexto {
+    padding: 20px 22px 14px;
+}
+
+.visualizarPostTexto h2 {
+    margin: 0 0 10px;
+
+    color: var(--cinza-escuro);
+    font-size: 20px;
+    line-height: 1.4;
+
+    overflow-wrap: anywhere;
+}
+
+.visualizarPostTexto h1 {
+    margin: 0 0 12px;
+
+    color: var(--cinza-escuro);
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 25px;
+    line-height: 1.3;
+
+    overflow-wrap: anywhere;
+}
+
+.visualizarPostTexto p {
+    margin: 0;
+
+    color: #555B63;
+    font-size: 14px;
+    line-height: 1.8;
+
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+/* =========================================================
+   AÇÕES DO POST
+========================================================= */
+
+.visualizarPostAcoes {
+    display: flex;
+    align-items: center;
+
+    margin-top: 18px;
+    padding-top: 14px;
+
+    border-top: 1px solid var(--azul-claro);
+}
+
+.visualizarPostCurtir {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 8px 12px;
+
+    border: none;
+    border-radius: 9px;
+
+    background: transparent;
+    color: var(--cinza);
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.visualizarPostCurtir:hover {
+    background: #FBEDEE;
+    color: var(--vermelho);
+}
+
+.visualizarPostCurtir:hover svg {
+    fill: var(--vermelho);
+}
+
+/* =========================================================
+   CARREGAMENTO E ESTADOS
+========================================================= */
+
+.visualizarPostEstado {
+    display: flex;
+
+    min-height: 60vh;
+
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 12px;
+
+    color: var(--cinza);
+    text-align: center;
+}
+
+.visualizarPostEstado h2 {
+    margin: 0;
+
+    color: var(--cinza-escuro);
+    font-size: 20px;
+}
+
+.visualizarPostEstado p {
+    max-width: 420px;
+
+    margin: 0;
+
+    line-height: 1.7;
+}
+
+.visualizarPostSpinner {
+    width: 32px;
+    height: 32px;
+
+    border: 3px solid var(--azul-claro);
+    border-top-color: var(--vermelho);
+
+    border-radius: 50%;
+
+    animation: visualizarPostGirar 0.8s linear infinite;
+}
+
+@keyframes visualizarPostGirar {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* =========================================================
+   RESPONSIVIDADE
+========================================================= */
+
+@media (max-width: 600px) {
+    .visualizarPostPagina {
+        padding: 12px 10px 36px;
+    }
+
+    .visualizarPostTopo {
+        margin-bottom: 18px;
+    }
+
+    .visualizarPostVoltar {
+        margin-bottom: 16px;
+    }
+
+    .visualizarPostCabecalho {
+        gap: 12px;
+        padding: 16px;
+        border-radius: 14px;
+    }
+
+    .visualizarPostLogo {
+        width: 46px;
+        height: 46px;
+    }
+
+    .visualizarPostCabecalho h1 {
+        font-size: 19px;
+    }
+
+    .visualizarPostFeed {
+        gap: 18px;
+    }
+
+    .visualizarPostConteudo {
+        border-radius: 14px;
+    }
+
+    .visualizarPostCardTopo {
+        padding: 13px 14px;
+    }
+
+    .visualizarPostAreaImagem {
+        height: 280px;
+    }
+
+    .visualizarPostTexto {
+        padding: 17px 16px 12px;
+    }
+
+    .visualizarPostTexto h2 {
+        font-size: 18px;
+    }
+}
+
+.visualizarPostMenuContainer {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.visualizarPostPonto {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: #70757C;
+    cursor: pointer;
+}
+
+.visualizarPostPonto:hover {
+    background: #DCE6F1;
+    color: #B01013;
+}
+
+.visualizarPostMenu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 20;
+    width: 220px;
+    padding: 6px;
+    background: #FFFFFF;
+    border: 1px solid #DCE6F1;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(41, 45, 50, 0.14);
+}
+
+.visualizarPostMenuItem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #B01013;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+}
+
+.visualizarPostMenuItem:hover {
+    background: #EEF3F8;
+}
+
+.visualizarPostMenuItem:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+
+
+
+.visualizarPostSucesso {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 720px;
+    margin: 20px auto;
+    padding: 16px 18px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 14px;
+    color: #166534;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+}
+
+.visualizarPostSucessoIcone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #dcfce7;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.visualizarPostSucesso strong {
+    display: block;
+    margin-bottom: 3px;
+}
+
+.visualizarPostSucesso p {
+    margin: 0;
+    font-size: 14px;
+}
+
+.visualizarPostSucesso button {
+    margin-left: auto;
+    border: none;
+    background: transparent;
+    color: #166534;
+    font-size: 24px;
+    cursor: pointer;
+}

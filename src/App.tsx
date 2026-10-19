@@ -14,15 +14,16 @@ import { Login } from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Perfil from "./pages/Perfil";
 import PerfilPessoal from "./pages/PerfilPessoal";
+import MinhasAvaliacoes from "./pages/AvaliaçõesCliente";
 
 export const App: React.FC = () => {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
-         <Route path="/esqueceuSenha" element={<EsqueceuSenha />} />
+        <Route path="/esqueceuSenha" element={<EsqueceuSenha />} />
 
-         <Route path="/redefinir-senha" element={<RedefinirSenha />} />
+        <Route path="/redefinir-senha" element={<RedefinirSenha />} />
 
         <Route path="/cadastro" element={<Cadastro />} />
 
@@ -33,6 +34,10 @@ export const App: React.FC = () => {
           <Route path="/perfil/:id_pessoa" element={<Perfil />} />
           <Route path="/perfil-pessoal" element={<PerfilPessoal />} />
         </Route>
+        <Route
+          path="/avaliacoes-cliente"
+          element={<MinhasAvaliacoes />}
+        />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
