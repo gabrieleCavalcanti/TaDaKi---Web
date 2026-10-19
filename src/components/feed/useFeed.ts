@@ -14,6 +14,7 @@ export function useFeed(user: Person | null, onlyLikes: boolean) {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [favoritesError, setFavoritesError] = useState(false);
+  const [favoriteErrors, setFavoriteErrors] = useState<Record<number, string>>({});
   const [pending, setPending] = useState<Set<string>>(new Set());
   const pendingRef = useRef(new Set<string>());
   const touchedCounts = useRef(new Set<number>());
@@ -218,6 +219,7 @@ export function useFeed(user: Person | null, onlyLikes: boolean) {
   const toggleFavorite = async (orgId: number) => {
     const key = `favorite:${orgId}`;
     if (!lock(key)) return;
+    setFavoriteErrors((previous) => ({ ...previous, [orgId]: "" }));
     try {
       const existing = favorites[orgId];
       let updated: FavoriteMap;
@@ -255,11 +257,11 @@ export function useFeed(user: Person | null, onlyLikes: boolean) {
         return next;
       });
     } catch (cause) {
-      setNotice(
-        cause instanceof Error
-          ? cause.message
-          : "Não foi possível atualizar o favorito.",
-      );
+      const message = cause instanceof Error
+        ? cause.message
+        : "Não foi possível atualizar o favorito.";
+      setNotice(message);
+      setFavoriteErrors((previous) => ({ ...previous, [orgId]: message }));
     } finally {
       unlock(key);
     }
@@ -275,6 +277,7 @@ export function useFeed(user: Person | null, onlyLikes: boolean) {
     counts,
     favorites,
     favoritesError,
+    favoriteErrors,
     loading,
     error,
     notice,

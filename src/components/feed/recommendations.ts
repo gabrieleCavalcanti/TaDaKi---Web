@@ -48,7 +48,9 @@ export function recommendations(posts: Post[], likes: Set<number>, favorites: Fa
   }
   const hasInterests = orgs.size > 0 || cats.size > 0;
   const score = (post: Post) => (orgs.get(Number(post.id_organizacao)) ?? 0) + (cats.get(Number(post.id_categoria)) ?? 0);
-  const data = posts.filter(post => !personalized || !hasInterests || score(post) > 0).slice().sort((a,b) => proximity(locations.user, locations.organizations[a.id_organizacao] ?? []) - proximity(locations.user, locations.organizations[b.id_organizacao] ?? []) || score(b) - score(a) || Number(b.id_post) - Number(a.id_post));
+  // Mostra os recomendados primeiro e deixa os outros posts no final.
+  const group = (post: Post) => personalized && hasInterests && score(post) <= 0 ? 1 : 0;
+  const data = posts.slice().sort((a, b) => group(a) - group(b) || proximity(locations.user, locations.organizations[a.id_organizacao] ?? []) - proximity(locations.user, locations.organizations[b.id_organizacao] ?? []) || score(b) - score(a) || Number(b.id_post) - Number(a.id_post));
   return { posts: data, hasInterests };
 }
 

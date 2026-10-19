@@ -43,6 +43,7 @@ export async function buscarAvaliacoes(): Promise<IAvaliacao[]> {
     }
 }
 
+
 export async function buscarAvaliacoesPorCliente(
     idCliente: number
 ): Promise<IAvaliacao[]> {
@@ -54,10 +55,22 @@ export async function buscarAvaliacoesPorCliente(
 
     const avaliacoes = await buscarAvaliacoes();
 
-    return avaliacoes.filter(
+    console.log("ID do cliente logado:", id);
+    console.log("Total de avaliações da API:", avaliacoes.length);
+    console.log(
+        "IDs dos clientes nas avaliações:",
+        [...new Set(avaliacoes.map(a => a.id_cliente))]
+    );
+
+    const minhasAvaliacoes = avaliacoes.filter(
         (avaliacao) => Number(avaliacao.id_cliente) === id
     );
+
+    console.log("Minhas avaliações:", minhasAvaliacoes);
+
+    return minhasAvaliacoes;
 }
+
 
 export async function buscarAvaliacoesPorOrganizacao(
     idOrganizacao: number

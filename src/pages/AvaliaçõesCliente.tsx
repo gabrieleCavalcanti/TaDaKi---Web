@@ -13,15 +13,12 @@ import {
 } from "lucide-react";
 
 import {
-    calcularMediaAvaliacoes,
     buscarAvaliacoesPorCliente,
 } from "./Avaliacao";
 
 import type { IAvaliacao } from "./Avaliacao";
 
-import { useAuth } from "../hooks/useAuth";
-import { BASE_URL } from "../services/api";
-
+import { BASE_URL, apiFetch } from "../services/api";
 import "../css/AvaliaçõesCliente.css";
 import "../css/Perfil.css";
 
@@ -34,8 +31,32 @@ type AvaliacaoEditavel = IAvaliacao & {
 };
 
 export default function MinhasAvaliacoes() {
-    const { user } = useAuth();
     const navigate = useNavigate();
+
+    async function abrirAvaliacaoNaOrganizacao(avaliacao: IAvaliacao) {
+        const idOrganizacao = Number(avaliacao.id_organizacao);
+        const idAvaliacao = Number(avaliacao.id_avaliacao);
+        if (!Number.isSafeInteger(idOrganizacao) || idOrganizacao <= 0 ||
+            !Number.isSafeInteger(idAvaliacao) || idAvaliacao <= 0) {
+            setErro("Esta avaliação não possui identificação válida da organização.");
+            return;
+        }
+        try {
+            const resposta = await apiFetch<any>("/pessoas?tipo=ORGANIZACAO");
+            const candidatos = [resposta?.funcionarios, resposta?.pessoas,
+                resposta?.dados, resposta?.data, resposta];
+            const lista = candidatos.find(Array.isArray) as any[] | undefined;
+            const organizacao = lista?.find((item: any) =>
+                Number(item?.id_organizacao) === idOrganizacao);
+            const idPessoa = Number(organizacao?.id_pessoa);
+            if (!Number.isSafeInteger(idPessoa) || idPessoa <= 0) {
+                throw new Error("Não foi possível encontrar o perfil desta organização.");
+            }
+            navigate(`/perfil/${idPessoa}?aba=avaliacoes&avaliacao=${idAvaliacao}`);
+        } catch (error) {
+            setErro(error instanceof Error ? error.message : "Não foi possível abrir a organização.");
+        }
+    }
 
     const [avaliacoes, setAvaliacoes] = useState<IAvaliacao[]>([]);
     const [carregando, setCarregando] = useState(true);
@@ -53,63 +74,58 @@ export default function MinhasAvaliacoes() {
     const [salvando, setSalvando] = useState(false);
     const [excluindoId, setExcluindoId] = useState<number | null>(null);
 
-    const mediaAvaliacoes = calcularMediaAvaliacoes(avaliacoes);
+    // Considera apenas notas válidas para evitar "NaN" na média.
+    const notasValidas = avaliacoes
+        .map((avaliacao) => Number(avaliacao.csat))
+        .filter((nota) => Number.isFinite(nota) && nota >= 1 && nota <= 5);
+    const mediaAvaliacoes = notasValidas.length
+        ? notasValidas.reduce((total, nota) => total + nota, 0) / notasValidas.length
+        : null;
 
     async function carregarAvaliacoes() {
         setCarregando(true);
         setErro("");
 
         try {
-            const idPessoa = Number(user?.id_pessoa_login);
-
-            if (!Number.isSafeInteger(idPessoa) || idPessoa <= 0) {
-                throw new Error("Não foi possível identificar o cliente.");
-            }
-
-            const resposta = await fetch(
-                `${BASE_URL}/pessoas?id=${idPessoa}`,
-                { credentials: "include" }
+            // Usa a mesma identificação de sessão do PerfilPessoal.
+            const respostaLogin = await apiFetch<any>("/auth/me");
+            const dadosLogin = respostaLogin?.user ?? respostaLogin;
+            const idPessoa = Number(
+                dadosLogin?.id_pessoa ?? dadosLogin?.id_pessoa_login ?? 0
             );
 
-            if (!resposta.ok) {
-                throw new Error("Não foi possível consultar o cliente.");
+            if (!Number.isSafeInteger(idPessoa) || idPessoa <= 0) {
+                throw new Error("Não foi possível identificar o usuário logado.");
             }
 
-            const data = await resposta.json();
-
-            const listas = [
-                data?.pessoaId,
-                data?.pessoas,
-                data?.dados,
-                data?.data,
-                data?.data?.pessoaId,
-                data?.data?.pessoas,
+            const data = await apiFetch<any>(`/pessoas?id=${idPessoa}`);
+            const candidatos = [
+                data?.pessoaId, data?.pessoas, data?.pessoa,
+                data?.dados, data?.data?.pessoaId, data?.data?.pessoas,
+                data?.data, data,
             ];
+            const pessoas = candidatos.flatMap((valor: any) =>
+                Array.isArray(valor) ? valor : valor && typeof valor === "object" ? [valor] : []
+            );
+            const pessoa = pessoas.find(
+                (item: any) =>
+                    Number(item?.id_pessoa) === idPessoa ||
+                    (
+                        String(item?.tipo).toUpperCase() === "CLIENTE" &&
+                        Number(item?.id_cliente) > 0
+                    )
+            );
 
-            let pessoa = listas
-                .filter(Array.isArray)
-                .flat()
-                .find((item) => Number(item.id_pessoa) === idPessoa);
-
-            if (
-                !pessoa &&
-                Number(data?.pessoa?.id_pessoa) === idPessoa
-            ) {
-                pessoa = data.pessoa;
-            }
-
+            // O endpoint /pessoas já fornece o ID do cliente vinculado.
+            // const idCliente = Number(pessoa?.id_cliente ?? pessoa?.cliente?.id_cliente);
             const idCliente = Number(pessoa?.id_cliente);
-
-            if (
-                String(pessoa?.tipo ?? "").trim().toUpperCase() !==
-                "CLIENTE" ||
-                !Number.isSafeInteger(idCliente) ||
-                idCliente <= 0
-            ) {
-                throw new Error("Não foi possível identificar o cliente.");
+            if (!Number.isSafeInteger(idCliente) || idCliente <= 0) {
+                console.error("Resposta de /pessoas:", data);
+                throw new Error("Não foi possível identificar o cliente na rota /pessoas.");
             }
 
             const resultado = await buscarAvaliacoesPorCliente(idCliente);
+            console.log("Avaliações retornadas:", resultado);
             setAvaliacoes(resultado);
         } catch (error) {
             console.error(error);
@@ -126,7 +142,16 @@ export default function MinhasAvaliacoes() {
 
     useEffect(() => {
         void carregarAvaliacoes();
-    }, [user?.id_pessoa_login]);
+    }, []);
+
+    useEffect(() => {
+        if (!avaliacaoEditando || salvando) return;
+        const fecharComEscape = (event: KeyboardEvent) => {
+            if (event.key === "Escape") cancelarEdicao();
+        };
+        window.addEventListener("keydown", fecharComEscape);
+        return () => window.removeEventListener("keydown", fecharComEscape);
+    }, [avaliacaoEditando, salvando]);
 
     function iniciarEdicao(avaliacao: IAvaliacao) {
         const id = Number(avaliacao.id_avaliacao);
@@ -394,122 +419,16 @@ export default function MinhasAvaliacoes() {
                         <div>
                             <span>Média das notas</span>
                             <strong>
-                                {avaliacoes.length > 0
-                                    ? Number(mediaAvaliacoes).toFixed(1)
+                                {mediaAvaliacoes !== null
+                                    ? mediaAvaliacoes.toFixed(1)
                                     : "—"}
                                 <small>
-                                    {avaliacoes.length > 0 ? " / 5" : ""}
+                                    {mediaAvaliacoes !== null ? " / 5" : ""}
                                 </small>
                             </strong>
                         </div>
                     </article>
                 </section>
-
-                {avaliacaoEditando && (
-                    <section
-                        className="formularioEdicaoAvaliacao"
-                        aria-labelledby="tituloEdicaoAvaliacao"
-                    >
-                        <div className="tituloListaAvaliacoes">
-                            <h2 id="tituloEdicaoAvaliacao">
-                                Editar avaliação
-                            </h2>
-
-                            <button
-                                type="button"
-                                onClick={cancelarEdicao}
-                                aria-label="Cancelar edição"
-                            >
-                                <X size={20} />
-                            </button>
-                        </div>
-
-                        <form onSubmit={salvarEdicao}>
-                            <label htmlFor="tituloAvaliacao">
-                                Título
-                            </label>
-
-                            <input
-                                id="tituloAvaliacao"
-                                type="text"
-                                value={titulo}
-                                onChange={(event) =>
-                                    setTitulo(event.target.value)
-                                }
-                                maxLength={150}
-                                required
-                            />
-
-                            <label htmlFor="comentarioAvaliacao">
-                                Comentário
-                            </label>
-
-                            <textarea
-                                id="comentarioAvaliacao"
-                                value={comentario}
-                                onChange={(event) =>
-                                    setComentario(event.target.value)
-                                }
-                                rows={4}
-                                required
-                            />
-
-                            <label>Nota</label>
-
-                            <div className="seletorEstrelasEdicao">
-                                {[1, 2, 3, 4, 5].map((estrela) => (
-                                    <button
-                                        key={estrela}
-                                        type="button"
-                                        onClick={() => setCsat(estrela)}
-                                        aria-label={`Dar nota ${estrela}`}
-                                        aria-pressed={csat === estrela}
-                                    >
-                                        <Star
-                                            size={27}
-                                            fill={
-                                                estrela <= csat
-                                                    ? "currentColor"
-                                                    : "none"
-                                            }
-                                        />
-                                    </button>
-                                ))}
-                            </div>
-
-                            <label className="opcaoAnonimaAvaliacao">
-                                <input
-                                    type="checkbox"
-                                    checked={anonimo}
-                                    onChange={(event) =>
-                                        setAnonimo(event.target.checked)
-                                    }
-                                />
-                                Publicar avaliação anonimamente
-                            </label>
-
-                            <div className="acoesEdicaoAvaliacao">
-                                <button
-                                    type="button"
-                                    onClick={cancelarEdicao}
-                                    disabled={salvando}
-                                >
-                                    Cancelar
-                                </button>
-
-                                <button
-                                    type="submit"
-                                    disabled={salvando}
-                                >
-                                    <Save size={17} />
-                                    {salvando
-                                        ? "Salvando..."
-                                        : "Salvar alterações"}
-                                </button>
-                            </div>
-                        </form>
-                    </section>
-                )}
 
                 <section className="listaMinhasAvaliacoes">
                     <div className="tituloListaAvaliacoes">
@@ -565,8 +484,14 @@ export default function MinhasAvaliacoes() {
                                             </span>
 
                                             <h3>
-                                                {avaliacao.titulo ||
-                                                    "Avaliação sem título"}
+                                                <button type="button"
+                                                    onClick={() => void abrirAvaliacaoNaOrganizacao(avaliacao)}
+                                                    title="Ver avaliação no perfil da organização"
+                                                    style={{ background: "none", border: 0, padding: 0,
+                                                        font: "inherit", color: "inherit", cursor: "pointer",
+                                                        textAlign: "left", textDecoration: "underline" }}>
+                                                    {avaliacao.titulo || "Avaliação sem título"}
+                                                </button>
                                             </h3>
                                         </div>
 
@@ -653,12 +578,126 @@ export default function MinhasAvaliacoes() {
                                                 : "Excluir"}
                                         </button>
                                     </div>
+
                                 </article>
                             ))}
                         </div>
                     )}
                 </section>
             </div>
+            {avaliacaoEditando && (
+                <div className="modalEdicaoOverlay">
+                    <button type="button" className="modalEdicaoBackdrop"
+                        aria-label="Fechar janela de edição"
+                        onClick={() => { if (!salvando) cancelarEdicao(); }} />
+<section
+                        className="formularioEdicaoAvaliacao modalEdicaoAvaliacao"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="tituloEdicaoAvaliacao"
+                    >
+                        <div className="tituloListaAvaliacoes">
+                            <h2 id="tituloEdicaoAvaliacao">
+                                Editar avaliação
+                            </h2>
+
+                            <button
+                                type="button"
+                                onClick={cancelarEdicao}
+                                disabled={salvando}
+                                aria-label="Cancelar edição"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        <form onSubmit={salvarEdicao}>
+                            <label htmlFor="tituloAvaliacao">
+                                Título
+                            </label>
+
+                            <input
+                                id="tituloAvaliacao"
+                                type="text"
+                                value={titulo}
+                                onChange={(event) =>
+                                    setTitulo(event.target.value)
+                                }
+                                maxLength={150}
+                                required
+                            />
+
+                            <label htmlFor="comentarioAvaliacao">
+                                Comentário
+                            </label>
+
+                            <textarea
+                                id="comentarioAvaliacao"
+                                value={comentario}
+                                onChange={(event) =>
+                                    setComentario(event.target.value)
+                                }
+                                rows={4}
+                                required
+                            />
+
+                            <label>Nota</label>
+
+                            <div className="seletorEstrelasEdicao">
+                                {[1, 2, 3, 4, 5].map((estrela) => (
+                                    <button
+                                        key={estrela}
+                                        type="button"
+                                        onClick={() => setCsat(estrela)}
+                                        aria-label={`Dar nota ${estrela}`}
+                                        aria-pressed={estrela <= csat}
+                                    >
+                                        <Star
+                                            size={27}
+                                            fill={
+                                                estrela <= csat
+                                                    ? "currentColor"
+                                                    : "none"
+                                            }
+                                        />
+                                    </button>
+                                ))}
+                            </div>
+
+                            <label className="opcaoAnonimaAvaliacao">
+                                <input
+                                    type="checkbox"
+                                    checked={anonimo}
+                                    onChange={(event) =>
+                                        setAnonimo(event.target.checked)
+                                    }
+                                />
+                                Publicar avaliação anonimamente
+                            </label>
+
+                            <div className="acoesEdicaoAvaliacao">
+                                <button
+                                    type="button"
+                                    onClick={cancelarEdicao}
+                                    disabled={salvando}
+                                >
+                                    Cancelar
+                                </button>
+
+                                <button
+                                    type="submit"
+                                    disabled={salvando}
+                                >
+                                    <Save size={17} />
+                                    {salvando
+                                        ? "Salvando..."
+                                        : "Salvar alterações"}
+                                </button>
+                            </div>
+                        </form>
+                    </section>
+                </div>
+            )}
         </main>
     );
 }

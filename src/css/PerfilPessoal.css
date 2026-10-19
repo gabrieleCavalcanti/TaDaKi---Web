@@ -1,706 +1,915 @@
 /* =========================================================
-   TA-DA-KI - PERFIL PESSOAL
-   ========================================================= */
+   TA-DA-KI — PERFIL PESSOAL
+   Paleta: vermelho, azul-claro e branco
+========================================================= */
 
 :root {
-    --vermelho: #8E0808;
-    --azul: #A2B9D5;
-    --azul-claro: #DCE6F1;
-    --verde: #ACCCB1;
-    --creme: #EAE4CF;
-    --branco: #FFFFFF;
-    --cinza: #70757C;
-    --cinza-escuro: #292D32;
-    --borda: #D6DDE5;
-    --preto: #111111;
+  --vermelho: #8E0808;
+  --vermelho-hover: #6F0606;
+  --azul: #A2B9D5;
+  --azul-claro: #DCE6F1;
+  --verde: #ACCCB1;
+  --creme: #EAE4CF;
+  --branco: #FFFFFF;
+  --cinza: #70757C;
+  --cinza-escuro: #292D32;
+  --borda: #D6DDE5;
+  --preto: #111111;
+  --fundo: #EEF3F8;
 }
 
-
-/* =========================================================
-   RESET
-   ========================================================= */
+/* RESET */
 
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 body {
-    margin: 0;
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-
-/* =========================================================
-   PÁGINA
-   ========================================================= */
+/* PÁGINA */
 
 .perfilPessoal {
-    min-height: 100vh;
-
-    background:
-        radial-gradient(
-            circle at 90% 5%,
-            rgba(162, 185, 213, 0.65) 0,
-            rgba(162, 185, 213, 0) 28%
-        ),
-        linear-gradient(
-            135deg,
-            #eef3f8 0%,
-            #f7f8fa 50%,
-            #e8eef5 100%
-        );
-
-    color: var(--cinza-escuro);
-
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-
-    overflow-x: hidden;
+  min-height: 100vh;
+  overflow-x: clip;
+  color: var(--cinza-escuro);
+  font-family: Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(
+      circle at 90% 5%,
+      rgba(162, 185, 213, 0.28) 0,
+      transparent 28%
+    ),
+    linear-gradient(135deg, #EEF3F8 0%, #F7F8FA 50%, #E8EEF5 100%);
 }
-
-
-/* =========================================================
-   CONTEÚDO
-   ========================================================= */
 
 .perfilPessoalConteudo {
-    width: min(950px, calc(100% - 40px));
-
-    margin: 0 auto;
-
-    padding: 30px 0 60px;
+  width: min(1100px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 30px 0 60px;
 }
 
-
-/* =========================================================
-   VOLTAR PARA O FEED
-   ========================================================= */
+/* VOLTAR PARA O FEED */
 
 .botaoVoltarFeed {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-
-    margin-bottom: 18px;
-
-    padding: 9px 14px;
-
-    border: 2px solid var(--borda);
-    border-radius: 10px;
-
-    background: white;
-
-    color: var(--cinza-escuro);
-
-    font-size: 14px;
-    font-weight: 700;
-
-    cursor: pointer;
-
-    transition:
-        background 0.2s ease,
-        border-color 0.2s ease,
-        color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 18px;
+  padding: 10px 15px;
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+  background: var(--branco);
+  color: var(--cinza-escuro);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, transform 0.2s;
 }
 
 .botaoVoltarFeed:hover {
-    background: var(--azul-claro);
-    border-color: var(--azul);
-    color: var(--vermelho);
+  background: var(--azul-claro);
+  border-color: var(--azul);
 }
 
+.botaoVoltarFeed:focus-visible,
+.botaoEditarPessoal:focus-visible,
+.botaoCancelarEdicao:focus-visible,
+.botaoAdicionarEmail:focus-visible,
+.botaoExcluirEmail:focus-visible,
+.cabecalhoFavoritos button:focus-visible,
+.metricaCard:focus-visible,
+.itemFavoritoPerfil:focus-visible {
+  outline: 3px solid var(--azul);
+  outline-offset: 3px;
+}
 
-/* =========================================================
-   CARD PRINCIPAL DO PERFIL
-   ========================================================= */
+/* CARD PRINCIPAL */
 
 .cardPerfilPessoal {
-    position: relative;
-
-    padding: 40px;
-
-    background: white;
-
-    border: 2px solid rgba(162, 185, 213, 0.65);
-
-    border-radius: 22px;
-
-    box-shadow:
-        0 10px 30px rgba(117, 8, 10, 0.08);
-
-    overflow: hidden;
+  position: relative;
+  padding: 38px 32px;
+  overflow: visible;
+  background: var(--branco);
+  border: 1px solid rgba(162, 185, 213, 0.7);
+  border-radius: 22px;
+  box-shadow: 0 8px 24px rgba(41, 45, 50, 0.06);
 }
 
-
-/* detalhe vermelho */
+/* A tira vermelha lateral foi removida.
+   Mantido o seletor para compatibilidade com o JSX. */
 
 .detalheVermelho {
-    position: absolute;
-
-    left: 0;
-    top: 0;
-
-    width: 8px;
-    height: 100%;
-
-    background: var(--vermelho);
+  display: none;
 }
 
-
-/* =========================================================
-   TOPO DO PERFIL
-   ========================================================= */
+/* CABEÇALHO DO PERFIL */
 
 .topoPerfilPessoal {
-    display: flex;
-    align-items: center;
-
-    gap: 25px;
-
-    padding-bottom: 32px;
-
-    border-bottom: 1px solid var(--borda);
+  display: grid;
+  grid-template-columns: 130px minmax(0, 1fr) 160px;
+  align-items: center;
+  gap: 26px;
+  padding: 4px 0 28px;
+  border-bottom: 1px solid var(--borda);
 }
 
-
-/* =========================================================
-   FOTO
-   ========================================================= */
+/* FOTO */
 
 .avatarPessoal {
-    width: 125px;
-    height: 125px;
-
-    flex-shrink: 0;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    overflow: hidden;
-
-    border-radius: 50%;
-
-    background: var(--azul);
-
-    border: 5px solid white;
-
-    box-shadow:
-        0 0 0 3px var(--vermelho),
-        0 8px 20px rgba(117, 8, 10, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 120px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border: 4px solid var(--branco);
+  border-radius: 50%;
+  background: var(--azul);
+  box-shadow: 0 0 0 2px var(--azul), 0 6px 16px rgba(41, 45, 50, 0.12);
 }
 
 .avatarPessoal img {
-    width: 100%;
-    height: 100%;
-
-    object-fit: cover;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-
-/* =========================================================
-   NOME
-   ========================================================= */
+/* NOME, USUÁRIO E CAMPOS DE EDIÇÃO */
 
 .nomePerfilPessoal {
-    display: flex;
-    flex-direction: column;
-
-    gap: 7px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 9px;
+  width: 100%;
+  min-width: 0;
 }
 
 .nomePerfilPessoal h1 {
-    margin: 0;
-
-    color: var(--vermelho);
-
-    font-size: 31px;
-    font-weight: 800;
+  margin: 0;
+  color: var(--vermelho);
+  font-size: 30px;
+  font-weight: 800;
+  overflow-wrap: anywhere;
 }
 
 .nomePerfilPessoal span {
-    color: var(--cinza);
-
-    font-size: 15px;
+  color: var(--cinza);
+  font-size: 14px;
 }
 
+.nomePerfilPessoal label {
+  display: block;
+  margin: 0;
+  color: #465365;
+  font-size: 12px;
+  font-weight: 700;
+}
 
-/* =========================================================
-   INFORMAÇÕES PESSOAIS
-   ========================================================= */
+.nomePerfilPessoal input {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--borda);
+  border-radius: 9px;
+  outline: none;
+  background: #F8FAFC;
+  color: var(--cinza-escuro);
+  font-family: inherit;
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.nomePerfilPessoal input:focus {
+  border-color: var(--vermelho);
+  background: var(--branco);
+  box-shadow: 0 0 0 3px rgba(142, 8, 8, 0.1);
+}
+
+/* BOTÕES DE EDIÇÃO */
+
+.botoesEdicaoPessoal {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 9px;
+  width: 100%;
+  min-width: 0;
+}
+
+.botaoEditarPessoal,
+.botaoCancelarEdicao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 42px;
+  margin: 0;
+  padding: 10px 13px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, transform 0.2s;
+}
+
+.botaoEditarPessoal {
+  border: 1px solid var(--vermelho);
+  background: var(--vermelho);
+  color: var(--branco);
+}
+
+.botaoEditarPessoal:hover:not(:disabled) {
+  border-color: var(--vermelho-hover);
+  background: var(--vermelho-hover);
+  transform: translateY(-1px);
+}
+
+.botaoCancelarEdicao {
+  border: 1px solid var(--borda);
+  background: var(--branco);
+  color: #505866;
+}
+
+.botaoCancelarEdicao:hover:not(:disabled) {
+  border-color: #B9C4D1;
+  background: #F1F3F6;
+}
+
+.botaoEditarPessoal:disabled,
+.botaoCancelarEdicao:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* INFORMAÇÕES PESSOAIS */
 
 .informacoesPessoais {
-    padding-top: 30px;
+  padding-top: 28px;
+  overflow: visible;
 }
 
 .informacoesPessoais h2 {
-    margin: 0 0 20px;
-
-    color: var(--cinza-escuro);
-
-    font-size: 20px;
-    font-weight: 800;
+  margin: 0 0 20px;
+  color: var(--cinza-escuro);
+  font-size: 22px;
+  font-weight: 800;
 }
-
-
-/* =========================================================
-   GRID DAS INFORMAÇÕES
-   ========================================================= */
 
 .informacoesGrid {
-    display: grid;
-
-    grid-template-columns:
-        repeat(2, 1fr);
-
-    gap: 14px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  overflow: visible;
 }
 
-
-/* =========================================================
-   ITEM DE INFORMAÇÃO
-   ========================================================= */
+/* CARDS DE INFORMAÇÃO */
 
 .informacaoItem {
-    display: flex;
-    align-items: center;
-
-    gap: 13px;
-
-    min-height: 75px;
-
-    padding: 15px;
-
-    background: #fafbfc;
-
-    border: 2px solid var(--borda);
-
-    border-radius: 13px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  min-height: 96px;
+  padding: 16px;
+  border: 1px solid var(--borda);
+  border-radius: 14px;
+  background: #FAFBFC;
+  transition: border-color 0.2s, background 0.2s;
 }
 
-
-/* =========================================================
-   ÍCONE DA INFORMAÇÃO
-   ========================================================= */
+.informacaoItem:hover {
+  border-color: var(--azul);
+}
 
 .iconeInformacao {
-    width: 43px;
-    height: 43px;
-
-    flex-shrink: 0;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 11px;
-
-    background: var(--azul-claro);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: var(--azul-claro);
+  color: var(--vermelho);
 }
 
-
-/* =========================================================
-   TEXTO DA INFORMAÇÃO
-   ========================================================= */
-
 .informacaoItem > div:last-child {
-    min-width: 0;
-
-    display: flex;
-    flex-direction: column;
-
-    gap: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
 }
 
 .informacaoItem span {
-    color: var(--cinza);
-
-    font-size: 12px;
-    font-weight: 600;
+  color: var(--cinza);
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .informacaoItem strong {
-    color: var(--cinza-escuro);
-
-    font-size: 14px;
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
-
-    white-space: nowrap;
+  color: var(--cinza-escuro);
+  font-size: 14px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
 }
 
+/* DATA DE NASCIMENTO */
 
-/* =========================================================
-   BOTÃO EDITAR PERFIL
-   ========================================================= */
-
-.botaoEditarPessoal {
-    margin-top: 25px;
-
-    min-width: 170px;
-
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    gap: 9px;
-
-    padding: 12px 20px;
-
-    border: 2px solid var(--vermelho);
-
-    border-radius: 11px;
-
-    background: var(--vermelho);
-
-    color: white;
-
-    font-size: 14px;
-    font-weight: 700;
-
-    cursor: pointer;
-
-    transition:
-        background 0.2s ease,
-        border-color 0.2s ease;
+.informacaoItem input[type="date"] {
+  display: block;
+  width: 100%;
+  max-width: 220px;
+  min-height: 40px;
+  margin-top: 2px;
+  padding: 7px 10px;
+  border: 1px solid var(--borda);
+  border-radius: 9px;
+  outline: none;
+  background: #F8FAFC;
+  color: var(--cinza-escuro);
+  font-family: inherit;
+  font-size: 13px;
 }
 
-.botaoEditarPessoal:hover {
-    background: #a30d0d;
-    border-color: #a30d0d;
+.informacaoItem input[type="date"]:focus {
+  border-color: var(--vermelho);
+  box-shadow: 0 0 0 3px rgba(142, 8, 8, 0.1);
 }
 
+/* E-MAILS */
 
-/* =========================================================
-   SEÇÃO DE MÉTRICAS
-   ========================================================= */
+.informacaoEmails {
+  position: relative;
+  z-index: 2;
+  align-items: center;
+  min-width: 0;
+  overflow: visible;
+}
+
+.conteudoEmails {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.emailPrincipal {
+  display: block;
+  margin-top: 3px;
+  overflow-wrap: anywhere;
+}
+
+/* Lista suspensa de e-mails */
+
+.listaEmails {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: -10px;
+  right: -10px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+  padding: 7px 10px;
+  border: 1px solid #D7DFE9;
+  border-radius: 10px;
+  background: var(--branco);
+  box-shadow: 0 8px 20px rgba(25, 40, 60, 0.12);
+}
+
+.itemEmail {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+  min-height: 34px;
+  padding: 5px 0;
+  border-bottom: 1px solid #EDF0F4;
+}
+
+.itemEmail:last-child {
+  border-bottom: none;
+}
+
+.selecaoEmail {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.selecaoEmail input {
+  flex-shrink: 0;
+  accent-color: var(--vermelho);
+}
+
+.selecaoEmail span {
+  overflow-wrap: anywhere;
+  color: #263448;
+  font-size: 12px;
+}
+
+.botaoExcluirEmail {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 4px;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--vermelho);
+  cursor: pointer;
+}
+
+.botaoExcluirEmail:hover:not(:disabled) {
+  background: #FBEDEE;
+}
+
+.botaoExcluirEmail:disabled {
+  color: #AAA;
+  cursor: not-allowed;
+}
+
+.botaoAdicionarEmail {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  width: 100%;
+  margin-top: 10px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #6685A8;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.botaoAdicionarEmail:hover {
+  color: var(--vermelho);
+}
+
+.formAdicionarEmail {
+  position: relative;
+  z-index: 21;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+  margin-top: 10px;
+}
+
+.formAdicionarEmail input {
+  flex: 1 1 160px;
+  width: 100%;
+  min-width: 0;
+  padding: 9px;
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  outline: none;
+  background: var(--branco);
+  color: var(--cinza-escuro);
+  font: inherit;
+  font-size: 13px;
+}
+
+.formAdicionarEmail input:focus {
+  border-color: var(--azul);
+  box-shadow: 0 0 0 3px rgba(162, 185, 213, 0.2);
+}
+
+.formAdicionarEmail button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 7px;
+  background: var(--vermelho);
+  color: var(--branco);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.formAdicionarEmail button:hover:not(:disabled) {
+  background: var(--vermelho-hover);
+}
+
+.formAdicionarEmail .botaoCancelarEmail {
+  background: #E8EDF3;
+  color: #263448;
+}
+
+.formAdicionarEmail .botaoCancelarEmail:hover:not(:disabled) {
+  background: #DCE4ED;
+}
+
+.formAdicionarEmail button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* SEÇÃO DE ATIVIDADES */
 
 .secaoMetricas {
-    margin-top: 25px;
-
-    padding: 27px;
-
-    background: white;
-
-    border: 2px solid rgba(162, 185, 213, 0.65);
-
-    border-radius: 20px;
-
-    box-shadow:
-        0 8px 25px rgba(117, 8, 10, 0.06);
+  margin-top: 26px;
+  padding: 26px;
+  border: 1px solid rgba(162, 185, 213, 0.7);
+  border-radius: 20px;
+  background: var(--branco);
+  box-shadow: 0 7px 20px rgba(41, 45, 50, 0.05);
 }
 
-
-/* =========================================================
-   TÍTULO DAS MÉTRICAS
-   ========================================================= */
-
 .tituloMetricas {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    margin-bottom: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 18px;
 }
 
 .tituloMetricas h2 {
-    margin: 0;
-
-    color: var(--cinza-escuro);
-
-    font-size: 20px;
-    font-weight: 800;
+  margin: 0;
+  color: var(--cinza-escuro);
+  font-size: 22px;
+  font-weight: 800;
 }
 
 .tituloMetricas span {
-    color: var(--cinza);
-
-    font-size: 13px;
+  color: var(--cinza);
+  font-size: 13px;
 }
 
-
-/* =========================================================
-   MÉTRICAS
-   ========================================================= */
+/* CARDS DE ATIVIDADE */
 
 .metricasPessoal {
-    display: grid;
-
-    grid-template-columns:
-        repeat(3, 1fr);
-
-    gap: 13px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 13px;
 }
 
-
-/* =========================================================
-   BOTÃO DE MÉTRICA
-   ========================================================= */
-
 .metricaCard {
-    min-height: 105px;
-
-    display: flex;
-    align-items: center;
-
-    gap: 13px;
-
-    padding: 18px;
-
-    border: 2px solid var(--borda);
-
-    border-radius: 15px;
-
-    cursor: pointer;
-
-    text-align: left;
-
-    transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease,
-        background 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 17px;
+  border: 1px solid var(--borda);
+  border-radius: 13px;
+  background: #FAFBFC;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
 }
 
 .metricaCard:hover {
-    border-color: var(--azul);
-
-    box-shadow:
-        0 7px 18px rgba(117, 8, 10, 0.08);
+  transform: translateY(-2px);
+  border-color: var(--azul);
+  box-shadow: 0 6px 16px rgba(41, 45, 50, 0.07);
 }
-
-
-/* =========================================================
-   CORES DOS CARDS
-   ========================================================= */
-
-.metricaLikes {
-    background: #f9eeee;
-}
-
-.metricaFavoritos {
-    background: #f1f5fa;
-}
-
-.metricaAvaliacoes {
-    background: #f7f3e7;
-}
-
-
-/* =========================================================
-   ÍCONE DA MÉTRICA
-   ========================================================= */
 
 .iconeMetrica {
-    width: 48px;
-    height: 48px;
-
-    flex-shrink: 0;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 13px;
-
-    background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 11px;
+  background: var(--azul-claro);
+  color: var(--vermelho);
 }
 
-
-/* =========================================================
-   TEXTO DA MÉTRICA
-   ========================================================= */
-
 .textoMetrica {
-    min-width: 0;
-
-    display: flex;
-    flex-direction: column;
-
-    gap: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
 }
 
 .textoMetrica strong {
-    color: var(--preto);
-
-    font-size: 23px;
-    font-weight: 800;
+  color: var(--cinza-escuro);
+  font-size: 21px;
+  font-weight: 800;
 }
 
 .textoMetrica span {
-    color: var(--cinza);
-
-    font-size: 12px;
-    font-weight: 700;
+  color: var(--cinza);
+  font-size: 12px;
+  font-weight: 600;
 }
-
-
-/* =========================================================
-   SETA
-   ========================================================= */
 
 .setaMetrica {
-    margin-left: auto;
-
-    color: var(--cinza);
-
-    font-size: 20px;
-    font-weight: 700;
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--cinza);
+  font-size: 20px;
 }
 
+/* FAVORITOS */
 
-/* =========================================================
-   LOADING
-   ========================================================= */
+.listaFavoritosPerfil {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid #E1E5EA;
+  border-radius: 15px;
+  background: var(--branco);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+}
+
+.cabecalhoFavoritos {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.cabecalhoFavoritos h2 {
+  margin: 0 0 5px;
+  color: var(--vermelho);
+  font-size: 18px;
+}
+
+.cabecalhoFavoritos span {
+  color: var(--cinza);
+  font-size: 12px;
+}
+
+.cabecalhoFavoritos button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 50%;
+  background: #F3F4F6;
+  color: #444;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.cabecalhoFavoritos button:hover {
+  background: var(--azul-claro);
+  color: var(--vermelho);
+}
+
+.gradeFavoritos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.itemFavoritoPerfil {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #E1E5EA;
+  border-radius: 11px;
+  background: var(--branco);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.itemFavoritoPerfil:hover {
+  transform: translateY(-1px);
+  border-color: var(--azul);
+}
+
+.imagemFavoritoPerfil {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.imagemFavoritoVazia {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--fundo);
+  color: #6685A8;
+}
+
+.dadosFavoritoPerfil {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.dadosFavoritoPerfil strong {
+  overflow: hidden;
+  color: #252525;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dadosFavoritoPerfil small {
+  overflow: hidden;
+  color: var(--cinza);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mensagemFavoritos {
+  padding: 20px 0;
+  color: var(--cinza);
+  text-align: center;
+}
+
+/* CARREGAMENTO */
 
 .perfilPessoalLoading {
-    min-height: 100vh;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    flex-direction: column;
-
-    gap: 12px;
-
-    background: #eef3f8;
-
-    color: var(--vermelho);
-
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-
-    font-size: 14px;
-    font-weight: 700;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 100vh;
+  background: #F3F6FA;
+  color: var(--cinza-escuro);
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-
-/* =========================================================
-   SPINNER
-   ========================================================= */
-
 .spinner {
-    width: 42px;
-    height: 42px;
-
-    border: 4px solid var(--azul-claro);
-
-    border-top-color: var(--vermelho);
-
-    border-radius: 50%;
-
-    animation:
-        girar 0.8s linear infinite;
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--azul-claro);
+  border-top-color: var(--vermelho);
+  border-radius: 50%;
+  animation: girar 0.8s linear infinite;
 }
 
 @keyframes girar {
-    to {
-        transform: rotate(360deg);
-    }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
+/* TABLET */
 
-/* =========================================================
-   TABLET
-   ========================================================= */
+@media (max-width: 900px) {
+  .perfilPessoalConteudo {
+    width: min(100% - 32px, 750px);
+  }
 
-@media (max-width: 800px) {
+  .cardPerfilPessoal {
+    padding: 28px;
+  }
 
-    .perfilPessoalConteudo {
-        width: calc(100% - 28px);
-    }
+  .topoPerfilPessoal {
+    grid-template-columns: 105px minmax(0, 1fr);
+    gap: 20px;
+  }
 
-    .cardPerfilPessoal {
-        padding: 30px;
-    }
+  .avatarPessoal {
+    width: 100px;
+    height: 100px;
+  }
 
-    .metricasPessoal {
-        grid-template-columns: 1fr;
-    }
+  .botoesEdicaoPessoal {
+    grid-column: 2;
+    flex-direction: row;
+  }
 
+  .botoesEdicaoPessoal button {
+    flex: 1;
+  }
+
+  .metricasPessoal {
+    grid-template-columns: 1fr;
+  }
 }
 
-
-/* =========================================================
-   MOBILE
-   ========================================================= */
+/* CELULAR */
 
 @media (max-width: 600px) {
+  .perfilPessoalConteudo {
+    width: calc(100% - 24px);
+    padding-top: 20px;
+  }
 
-    .perfilPessoalConteudo {
-        width: calc(100% - 18px);
+  .cardPerfilPessoal {
+    padding: 22px 18px;
+    border-radius: 17px;
+  }
 
-        padding-top: 18px;
-    }
+  .topoPerfilPessoal {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: stretch;
+    gap: 17px;
+    padding: 8px 0 22px;
+  }
 
-    .cardPerfilPessoal {
-        padding: 27px 20px;
+  .avatarPessoal {
+    justify-self: center;
+    width: 108px;
+    height: 108px;
+  }
 
-        border-radius: 18px;
-    }
+  .nomePerfilPessoal {
+    width: 100%;
+  }
 
-    .topoPerfilPessoal {
-        flex-direction: column;
+  .nomePerfilPessoal h1 {
+    font-size: 24px;
+  }
 
-        text-align: center;
+  .botoesEdicaoPessoal {
+    grid-column: 1;
+    flex-direction: column;
+  }
 
-        gap: 18px;
-    }
+  .botoesEdicaoPessoal button {
+    width: 100%;
+  }
 
-    .nomePerfilPessoal h1 {
-        font-size: 25px;
-    }
+  .informacoesPessoais {
+    padding-top: 22px;
+  }
 
-    .informacoesGrid {
-        grid-template-columns: 1fr;
-    }
+  .informacoesPessoais h2,
+  .tituloMetricas h2 {
+    font-size: 20px;
+  }
 
-    .tituloMetricas {
-        flex-direction: column;
+  .informacoesGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 
-        align-items: flex-start;
+  .informacaoItem {
+    padding: 15px;
+  }
 
-        gap: 5px;
-    }
+  .secaoMetricas {
+    padding: 20px 16px;
+    border-radius: 17px;
+  }
 
-    .secaoMetricas {
-        padding: 20px 15px;
-    }
+  .tituloMetricas {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 
+  .metricaCard {
+    padding: 15px;
+  }
+
+  .listaFavoritosPerfil {
+    padding: 16px;
+  }
+
+  .gradeFavoritos {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .listaEmails {
+    left: -6px;
+    right: -6px;
+  }
+
+  .formAdicionarEmail {
+    flex-direction: column;
+  }
+
+  .formAdicionarEmail input,
+  .formAdicionarEmail button {
+    width: 100%;
+  }
 }
 
-
-/* =========================================================
-   CELULAR PEQUENO
-   ========================================================= */
-
-@media (max-width: 420px) {
-
-    .perfilPessoalConteudo {
-        width: calc(100% - 12px);
-    }
-
-    .avatarPessoal {
-        width: 100px;
-        height: 100px;
-    }
-
-    .nomePerfilPessoal h1 {
-        font-size: 22px;
-    }
-
-    .informacaoItem {
-        padding: 12px;
-    }
-
-    .metricaCard {
-        min-height: 90px;
-        padding: 14px;
-    }
-
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -14,7 +14,6 @@ import { Login } from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Perfil from "./pages/Perfil";
 import PerfilPessoal from "./pages/PerfilPessoal";
-import VisualizarPost from "./pages/VisualizarPost";
 import MinhasAvaliacoes from "./pages/AvaliaçõesCliente";
 
 export const App: React.FC = () => {
@@ -35,10 +34,6 @@ export const App: React.FC = () => {
           <Route path="/perfil/:id_pessoa" element={<Perfil />} />
           <Route path="/perfil-pessoal" element={<PerfilPessoal />} />
         </Route>
-        <Route
-          path="/visualizar-post/:id_post"
-          element={<VisualizarPost />}
-        />
         <Route
           path="/avaliacoes-cliente"
           element={<MinhasAvaliacoes />}

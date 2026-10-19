@@ -1,16 +1,11 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-
+import { LoadingScreen } from "./LoadingScreen";
 export const PrivateRoute = () => {
     const {user, loading} = useAuth();
 
     if(loading) {
-        return (
-            <div className="loading-screen">
-                <div className="big-spinner"></div>
-                <p>Verificando sessão segura</p>
-            </div>
-        );
+        return <LoadingScreen />;
     }
 
     if (!user) {
