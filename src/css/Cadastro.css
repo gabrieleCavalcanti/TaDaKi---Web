@@ -1592,13 +1592,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   transform: scale(1.05);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .cadastro-page::before,
-  .cadastro-page::after {
-    animation: none;
-    opacity: 0;
-  }
-}/* ========================================
+/* ========================================
    CARD INTERATIVO (inclina com o mouse)
 ======================================== */
 
@@ -1641,9 +1635,115 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .cadastro-container {
-    transform: none !important;
-    animation: none;
+/* ========================================
+   GARANTIA: ANIMAÇÕES SEMPRE LIGADAS NO CADASTRO
+   Vence qualquer regra global de prefers-reduced-motion em outro .css
+======================================== */
+
+.cadastro-page::before,
+.cadastro-page::after {
+  animation: cadastroRadar 14s linear infinite !important;
+}
+.cadastro-page::before { animation-delay: -9.3s !important; }
+.cadastro-page::after  { animation-delay: -4.6s !important; }
+
+.cadastro-page .cadastro-container {
+  animation: cadastroReveal 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) backwards !important;
+  transition: transform 0.2s ease-out !important;
+}
+
+.cadastro-page .cadastro-btn {
+  transition: transform 0.3s cubic-bezier(0.3, 1.4, 0.5, 1), box-shadow 0.25s ease !important;
+}
+/* ========================================
+   CONTINUIDADE NA TROCA CLIENTE <-> ORGANIZAÇÃO
+   - faixa vinho mais clara que o fundo (o card não "some")
+   - contorno fino mantém a silhueta do card durante a varredura
+   - varredura mais curta e textos entrando logo atrás dela
+======================================== */
+
+.cadastro-container {
+  outline: 1px solid rgba(255, 255, 255, 0.35);
+  outline-offset: -1px;
+}
+
+.toggle-box::before {
+  background: linear-gradient(145deg, #bd2230 0%, #94101a 55%, #6e0a11 100%);
+  transition: left 1.2s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* painel do cliente (esquerda) */
+.toggle-left {
+  transition-delay: 0.7s;
+}
+.cadastro-container.active .toggle-left {
+  transition-delay: 0s;
+}
+
+/* painel da organização (direita) */
+.toggle-right {
+  transition-delay: 0s;
+}
+.cadastro-container.active .toggle-right {
+  transition-delay: 0.7s;
+}
+
+@media screen and (max-width: 800px) {
+  .toggle-box::before {
+    transition: top 1.2s cubic-bezier(0.65, 0, 0.35, 1);
+  }
+}
+
+/* ========================================
+   GARANTIA: TRANSIÇÕES DA TROCA SEMPRE COM DURAÇÃO
+   Uma regra global `* { transition-duration: .01ms !important }`
+   (prefers-reduced-motion) zera as durações mas NÃO os atrasos:
+   a faixa pula na hora e o texto aparece só depois do delay.
+   Estas regras mais específicas vencem essa regra global.
+======================================== */
+
+.cadastro-page .form-box {
+  transition:
+    left 0.8s ease-in-out,
+    right 0.8s ease-in-out,
+    opacity 0.5s ease-in-out !important;
+}
+
+.cadastro-page .toggle-box::before {
+  transition: left 1.2s cubic-bezier(0.65, 0, 0.35, 1) !important;
+}
+
+.cadastro-page .toggle-panel {
+  transition: all 0.6s ease-in-out !important;
+}
+
+.cadastro-page .toggle-btn {
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    transform 0.3s cubic-bezier(0.3, 1.4, 0.5, 1) !important;
+}
+
+.cadastro-page .documento-card {
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.cadastro-page .documento-icone,
+.cadastro-page .documento-check {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease !important;
+}
+
+.cadastro-page .form-box input,
+.cadastro-page .form-box select {
+  transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease !important;
+}
+
+@media screen and (max-width: 800px) {
+  .cadastro-page .form-box {
+    transition: bottom 0.8s ease-in-out, opacity 0.4s ease-in-out !important;
+  }
+
+  .cadastro-page .toggle-box::before {
+    transition: top 1.2s cubic-bezier(0.65, 0, 0.35, 1) !important;
   }
 }

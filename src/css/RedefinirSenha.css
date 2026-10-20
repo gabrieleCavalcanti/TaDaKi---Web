@@ -1,378 +1,649 @@
+/* =====================================================
+   RECUPERAÇÃO DE SENHA (Esqueceu / Redefinir)
+   Mesmo visual do Login. Compartilhado pelas duas telas.
+   Importe este arquivo DEPOIS do css antigo de cada tela.
+===================================================== */
 
-/* =========================================
-   PÁGINA REDEFINIR SENHA
-========================================= */
+section.recovery-page,
+.recovery-page input,
+.recovery-page button {
+  font-family: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+}
 
-.reset-page {
+/* ---------- PÁGINA: fundo vinho ---------- */
+section.recovery-page {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  box-sizing: border-box;
   width: 100%;
   min-height: 100vh;
-  position: relative;
+  padding: 40px 6%;
 
   display: flex;
-  justify-content: flex-end;
+  flex-direction: row;
   align-items: center;
+  justify-content: center;
+  gap: clamp(48px, 7vw, 110px);
 
-  padding: 40px 10% 40px 15%;
-  box-sizing: border-box;
-
-  font-family: sans-serif;
-
-  background-image: url("../assets/fundo1.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(255, 255, 255, 0.08), transparent 40%),
+    linear-gradient(145deg, #a3121d 0%, #79090e 55%, #4e060a 100%);
 }
 
-/* =========================================
-   LATERAL VERMELHA
-========================================= */
+/* ---------- TEXTO DA ESQUERDA ---------- */
+.recovery-page .recovery-red-background {
+  position: relative;
+  top: auto;
+  left: auto;
+  z-index: auto;
 
-.reset-red-background {
-  position: absolute;
-  top: 0;
-  left: 0;
+  flex: 0 1 430px;
+  width: auto;
+  height: auto;
 
-  width: 40%;
-  height: 100%;
-
-  background: rgba(117, 8, 10, 1);
-
-  border-top-right-radius: 170px;
-  border-bottom-right-radius: 170px;
-
-  z-index: 10;
+  background: none;
+  border-radius: 0;
+  color: #fff;
 }
 
-/* =========================================
-   TEXTO LATERAL
-========================================= */
-
-.reset-side-content {
-  position: absolute;
-  top: 30%;
-  left: 15%;
-
-  width: 400px;
-  max-width: 80%;
+.recovery-page .recovery-side-content {
+  position: static;
+  top: auto;
+  left: auto;
+  z-index: auto;
+  width: auto;
+  max-width: none;
 
   color: #fff;
-  z-index: 11;
+  animation: recoveryTextReveal 0.9s ease-out both;
 }
 
-.reset-side-content h2 {
-  margin: 0 0 18px;
-  font-size: 32px;
-  line-height: 1.4;
-  font-weight: 700;
+.recovery-page .recovery-side-content h2 {
+  margin: 0 0 20px;
+  font-size: clamp(30px, 3vw, 44px);
+  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: -1.2px;
+  color: #fff;
 }
 
-.reset-side-content p {
+.recovery-page .recovery-side-content p {
   margin: 0;
-  font-size: 20px;
-  line-height: 1.5;
+  font-size: clamp(15px, 1.3vw, 18px);
+  line-height: 1.7;
   font-weight: 400;
+  color: rgba(255, 255, 255, 0.82);
 }
 
-/* =========================================
-   CARD
-========================================= */
-
-.reset-card {
-  width: 52%;
-  max-width: 600px;
-  min-width: 350px;
-
-  min-height: 520px;
-  padding: 36px;
-
-  box-sizing: border-box;
+/* ---------- CARD ---------- */
+.recovery-page .recovery-card-wrap {
   position: relative;
-  z-index: 20;
+  flex: 0 0 auto;
+  width: min(480px, 46%);
+}
+
+.recovery-page .recovery-card {
+  position: relative;
+  z-index: 2;
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  width: min(480px, 46%);
+  min-width: 0;
+  min-height: 0;
+  max-width: none;
+  margin: 0;
+  padding: 36px 40px 32px;
 
   display: flex;
   flex-direction: column;
   justify-content: center;
 
-  background: #f0f2f4;
-  border-radius: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 28px;
+  background: linear-gradient(180deg, #ffffff 0%, #f6f7fa 100%);
+  box-shadow:
+    inset 0 1px 0 #fff,
+    inset 0 -2px 0 rgba(15, 23, 42, 0.04),
+    0 2px 4px rgba(25, 0, 3, 0.1),
+    0 14px 28px rgba(25, 0, 3, 0.16),
+    0 40px 80px rgba(25, 0, 3, 0.34);
+
+  transform: perspective(1100px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 0.18s ease-out;
+  /* "backwards" e não "both": senão a animação de entrada trava o transform do tilt */
+  animation: recoveryReveal 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
 }
 
-/* =========================================
-   LOGO
-========================================= */
+.recovery-page .recovery-card-wrap .recovery-card {
+  width: 100%;
+}
 
-.reset-logo-container {
+/* ---------- ONDAS DE RADAR (saem do centro do card) ---------- */
+.recovery-page .recovery-card::before,
+.recovery-page .recovery-card::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  top: 50%;
+  width: 520px;
+  height: 520px;
+  margin: -260px 0 0 -260px;
+
+  border: 2px solid rgba(255, 255, 255, 0.55);
+  border-radius: 50%;
+  background: radial-gradient(circle, transparent 62%, rgba(255, 255, 255, 0.07) 100%);
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+  animation: recoveryRadar 14s linear infinite;
+}
+
+.recovery-page .recovery-card::before { animation-delay: -9.3s; }
+.recovery-page .recovery-card::after  { animation-delay: -4.6s; }
+
+/* ---------- LOGO E TÍTULO ---------- */
+.recovery-page .recovery-logo-container {
   display: flex;
   justify-content: center;
-  margin-bottom: 20px;
+  width: auto;
+  margin: 0 auto 18px;
+  padding: 0;
+  background: none;
+  border-radius: 0;
+  box-shadow: none;
 }
 
-.reset-logo {
+.recovery-page .recovery-logo {
+  display: block;
   width: 150px;
   height: auto;
   object-fit: contain;
+  filter: drop-shadow(0 6px 10px rgba(158, 16, 27, 0.2));
 }
 
-/* =========================================
-   TÍTULO E DESCRIÇÃO
-========================================= */
-
-.reset-heading {
+.recovery-page .recovery-heading {
+  margin: 0 0 22px;
   text-align: center;
-  margin-bottom: 25px;
 }
 
-.reset-heading h1 {
-  margin: 0 0 12px;
-  color: #374151;
-  font-size: 25px;
-  font-weight: 700;
+.recovery-page .recovery-heading h1 {
+  margin: 0 0 8px;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #232b36;
 }
 
-.reset-heading p {
+.recovery-page .recovery-heading p {
   margin: 0;
-  color: #64748b;
   font-size: 14px;
   line-height: 1.6;
+  color: #64748b;
 }
 
-/* =========================================
-   FORMULÁRIO
-========================================= */
-
-.reset-card form {
+/* ---------- CAMPOS ---------- */
+.recovery-page .recovery-card form {
+  display: flex;
+  flex-direction: column;
   width: 100%;
 }
 
-.reset-form-group {
+.recovery-page .recovery-form-group {
   width: 100%;
-  margin-bottom: 20px;
+  min-width: 0;
+  margin: 0 0 16px;
 }
 
-.reset-form-group label {
+.recovery-page .recovery-card label {
   display: block;
-  margin-bottom: 7px;
-
-  color: #374151;
-  font-size: 14px;
+  margin: 0 0 6px 6px;
+  font-size: 13px;
   font-weight: 600;
+  color: #45505f;
 }
 
-/* =========================================
-   INPUTS
-========================================= */
-
-.reset-input-container {
+.recovery-page .recovery-input-container {
   position: relative;
   width: 100%;
 }
 
-.reset-input {
-  width: 100%;
-  height: 45px;
-
+.recovery-page .recovery-card input {
+  display: block;
   box-sizing: border-box;
-  padding: 13px 42px;
+  width: 100%;
+  height: 50px;
+  padding: 0 46px;
 
-  background-color: #fafafa;
-  border: none;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
   outline: none;
-  border-radius: 15px;
-
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 500;
-  color: #000;
-
-  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
-}
-
-.reset-input:focus {
+  background: #f1f4f9;
   box-shadow:
-    inset 0 0 0 1px #d2272a,
-    0 0 0 2px rgba(210, 39, 42, 0.12);
+    inset 0 2px 4px rgba(15, 23, 42, 0.06),
+    0 1px 0 #fff;
+
+  color: #232b36;
+  font-size: 15px;
+  font-weight: 500;
+
+  transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
 }
 
+.recovery-page .recovery-card input::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
+}
 
-/* Ícone do cadeado dentro do campo */
-.reset-input-icon {
+.recovery-page .recovery-card input:hover {
+  background: #eef2f7;
+  border-color: #cbd5e1;
+}
+
+.recovery-page .recovery-card input:focus {
+  background: #fff;
+  border-color: #c82029;
+  box-shadow:
+    inset 0 1px 2px rgba(15, 23, 42, 0.05),
+    0 0 0 4px rgba(200, 32, 41, 0.1);
+}
+
+.recovery-page .recovery-card input:-webkit-autofill {
+  -webkit-text-fill-color: #232b36;
+  -webkit-box-shadow: 0 0 0 100px #f1f4f9 inset;
+  caret-color: #232b36;
+}
+
+/* ícone à esquerda dentro do campo */
+.recovery-page .recovery-input-icon {
   position: absolute;
-  left: 14px;
+  left: 16px;
   top: 50%;
   transform: translateY(-50%);
-  width: 18px;
-  height: 18px;
-  color: #64748b;
-  pointer-events: none;
   z-index: 1;
+  pointer-events: none;
+  color: #64748b;
 }
 
-/* Botão do olho dentro do campo */
-.reset-password-toggle {
+/* olho (mostrar/ocultar senha) à direita */
+.recovery-page .recovery-password-toggle {
   position: absolute;
   right: 12px;
   top: 50%;
   transform: translateY(-50%);
+  z-index: 2;
 
   display: flex;
-  align-items: center;
   justify-content: center;
-
-  width: 24px;
-  height: 24px;
+  align-items: center;
+  width: 28px;
+  height: 28px;
   padding: 0;
 
   border: none;
   background: transparent;
   color: #64748b;
   cursor: pointer;
-  z-index: 2;
+  transition: color 0.2s ease;
 }
 
-/* Espaço para o cadeado e para o olho */
-.reset-input {
-  width: 100%;
-  height: 45px;
-  box-sizing: border-box;
-  padding: 0 44px;
+.recovery-page .recovery-password-toggle:hover,
+.recovery-page .recovery-input-container:focus-within .recovery-input-icon,
+.recovery-page .recovery-input-container:focus-within .recovery-password-toggle {
+  color: #c82029;
 }
 
-
-/* =========================================
-   MENSAGENS
-========================================= */
-
-.reset-error {
-  margin: 0 0 15px;
-  color: #b91c1c;
-
+/* ---------- MENSAGENS ---------- */
+.recovery-page .recovery-error,
+.recovery-page .recovery-success {
+  margin: 0 0 14px;
+  padding: 10px 14px;
+  border-radius: 14px;
   font-size: 13px;
+  font-weight: 600;
   line-height: 1.5;
   overflow-wrap: anywhere;
 }
 
-/* =========================================
-   BOTÃO
-========================================= */
-
-.reset-button {
-  width: 100%;
-  margin-top: 5px;
-  padding: 13px 16px;
-
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 15px;
-
-  background-color: rgb(210, 39, 42);
-  color: #fff;
-
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 700;
-
-  cursor: pointer;
-  transition: background-color 0.2s ease;
+.recovery-page .recovery-error {
+  background: #fdecee;
+  color: #b4232c;
 }
 
-.reset-button:hover:not(:disabled) {
-  background-color: #b91f24;
+.recovery-page .recovery-success {
+  background: #e8f6ee;
+  color: #146c3b;
 }
 
-.reset-button:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-}
+/* ---------- BOTÃO ---------- */
+.recovery-page .recovery-card button[type="submit"],
+.recovery-page .recovery-button {
+  position: relative;
+  overflow: hidden;
 
-/* =========================================
-   VOLTAR AO LOGIN
-========================================= */
-
-.reset-footer {
   display: flex;
   justify-content: center;
-  margin-top: 22px;
+  align-items: center;
+  gap: 10px;
+
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 52px;
+  margin: 6px 0 0;
+  padding: 0 16px;
+
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(100deg, #d41f2b 0%, #f0414b 100%);
+  box-shadow: 0 10px 24px rgba(212, 31, 43, 0.35);
+
+  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+
+  transition:
+    transform 0.3s cubic-bezier(0.3, 1.4, 0.5, 1),
+    box-shadow 0.25s ease;
 }
 
-.reset-link {
-  color: #d2272a;
+/* reflexo de luz que atravessa o botão no hover */
+.recovery-page .recovery-card button[type="submit"]::before,
+.recovery-page .recovery-button::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 -60%;
+  width: 40%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.7s ease;
+  pointer-events: none;
+}
+
+.recovery-page .recovery-card button[type="submit"]:hover:not(:disabled)::before,
+.recovery-page .recovery-button:hover:not(:disabled)::before {
+  left: 130%;
+}
+
+.recovery-page .recovery-card button[type="submit"]:hover:not(:disabled),
+.recovery-page .recovery-button:hover:not(:disabled) {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 16px 32px rgba(212, 31, 43, 0.45);
+}
+
+.recovery-page .recovery-card button[type="submit"]:active:not(:disabled),
+.recovery-page .recovery-button:active:not(:disabled) {
+  transform: translateY(0) scale(0.97);
+  box-shadow: 0 6px 14px rgba(212, 31, 43, 0.35);
+}
+
+.recovery-page .recovery-card button[type="submit"]:disabled,
+.recovery-page .recovery-button:disabled {
+  opacity: 0.75;
+  cursor: wait;
+}
+
+/* seta dentro de um círculo (se o botão tiver ícone) */
+.recovery-page .recovery-button svg {
+  box-sizing: content-box;
+  width: 17px;
+  height: 17px;
+  padding: 5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  transition: transform 0.3s ease, background 0.25s ease, color 0.25s ease;
+}
+
+.recovery-page .recovery-button:hover:not(:disabled) svg {
+  transform: translateX(4px);
+  background: #fff;
+  color: #d41f2b;
+}
+
+/* ---------- VOLTAR PARA O LOGIN ---------- */
+.recovery-page .recovery-footer {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.recovery-page .recovery-link {
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
+  color: #c82029;
   text-decoration: none;
+  transition: color 0.2s ease;
 }
 
-.reset-link:hover {
+.recovery-page .recovery-link:hover {
+  color: #870b13;
   text-decoration: underline;
 }
 
-/* =========================================
-   RESPONSIVIDADE
-========================================= */
+/* ---------- MARCADORES (só aparecem se o TSX tiver .recovery-markers) ---------- */
+.recovery-page .recovery-markers {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
 
+.recovery-page .recovery-marker {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+
+  background: radial-gradient(circle at 32% 26%, #ffffff 0%, #eef1f6 55%, #cfd6e2 100%);
+  color: #9e101b;
+  box-shadow:
+    inset 0 2px 3px #fff,
+    inset 0 -4px 8px rgba(15, 23, 42, 0.12),
+    0 14px 28px rgba(25, 0, 3, 0.35);
+
+  pointer-events: auto;
+  cursor: pointer;
+  animation: recoveryFloat 5s ease-in-out infinite;
+  transition: scale 0.3s cubic-bezier(0.3, 1.5, 0.5, 1);
+}
+
+/* anel que pulsa em volta de cada marcador */
+.recovery-page .recovery-marker::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border: 1.5px solid rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  animation: recoveryPulse 3.2s ease-out infinite;
+}
+
+.recovery-page .recovery-marker.mk-one {
+  width: 54px;
+  height: 54px;
+  top: -92px;
+  right: 20px;
+}
+
+.recovery-page .recovery-marker.mk-two {
+  width: 44px;
+  height: 44px;
+  bottom: -84px;
+  left: 130px;
+  animation-delay: -2s;
+}
+
+.recovery-page .recovery-marker.mk-three {
+  width: 40px;
+  height: 40px;
+  top: 46%;
+  right: -34px;
+  animation-delay: -3.5s;
+}
+
+.recovery-page .recovery-marker.mk-two::after   { animation-delay: 1s; }
+.recovery-page .recovery-marker.mk-three::after { animation-delay: 2s; }
+
+.recovery-page .recovery-marker:hover { scale: 1.2; }
+.recovery-page .recovery-marker:hover::after { animation-duration: 1.2s; }
+.recovery-page .recovery-marker:hover svg { animation: recoveryWiggle 0.6s ease; }
+.recovery-page .recovery-marker:active { scale: 0.88; }
+
+/* ---------- ANIMAÇÕES ---------- */
+@keyframes recoveryReveal {
+  from { opacity: 0; transform: translate(24px, 10px); }
+  to   { opacity: 1; transform: translate(0, 0); }
+}
+
+@keyframes recoveryTextReveal {
+  from { opacity: 0; transform: translateX(-18px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes recoveryRadar {
+  0%   { transform: scale(0.7); opacity: 0; }
+  12%  { opacity: 1; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+
+@keyframes recoveryFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+
+@keyframes recoveryPulse {
+  0%   { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(1.9); opacity: 0; }
+}
+
+@keyframes recoveryWiggle {
+  0%   { transform: rotate(0); }
+  25%  { transform: rotate(-16deg) scale(1.1); }
+  55%  { transform: rotate(12deg) scale(1.1); }
+  80%  { transform: rotate(-6deg); }
+  100% { transform: rotate(0); }
+}
+
+/* ---------- CELULAR ---------- */
 @media screen and (max-width: 800px) {
-  .reset-page {
-    justify-content: center;
+  section.recovery-page {
+    flex-direction: column;
+    gap: 28px;
     padding: 40px 20px;
   }
 
-  .reset-red-background {
+  .recovery-page .recovery-red-background {
+    flex: none;
     width: 100%;
-    height: 35%;
-
-    border-radius: 0 0 70px 70px;
+    max-width: 480px;
   }
 
-  .reset-side-content {
-    top: 35px;
-    left: 8%;
-    width: 84%;
-    max-width: none;
-    text-align: center;
+  .recovery-page .recovery-side-content h2 {
+    font-size: 28px;
   }
 
-  .reset-side-content h2 {
-    margin-bottom: 8px;
-    font-size: 25px;
+  .recovery-page .recovery-side-content p {
+    font-size: 14px;
+    line-height: 1.5;
   }
 
-  .reset-side-content p {
-    font-size: 15px;
-    line-height: 1.4;
+  .recovery-page .recovery-markers {
+    display: none;
   }
 
-  .reset-card {
+  .recovery-page .recovery-card-wrap {
     width: 100%;
-    max-width: 460px;
-    min-width: 0;
-    min-height: 0;
+    max-width: 480px;
+  }
 
-    margin-top: 100px;
+  .recovery-page .recovery-card {
+    width: 100%;
+    max-width: 480px;
     padding: 30px 24px;
-  }
-
-  .reset-logo {
-    width: 130px;
-  }
-
-  .reset-heading h1 {
-    font-size: 23px;
+    transform: none;
   }
 }
 
 @media screen and (max-width: 380px) {
-  .reset-page {
-    padding: 30px 12px;
+  section.recovery-page {
+    padding-inline: 14px;
   }
 
-  .reset-card {
-    padding: 25px 18px;
-  }
-
-  .reset-side-content h2 {
-    font-size: 22px;
-  }
-
-  .reset-side-content p {
-    font-size: 13px;
+  .recovery-page .recovery-card {
+    padding: 26px 18px;
   }
 }
 
+/* =====================================================
+   GARANTIA: ANIMAÇÕES SEMPRE LIGADAS
+   Vence qualquer regra global (em qualquer .css do projeto) que
+   desligue animações/transições, como
+   `* { animation-duration: .01ms !important }` em prefers-reduced-motion.
+===================================================== */
+
+.recovery-page .recovery-card::before,
+.recovery-page .recovery-card::after {
+  animation: recoveryRadar 14s linear infinite !important;
+}
+.recovery-page .recovery-card::before { animation-delay: -9.3s !important; }
+.recovery-page .recovery-card::after  { animation-delay: -4.6s !important; }
+
+.recovery-page .recovery-card {
+  animation: recoveryReveal 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) backwards !important;
+  transition: transform 0.18s ease-out !important;
+}
+
+.recovery-page .recovery-side-content {
+  animation: recoveryTextReveal 0.9s ease-out both !important;
+}
+
+.recovery-page .recovery-marker {
+  animation: recoveryFloat 5s ease-in-out infinite !important;
+  transition: scale 0.3s cubic-bezier(0.3, 1.5, 0.5, 1) !important;
+}
+.recovery-page .recovery-marker.mk-one   { animation-delay: 0s !important; }
+.recovery-page .recovery-marker.mk-two   { animation-delay: -2s !important; }
+.recovery-page .recovery-marker.mk-three { animation-delay: -3.5s !important; }
+
+.recovery-page .recovery-marker::after {
+  animation: recoveryPulse 3.2s ease-out infinite !important;
+}
+.recovery-page .recovery-marker.mk-two::after   { animation-delay: 1s !important; }
+.recovery-page .recovery-marker.mk-three::after { animation-delay: 2s !important; }
+.recovery-page .recovery-marker:hover::after    { animation-duration: 1.2s !important; }
+.recovery-page .recovery-marker:hover svg       { animation: recoveryWiggle 0.6s ease !important; }
+
+.recovery-page .recovery-card button[type="submit"],
+.recovery-page .recovery-button {
+  transition: transform 0.3s cubic-bezier(0.3, 1.4, 0.5, 1), box-shadow 0.25s ease !important;
+}
+
+.recovery-page .recovery-card input {
+  transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease !important;
+}
+
+/* ---------- ONDAS DE RADAR (saem do centro do card, ficam fixas) ---------- */
+.recovery-page .recovery-radar {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.recovery-page .recovery-radar span {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 520px;
+  height: 520px;
+  margin: -260px 0 0 -260px;
+  border: 2px solid rgba(255, 255, 255, 0.55);
+  border-radius: 50%;
+  background: radial-gradient(circle, transparent 62%, rgba(255, 255, 255, 0.07) 100%);
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: recoveryRadar 14s linear infinite !important;
+}
+
+.recovery-page .recovery-radar span:nth-child(2) { animation-delay: -9.3s !important; }
+.recovery-page .recovery-radar span:nth-child(3) { animation-delay: -4.6s !important; }

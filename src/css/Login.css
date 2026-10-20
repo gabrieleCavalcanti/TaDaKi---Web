@@ -427,16 +427,6 @@
   50%      { transform: translateY(-3px); }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
 /* ---------- CELULAR ---------- */
 @media screen and (max-width: 800px) {
   .login-page {
@@ -951,12 +941,6 @@
   /* "backwards" em vez de "both", senão a animação de entrada trava o transform */
   animation: cardReveal 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
 }
-
-@media (prefers-reduced-motion: reduce) {
-  .login-card {
-    transform: none !important;
-  }
-}
 /* ========================================
    BOTÃO JOVIAL
 ======================================== */
@@ -1022,7 +1006,8 @@
 .login-button:active:not(:disabled) {
   transform: translateY(0) scale(0.97);
   box-shadow: 0 6px 14px rgba(212, 31, 43, 0.35);
-}/* ========================================
+}
+/* ========================================
    MARCADORES: SÓ REAGEM AO PASSAR O MOUSE
 ======================================== */
 
@@ -1057,4 +1042,79 @@
   55%  { transform: rotate(12deg) scale(1.1); }
   80%  { transform: rotate(-6deg); }
   100% { transform: rotate(0); }
+}
+
+/* ========================================
+   ONDAS DE RADAR MAIS VISÍVEIS
+   (antes: linha fina com ~20% de opacidade, quase invisível
+   em telas com menos contraste)
+======================================== */
+
+.login-radar span {
+  border: 2px solid rgba(255, 255, 255, 0.55);
+  background: radial-gradient(circle, transparent 62%, rgba(255, 255, 255, 0.07) 100%);
+  animation: radarPulseVisible 14s linear infinite;
+  will-change: transform, opacity;
+}
+
+.login-radar span:nth-child(2) { animation-delay: -9.3s; }
+.login-radar span:nth-child(3) { animation-delay: -4.6s; }
+
+@keyframes radarPulseVisible {
+  0%   { transform: scale(0.7); opacity: 0; }
+  12%  { opacity: 1; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+
+/* ========================================
+   GARANTIA: ANIMAÇÕES SEMPRE LIGADAS NA TELA DE LOGIN
+   Vence qualquer regra global (em qualquer .css do projeto) que
+   desligue animações, como `* { animation-duration: .01ms !important }`
+   dentro de prefers-reduced-motion. Seletores mais específicos
+   ganham de `*` mesmo entre !important.
+======================================== */
+
+.login-page .login-radar span {
+  animation: radarPulseVisible 14s linear infinite !important;
+  animation-delay: 0s !important;
+}
+.login-page .login-radar span:nth-child(2) { animation-delay: -9.3s !important; }
+.login-page .login-radar span:nth-child(3) { animation-delay: -4.6s !important; }
+
+.login-page .marker {
+  animation: markerFloat 5s ease-in-out infinite !important;
+  animation-delay: 0s !important;
+}
+.login-page .marker.mk-two   { animation-delay: -2s !important; }
+.login-page .marker.mk-three { animation-delay: -3.5s !important; }
+
+.login-page .marker::after {
+  animation: markerPulse 3.2s ease-out infinite !important;
+  animation-delay: 0s !important;
+}
+.login-page .marker.mk-two::after   { animation-delay: 1s !important; }
+.login-page .marker.mk-three::after { animation-delay: 2s !important; }
+.login-page .marker:hover::after    { animation-duration: 1.2s !important; }
+.login-page .marker:hover svg       { animation: iconWiggle 0.6s ease !important; }
+
+.login-page .login-eyebrow svg {
+  animation: pinBounce 2.4s ease-in-out infinite !important;
+}
+.login-page .login-store-icon {
+  animation: textReveal 0.9s ease-out both !important;
+}
+.login-page .login-card {
+  animation: cardReveal 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) backwards !important;
+  transition: transform 0.18s ease-out !important;
+}
+
+/* transições (hover, foco, botão) também não podem ser zeradas */
+.login-page .login-button {
+  transition: transform 0.3s cubic-bezier(0.3, 1.4, 0.5, 1), box-shadow 0.25s ease !important;
+}
+.login-page .marker {
+  transition: scale 0.3s cubic-bezier(0.3, 1.5, 0.5, 1) !important;
+}
+.login-page .form-input {
+  transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease !important;
 }
