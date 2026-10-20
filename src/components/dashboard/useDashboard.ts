@@ -26,7 +26,9 @@ export function useDashboard(allowed: boolean, ownerId: number) {
           if (!controller.signal.aborted)
             setError(
               cause instanceof Error
-                ? cause.message
+                ? cause.message.includes("404") || cause.message.includes("Not Found")
+                  ? "Dashboard indisponível (404). Verifique se a API atualizada está em execução e se esta conta possui uma organização cadastrada."
+                  : cause.message
                 : "Não foi possível carregar o dashboard.",
             );
         } finally {

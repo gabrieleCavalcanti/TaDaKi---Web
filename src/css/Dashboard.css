@@ -56,3 +56,32 @@
 @media(max-width:600px) { .dashboard-shell { padding:18px 16px 40px; }.dashboard-topbar { flex-wrap:wrap; }.dashboard-heading { flex-direction:column; align-items:stretch; margin-top:24px; padding:22px; }.dashboard-month { width:100%; }.dashboard-period { flex-wrap:wrap; }.dashboard-best { padding:20px; }.dashboard-best-body { grid-template-columns:1fr; gap:20px; }.dashboard-metric { padding:16px; }.dashboard-metric strong { font-size:34px; }.dashboard-metric-top { flex-wrap:wrap; }.dashboard-best-heading h2 { font-size:18px; } }
 @media(max-width:360px) { .dashboard-metrics { grid-template-columns:1fr; } }
 @media(prefers-reduced-motion:reduce) { .organization-dashboard *, .organization-dashboard *::before, .organization-dashboard *::after { animation:none !important; transition:none !important; } }
+/* Dashboard em sintonia com a nova vitrine TaDaKi. */
+.organization-dashboard{background:#fff;color:#0e2037}
+.dashboard-shell{max-width:1320px}
+.dashboard-heading{background:linear-gradient(115deg,#edf4fa,#fff 85%);border-color:#e2eaf2;border-radius:18px}
+.dashboard-metric,.dashboard-best{border-color:#e2eaf2;box-shadow:none;border-radius:16px}
+.dashboard-metric-icon{background:#edf4fa}
+.dashboard-metric strong{color:#0e2037}
+.dashboard-metric--red strong{color:#b01013}
+.dashboard-best-media img{object-fit:cover}
+
+/* Dashboard editorial: profundidade, hierarquia e microinterações */
+.organization-dashboard{background:radial-gradient(circle at 95% 0%,#e8f0f9 0,transparent 36%),#f7f9fc}
+.dashboard-heading{position:relative;overflow:hidden;background:linear-gradient(115deg,#9e0e24 0%,#c51f35 55%,#e04755 100%);color:#fff;border:0;padding:46px 42px;box-shadow:0 20px 45px #9e0e2425}
+.dashboard-heading:after{content:"";position:absolute;width:330px;height:330px;border:55px solid #ffffff18;border-radius:50%;right:-65px;top:-170px;pointer-events:none}
+.dashboard-heading .dashboard-eyebrow,.dashboard-heading > div > p:last-child{color:#ffe4e7}
+.dashboard-heading h1{color:white;font-size:clamp(30px,3.4vw,46px);font-weight:850}
+.dashboard-month{z-index:1;box-shadow:0 10px 24px #5004161f;border:0}
+.dashboard-metric{position:relative;overflow:hidden;border:1px solid #e5eaf3;border-radius:20px;background:#fff;padding:26px;box-shadow:0 10px 27px #192e5210;transition:transform .2s,box-shadow .2s}
+.dashboard-metric:hover{transform:translateY(-4px);box-shadow:0 16px 36px #192e5220}
+.dashboard-metric:before{content:"";position:absolute;inset:0 0 auto;height:4px;background:#a2b9d5}
+.dashboard-metric--red:before{background:#c3132c}
+.dashboard-metric strong{font-size:clamp(34px,4vw,52px);letter-spacing:-2px}
+.dashboard-metric-icon{width:50px;height:50px;border-radius:15px}
+.dashboard-best{padding:32px;border-radius:22px;box-shadow:0 12px 35px #192e520c}
+.dashboard-best-media{border-radius:19px;min-height:200px;background:linear-gradient(135deg,#edf2fa,#dae6f4)}
+.dashboard-like-badge{border-radius:25px}
+.dashboard-note{background:#eaf1f9;border:0;border-left:4px solid #a2b9d5}
+@media(max-width:600px){.dashboard-heading{padding:28px 24px}.dashboard-best{padding:20px}.dashboard-metric{padding:18px}}
+@media(prefers-reduced-motion:reduce){.dashboard-metric:hover{transform:none}}
