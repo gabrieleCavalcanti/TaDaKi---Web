@@ -12,6 +12,8 @@ import { Home } from "./pages/Home";
 import { Likes } from "./pages/Likes";
 import { Login } from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import Sobre from "./pages/Sobre";
+import Ajuda from "./pages/Ajuda";
 import Perfil from "./pages/Perfil";
 import PerfilPessoal from "./pages/PerfilPessoal";
 import MinhasAvaliacoes from "./pages/AvaliaçõesCliente";
@@ -31,6 +33,8 @@ export const App: React.FC = () => {
           <Route path="/" element={<Home />} />
           <Route path="/likes" element={<Likes />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/sobre" element={<Sobre />} />
+          <Route path="/ajuda" element={<Ajuda />} />
           <Route path="/perfil/:id_pessoa" element={<Perfil />} />
           <Route path="/perfil-pessoal" element={<PerfilPessoal />} />
         </Route>

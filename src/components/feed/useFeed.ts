@@ -6,6 +6,7 @@ import type { Category, FavoriteMap, Person, Post } from "./model";
 export function useFeed(user: Person | null, onlyLikes: boolean) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [organizations, setOrganizations] = useState<Person[]>([]);
   const [person, setPerson] = useState<Person | null>(null);
   const [likedIds, setLikedIds] = useState<Set<number>>(new Set());
   const [counts, setCounts] = useState<Record<number, number>>({});
@@ -78,6 +79,7 @@ export function useFeed(user: Person | null, onlyLikes: boolean) {
       );
       setPosts(hydrated);
       setCategories(cats);
+      setOrganizations(orgs);
       setPerson(currentPerson);
       setLikedIds(
         new Set(
@@ -95,7 +97,7 @@ export function useFeed(user: Person | null, onlyLikes: boolean) {
           id_favorito: number;
         }>(optional[3].value, ["resultadoSelecionaTodos", "favoritos"])) {
           if (
-            item.id_organizacao && item.id_favorito
+            item.id_organizacao && item.id_favorito && Number(item.id_cliente) === Number(currentPerson?.id_cliente)
           )
             stored[item.id_organizacao] = {
               favoritado: true,
@@ -221,6 +223,7 @@ export function useFeed(user: Person | null, onlyLikes: boolean) {
     if (!lock(key)) return;
     setFavoriteErrors((previous) => ({ ...previous, [orgId]: "" }));
     try {
+      if (!Number(person?.id_cliente)) throw new Error("Não foi possível identificar o cadastro de cliente. Entre novamente na conta.");
       const existing = favorites[orgId];
       let updated: FavoriteMap;
       if (existing?.favoritado && existing.id_favorito) {
@@ -236,6 +239,7 @@ export function useFeed(user: Person | null, onlyLikes: boolean) {
           method: "POST",
           body: JSON.stringify({
             id_organizacao: orgId,
+            id_cliente: Number(person?.id_cliente),
           }),
         });
         const favoriteId = Number(
@@ -272,6 +276,7 @@ export function useFeed(user: Person | null, onlyLikes: boolean) {
       ? posts.filter((post) => likedIds.has(Number(post.id_post)))
       : posts,
     categories,
+    organizations,
     person,
     likedIds,
     counts,

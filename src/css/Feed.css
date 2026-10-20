@@ -1267,3 +1267,127 @@
 .create-post-modal { animation-duration:.38s; animation-timing-function:cubic-bezier(.22,1,.36,1); }
 .image-dialog { animation:modal-in .32s ease both; }
 @media(prefers-reduced-motion:reduce) { .feed-scroll-post { opacity:1; transform:none; transition:none; }.post-card__media img { transition:none; }.post-card__media:hover img { transform:none; }.image-dialog { animation:none; } }
+
+/* TaDaKi 2026 — identidade compartilhada Home / Curtidas */
+.feed-page { --ink:#0e2037; --muted:#5d728b; --line:#e2eaf2; --blue-soft:#eff5fa; background:#fff; }
+.feed-header { height:72px; padding:0 26px; box-shadow:none; }
+.feed-logo {width:120px;height:51px}
+.tadaki-header-search {display:flex;align-items:center;gap:12px;background:#f3f7fa;border:1px solid #edf1f5;border-radius:28px;padding:0 18px;height:42px;width:min(500px,46vw);color:#687e97}
+.tadaki-header-search input {flex:1;min-width:0;background:transparent;border:0;outline:none;color:var(--ink);font-size:14px}
+.feed-page .feed-header__actions .feed-action {border:0;border-radius:50%;background:transparent}
+.feed-shell {width:auto;margin:0 400px 0 255px;padding:30px 30px 70px;max-width:none}
+.feed-heading {margin:0 0 23px}.feed-heading h1 {font-size:clamp(27px,2.4vw,38px);letter-spacing:-1.35px;color:#0d2036}
+.feed-heading .feed-eyebrow {display:none}.feed-heading p {font-size:15px;color:#627891}
+.tadaki-side-nav {position:fixed;top:72px;bottom:0;left:0;width:240px;padding:18px 12px;display:flex;flex-direction:column;gap:6px;background:#fff;border-right:1px solid var(--line);z-index:12;overflow-y:auto}
+.tadaki-side-nav button {border:0;background:transparent;border-radius:10px;color:#243d58;text-align:left;display:flex;align-items:center;gap:16px;padding:14px 17px;font-size:14px;font-weight:600}
+.tadaki-side-nav button.active {background:#eaf3fa;color:#b01013;font-weight:800}.tadaki-side-nav button:hover {background:#edf3f8}
+.tadaki-side-nav hr {height:1px;border:0;background:var(--line);width:100%;margin:18px 0}
+.feed-layout {display:block}.feed-main {width:100%}
+.feed-sidebar {position:fixed;right:0;top:72px;bottom:0;width:375px;padding:20px 17px;background:#fff;border-left:1px solid var(--line);overflow-y:auto}
+.feed-sidebar h2 {font-size:16px;margin:0 0 15px;color:var(--ink)}
+.tadaki-region-panel {background:#edf4f9;padding:15px;border-radius:16px;margin-bottom:22px}.tadaki-region-panel p {font-size:13px;line-height:1.65;color:#4d6480}
+.tadaki-region-title {font-size:15px!important;font-weight:800;color:var(--ink)!important;display:flex;align-items:center;gap:10px}.tadaki-region-title svg{color:#b01013}
+.tadaki-region-map {height:175px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border-radius:14px;margin:12px 0;background:repeating-linear-gradient(32deg,#dfeaf4 0 3px,transparent 3px 36px),repeating-linear-gradient(130deg,#fff 0 4px,#e7f0f8 4px 49px);color:#b01013}.tadaki-region-map span {font-size:12px;padding:5px 10px;border-radius:20px;background:#fff;color:#243d58;font-weight:700}
+.tadaki-highlights {margin:0 0 22px}.tadaki-highlight {width:100%;border:0;border-bottom:1px solid var(--line);background:#fff;display:flex;align-items:center;gap:12px;text-align:left;padding:11px 0}.tadaki-highlight img,.tadaki-highlight-fallback{height:62px;width:76px;object-fit:cover;border-radius:9px;background:#edf3f8;display:flex;align-items:center;justify-content:center;flex-shrink:0}.tadaki-highlight span:nth-child(2){flex:1;display:flex;flex-direction:column;gap:4px}.tadaki-highlight strong{font-size:13px;color:var(--ink)}.tadaki-highlight small{color:var(--muted);font-size:12px}
+.tadaki-nearby {margin:0 0 24px}.tadaki-section-title {display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}.tadaki-section-title h2{font-size:17px;margin:0}.tadaki-section-title span {font-size:12px;color:var(--muted)}.tadaki-nearby-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.tadaki-nearby-item {display:flex;align-items:center;gap:10px;background:#fff;border:0;text-align:left;min-width:0;padding:0}.tadaki-nearby-item img,.tadaki-nearby-placeholder{height:78px;width:95px;flex:0 0 95px;border-radius:10px;object-fit:cover;background:#edf3f8;display:flex;align-items:center;justify-content:center}.tadaki-nearby-item span:last-child{display:flex;min-width:0;flex-direction:column;gap:4px}.tadaki-nearby-item strong{font-size:13px;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tadaki-nearby-item small{display:flex;align-items:center;gap:3px;color:var(--muted);font-size:11px}
+.post-list {gap:14px}.post-card {border-radius:15px;box-shadow:none}.post-card__media img{object-fit:cover}.feed-page .primary-button{background:#b01013}
+.feed-page .category-filters button.selected{background:#fff0f1;color:#b01013;border-color:#b01013}
+@media(max-width:1250px){.feed-shell{margin-right:315px;margin-left:215px;padding:24px 20px}.tadaki-side-nav{width:200px}.feed-sidebar{width:300px}.tadaki-nearby-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.tadaki-nearby-item:nth-child(3){display:none}}
+@media(max-width:1000px){.feed-shell{margin-right:0}.feed-sidebar{position:static;width:100%;border:0;padding:22px 0;display:grid;grid-template-columns:1fr 1fr;gap:18px}.tadaki-highlights{margin:0}}
+@media(max-width:690px){.feed-header{padding:0 14px}.tadaki-header-search{width:auto;flex:1}.tadaki-header-search input{font-size:12px}.tadaki-side-nav{display:none}.feed-shell{margin:0;padding:20px 14px 50px}.feed-heading h1{font-size:28px}.feed-sidebar{display:block}.tadaki-nearby-grid{grid-template-columns:1fr 1fr}.tadaki-nearby-item{display:block}.tadaki-nearby-item img,.tadaki-nearby-placeholder{height:100px;width:100%;margin-bottom:6px}.tadaki-nearby-item:nth-child(3){display:none}.tadaki-notification{display:none!important}}
+@media(prefers-reduced-motion:reduce){.tadaki-nearby-item,.tadaki-highlight{transition:none!important}}
+
+/* CTA de publicação sempre visível para contas de organização */
+.feed-page .feed-header__actions .create-button{display:inline-flex!important;align-items:center;gap:9px;width:auto;min-width:170px;padding:0 17px;background:#ba0919!important;color:white!important;border-radius:12px!important;font-weight:750;box-shadow:0 7px 17px #b509172a;white-space:nowrap}.feed-page .feed-header__actions .create-button:hover{background:#990b17!important;transform:translateY(-1px)}@media(max-width:690px){.feed-page .feed-header__actions .create-button{min-width:unset;padding:0 11px;font-size:12px;gap:5px}.feed-page .feed-header__actions .create-button svg{width:17px}}
+
+/* Central de notificações / sair */
+.tadaki-notification-wrap{position:relative}.tadaki-notification-count{position:absolute;top:-4px;right:-4px;background:#dc2626;color:#fff;border-radius:20px;padding:1px 6px;font-size:11px;pointer-events:none}
+.tadaki-notification-panel{position:absolute;right:0;top:calc(100% + 12px);z-index:90;width:min(370px,90vw);max-height:430px;overflow:auto;background:#fff;border:1px solid #eee;border-radius:17px;box-shadow:0 15px 45px #0002;padding:16px;text-align:left;color:#252d3b}
+.tadaki-notification-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}.tadaki-notification-heading button{border:0;background:transparent;color:#c62828;font-size:12px;cursor:pointer}
+.tadaki-notification-item{display:flex;flex-direction:column;gap:4px;width:100%;padding:12px;border:0;border-bottom:1px solid #f1f1f1;background:transparent;text-align:left;color:#313846;cursor:pointer}.tadaki-notification-item.unread{background:#fff2f1}.tadaki-notification-item span{font-size:13px}.tadaki-notification-item small{color:#687280}.tadaki-side-nav .tadaki-exit{color:#b91c1c;margin-top:10px}
+
+/* Cartões inspirados no protótipo TaDaKi: foto de ponta a ponta, bordas leves,
+   informações em sequência e ações com alvos acessíveis. */
+.feed-page .post-list{gap:14px}
+.feed-page .post-card{border:1px solid #e1e9f1;border-radius:17px;background:#fff;box-shadow:0 4px 18px rgba(18,45,73,.045);transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease}
+.feed-page .post-card:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(26,53,83,.095);border-color:#cdddea}
+.feed-page .post-card__header{padding:12px 15px;gap:10px}
+.feed-page .org-avatar{width:49px;height:49px}
+.feed-page .post-card__identity strong{font-size:15px}
+.feed-page .post-business-subtitle{display:flex;align-items:center;gap:4px;font-size:12px}
+.feed-page .category-badge{display:inline-flex;align-items:center;gap:5px;border-radius:20px;font-size:11px;max-width:170px}
+.feed-page .post-card__media{aspect-ratio: 16/7.1;margin:0 14px;width:calc(100% - 28px);border-radius:11px;background:#edf2f7}
+.feed-page .post-card__media img{object-fit:cover}
+.feed-page .post-card__footer{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 18px;padding:11px 15px 13px;align-items:end}
+.feed-page .post-card__copy{grid-column:1 / -1;grid-row:1}
+.feed-page .post-card__copy h2{font-size:17px;margin:0 0 3px}
+.feed-page .post-card__copy p{font-size:13px;line-height:1.55;margin:0}
+.feed-page .post-actions{grid-column:1;grid-row:2;margin:0;align-self:center}
+.feed-page .post-actions .social-button{min-height:44px;color:#b4091b}
+.feed-page .business-link{grid-column:2;grid-row:2;min-height:44px;background:#b80b1b!important;color:white!important;border-radius:11px;font-weight:750;padding:10px 16px;display:inline-flex;gap:8px;align-items:center;justify-content:center;transition:filter .2s,transform .2s}
+.feed-page .business-link:hover{filter:brightness(.91);transform:translateX(2px)}
+.feed-page button:focus-visible,.feed-page input:focus-visible{outline:3px solid #356caa;outline-offset:3px}
+.feed-page .tadaki-side-nav button svg,.feed-page .post-card button svg{flex-shrink:0}
+.feed-page .image-hint{display:flex;align-items:center;gap:5px}
+@media(max-width:560px){.feed-page .post-card__footer{grid-template-columns:1fr}.feed-page .business-link{grid-column:1;grid-row:3;width:100%}.feed-page .post-card__media{aspect-ratio: 16/10}.feed-page .post-card__header{flex-wrap:wrap}.feed-page .category-badge{max-width:100%}}
+@media(prefers-reduced-motion:reduce){.feed-page .post-card,.feed-page .business-link,.feed-page .post-card__media img{transition:none!important;animation:none!important;transform:none!important}}
+
+@media (prefers-reduced-motion: no-preference){
+ .feed-page .post-card__header .org-avatar{transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+ .feed-page .post-card:hover .org-avatar{transform:scale(1.05)}
+ .feed-page .post-card .social-button svg{transition:transform .22s cubic-bezier(.2,.8,.2,1)}
+ .feed-page .post-card .social-button:active svg{transform:scale(.84)}
+ .feed-page .post-card .social-button.is-liked svg{animation:tadaki-heart-pop .38s ease}
+ @keyframes tadaki-heart-pop{0%{transform:scale(.8)}55%{transform:scale(1.22)}100%{transform:scale(1)}}
+}
+
+/* Acessibilidade e favoritos em organizações sem posts */
+.tadaki-skip-link{position:fixed;z-index:9999;left:12px;top:-90px;padding:14px 20px;background:#fff;color:#a50010;border:3px solid #a50010;border-radius:10px;font-weight:700}
+.tadaki-skip-link:focus{top:12px}
+.feed-page :is(button,a,input,[tabindex]):focus-visible{outline:3px solid #a50010!important;outline-offset:3px}
+.tadaki-nearby-card{position:relative;min-width:0}
+.tadaki-nearby-card .tadaki-nearby-item{width:100%;padding-right:42px;text-align:left}
+.tadaki-nearby-favorite{position:absolute;right:5px;top:5px;width:42px;height:42px;border:1px solid #bdcbd7;background:#fff;border-radius:12px;color:#a50010;display:grid;place-items:center;cursor:pointer}
+.tadaki-nearby-favorite[aria-pressed="true"]{background:#fff0f2}
+.tadaki-nearby-favorite:disabled{opacity:.45;cursor:not-allowed}
+@media(prefers-reduced-motion:reduce){.feed-page *, .feed-page *::before,.feed-page *::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+/* Painel de acessibilidade Web: preferencias guardadas pelo navegador. */
+.tadaki-access-wrap{position:relative;flex-shrink:0}
+.feed-page .tadaki-access-trigger{width:auto;min-width:46px;padding:0 14px;gap:8px;white-space:nowrap}
+.tadaki-access-panel{position:absolute;right:0;top:calc(100% + 12px);width:min(360px,calc(100vw - 24px));background:#fff;color:#142435;border:1px solid #a9bdce;border-radius:16px;box-shadow:0 14px 36px #182e4b30;padding:18px;z-index:90;font-size:16px;text-align:left}
+.tadaki-access-heading,.tadaki-access-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.tadaki-access-heading strong{font-size:19px}
+.tadaki-access-heading button{border:0;background:#eef3f7;border-radius:8px;width:38px;height:38px;font-size:23px}
+.tadaki-access-panel p{margin:6px 0 18px;color:#485c71}
+.tadaki-access-row{padding:12px 0;border-top:1px solid #dae2eb}
+.tadaki-access-row input{width:22px;height:22px;accent-color:#a70012;cursor:pointer}
+.tadaki-access-font-actions{display:flex;gap:8px}
+.tadaki-access-font-actions button,.tadaki-access-reset{border:1px solid #a6bacb;background:#f3f6f9;padding:8px 12px;border-radius:9px;color:#142435;font-weight:700}
+.tadaki-access-reset{width:100%;margin-top:12px}
+/* Scale textual elements rather than the fixed size of icons and images. */
+.feed-page{font-size:calc(16px * var(--tadaki-access-font-scale,1))!important}
+.feed-page :is(p,span,small,a,label,li,button,input){font-size:inherit}
+.feed-page h1{font-size:calc(2.15rem * var(--tadaki-access-font-scale,1))}
+.feed-page h2{font-size:calc(1.55rem * var(--tadaki-access-font-scale,1))}
+html.tadaki-high-contrast .feed-page{--ink:#000;--muted:#18212b;--line:#44505c;--blue-soft:#fff;background:#fff;color:#000}
+html.tadaki-high-contrast .feed-page :is(.feed-header,.tadaki-side-nav,.post-card,.tadaki-access-panel){background:#fff!important;color:#000!important;border-color:#222!important}
+html.tadaki-high-contrast .feed-page :is(button,a,input):focus-visible{outline:4px solid #000!important;outline-offset:3px!important}
+html.tadaki-reduce-motion .feed-page *,html.tadaki-reduce-motion .feed-page *::before,html.tadaki-reduce-motion .feed-page *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important;transform:none!important}
+@media(max-width:650px){.feed-page .tadaki-access-trigger span{display:none}.feed-page .tadaki-access-trigger{padding:0;width:44px}}
+
+/* Motion design da Home: entrada em cascata, microinterações e botão de paginação */
+@keyframes tadaki-enter-card{from{opacity:0;transform:translateY(24px) scale(.975)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes tadaki-soft-glow{0%,100%{box-shadow:0 4px 16px #b20c1916}50%{box-shadow:0 8px 28px #b20c1940}}
+@media(prefers-reduced-motion:no-preference){
+ .feed-page .tadaki-nearby-card{animation:tadaki-enter-card .6s cubic-bezier(.16,1,.3,1) backwards;transition:transform .28s ease,box-shadow .28s ease}
+ .feed-page .tadaki-nearby-card:nth-child(2){animation-delay:.07s}.feed-page .tadaki-nearby-card:nth-child(3){animation-delay:.14s}.feed-page .tadaki-nearby-card:nth-child(4){animation-delay:.21s}.feed-page .tadaki-nearby-card:nth-child(5){animation-delay:.28s}.feed-page .tadaki-nearby-card:nth-child(6){animation-delay:.35s}
+ .feed-page .tadaki-nearby-card:hover{transform:translateY(-6px);box-shadow:0 14px 30px #21374c1b}
+ .feed-page .tadaki-nearby-card img{transition:transform .45s cubic-bezier(.2,.75,.2,1)}
+ .feed-page .tadaki-nearby-card:hover img{transform:scale(1.055)}
+ .feed-page .tadaki-nearby-favorite:active{transform:scale(.88)}
+ .feed-page .tadaki-business-more{animation:tadaki-soft-glow 3s ease-in-out infinite}
+}
+.tadaki-business-more{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;margin:24px auto 8px;border:0;background:#b50917;color:#fff;font:inherit;font-weight:800;border-radius:14px;padding:12px 25px;cursor:pointer;transition:background .2s,transform .2s}
+.tadaki-business-more:hover{background:#900817;transform:translateY(-2px)}

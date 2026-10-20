@@ -1,6 +1,5 @@
 import {
   Heart,
-  Menu,
   Plus,
   Search,
   Star,
@@ -10,14 +9,20 @@ import {
   BarChart3,
   Home,
   UserRound,
+  MapPin,
+  Compass,
+  Info,
+  HelpCircle,
+  Accessibility,
+  ChevronRight,
   LogOut,
 } from "lucide-react";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import logo from "../../assets/Logo.png";
 import { useAuth } from "../../hooks/useAuth";
 import { getImageUrl } from "../../services/api";
-import { filterPosts, userType } from "./model";
+import { filterPosts, userType, photo } from "./model";
 import type { Post } from "./model";
 import { useFeed } from "./useFeed";
 import { useDiscovery } from "./useDiscovery";
@@ -35,14 +40,36 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
   const { user, logout } = useAuth();
   const feed = useFeed(user, onlyLikes);
   const [search, setSearch] = useState("");
+  const [accessOpen, setAccessOpen] = useState(false);
+  const [fontScale, setFontScale] = useState(() => Number(localStorage.getItem("tadaki-font-scale") || "100"));
+  const [highContrast, setHighContrast] = useState(() => localStorage.getItem("tadaki-high-contrast") === "true");
+  const [reduceMotion, setReduceMotion] = useState(() => localStorage.getItem("tadaki-reduce-motion") === "true");
+  useEffect(() => {
+    document.documentElement.style.setProperty("--tadaki-access-font-scale", String(fontScale / 100));
+    document.documentElement.classList.toggle("tadaki-high-contrast", highContrast);
+    document.documentElement.classList.toggle("tadaki-reduce-motion", reduceMotion);
+    localStorage.setItem("tadaki-font-scale", String(fontScale));
+    localStorage.setItem("tadaki-high-contrast", String(highContrast));
+    localStorage.setItem("tadaki-reduce-motion", String(reduceMotion));
+    return () => {
+      document.documentElement.classList.remove("tadaki-high-contrast", "tadaki-reduce-motion");
+      document.documentElement.style.removeProperty("--tadaki-access-font-scale");
+    };
+  }, [fontScale, highContrast, reduceMotion]);
+  const [signingOut, setSigningOut] = useState(false);
+  const signOut = async () => {
+    if (!window.confirm("Deseja realmente sair da sua conta?")) return;
+    setSigningOut(true);
+    try { await logout(); navigate("/login", {replace:true}); } finally { setSigningOut(false); }
+  };
   const [category, setCategory] = useState(0);
   const [favoritesOnly, setFavoritesOnly] = useState(
     params.get("favoritos") === "1",
   );
-  const [menuOpen, setMenuOpen] = useState(false);
   const [composerOpen, setComposerOpen] = useState(false);
   const [imagePost, setImagePost] = useState<Post | null>(null);
   const [limit, setLimit] = useState(12);
+  const [businessLimit, setBusinessLimit] = useState(6);
   const [imageFailed, setImageFailed] = useState(false);
   const discovery = useDiscovery(
     Number(feed.person?.id_pessoa ?? feed.person?.id_pessoa_login ?? 0),
@@ -52,12 +79,9 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
     !onlyLikes && !favoritesOnly && !search.trim() && !category,
   );
 
-  const menuRef = useRef<HTMLElement>(null);
   const imageRef = useRef<HTMLDivElement>(null);
-  const closeMenu = useCallback(() => setMenuOpen(false), []);
   const closeImage = useCallback(() => setImagePost(null), []);
   const closeComposer = useCallback(() => setComposerOpen(false), []);
-  useDialog(menuOpen, menuRef, closeMenu);
   useDialog(Boolean(imagePost), imageRef, closeImage);
   const type = userType(feed.person) || userType(user);
   const canCreate = type === "ORGANIZACAO";
@@ -81,14 +105,39 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
       feed.favorites,
     ],
   );
+  const featured = useMemo(() => {
+    const seen = new Set<number>();
+    return filtered.filter(post => {
+      if (seen.has(post.id_organizacao)) return false;
+      seen.add(post.id_organizacao);
+      return true;
+    });
+  }, [filtered]);
+  // Organizações são entidades independentes: uma empresa recém-cadastrada
+  // deve aparecer na descoberta mesmo sem ter criado nenhuma publicação.
+  const discoveredOrganizations = useMemo(() => {
+    if (onlyLikes || favoritesOnly) return [];
+    const term = search.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    const active = feed.organizations.filter(org => {
+      const name = String(org.nome ?? org.username ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+      return Number(org.id_pessoa) > 0 && name.includes(term);
+    });
+    return active.sort((a,b) => {
+      const aPosts = feed.allPosts.filter(p => Number(p.id_organizacao) === Number(a.id_organizacao));
+      const bPosts = feed.allPosts.filter(p => Number(p.id_organizacao) === Number(b.id_organizacao));
+      return bPosts.length - aPosts.length;
+    });
+  }, [feed.organizations, feed.allPosts, search, onlyLikes, favoritesOnly]);
+  const regionName = discovery.selectedAddress
+    ? `${discovery.selectedAddress.municipio}, ${discovery.selectedAddress.uf}`
+    : discovery.locations.user.length ? "Sua região cadastrada" : "Defina sua região";
   const title = onlyLikes
-    ? "Suas descobertas favoritas"
+    ? "Minhas curtidas"
     : favoritesOnly
-      ? "Empresas que você favoritou"
-      : "Descubra quem faz acontecer";
+      ? "Suas empresas favoritas"
+      : "Seu próximo achado está por perto";
   const timelineError = favoritesOnly && feed.favoritesError ? "Não foi possível carregar sua timeline. Atualize os favoritos para tentar novamente." : "";
   const goProfile = () => {
-    closeMenu();
     if (type === "CLIENTE") {
       navigate("/perfil-pessoal");
       return;
@@ -109,9 +158,10 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
   };
   return (
     <main className="feed-page">
+      <a className="tadaki-skip-link" href="#tadaki-publicacoes">Pular para as publicações</a>
       <header
         className="feed-header"
-        inert={menuOpen || composerOpen || Boolean(imagePost)}
+        inert={composerOpen || Boolean(imagePost)}
       >
         <button
           className="logo-button"
@@ -123,10 +173,19 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
         >
           <img className="feed-logo" src={logo} alt="TaDaKi" />
         </button>
-        <span className="header-tagline">
-          Pertinho de você. Feito por gente.
-        </span>
+        <label className="tadaki-header-search"><Search size={19} /><input aria-label="Buscar negócios e serviços" placeholder="Buscar negócios e serviços" value={search} onChange={event => setSearch(event.target.value)} /></label>
         <div className="feed-header__actions">
+          <div className="tadaki-access-wrap">
+            <button type="button" className="feed-action tadaki-access-trigger" onClick={() => setAccessOpen(v => !v)} aria-label="Abrir opções de acessibilidade" aria-expanded={accessOpen} aria-controls="tadaki-access-panel" title="Acessibilidade"><Accessibility size={22}/><span>Acessibilidade</span></button>
+            {accessOpen && <section id="tadaki-access-panel" className="tadaki-access-panel" aria-label="Opções de acessibilidade">
+              <div className="tadaki-access-heading"><strong>Acessibilidade</strong><button type="button" onClick={() => setAccessOpen(false)} aria-label="Fechar painel de acessibilidade">×</button></div>
+              <p>Ajuste a leitura do TaDaKi.</p>
+              <div className="tadaki-access-row"><span id="tadaki-font-label">Tamanho do texto: {fontScale}%</span><div className="tadaki-access-font-actions"><button type="button" aria-label="Diminuir tamanho do texto" disabled={fontScale <= 100} onClick={() => setFontScale(v => Math.max(100, v - 10))}>A−</button><button type="button" aria-label="Aumentar tamanho do texto" disabled={fontScale >= 150} onClick={() => setFontScale(v => Math.min(150, v + 10))}>A+</button></div></div>
+              <label className="tadaki-access-row"><span>Alto contraste</span><input type="checkbox" checked={highContrast} onChange={e => setHighContrast(e.target.checked)}/></label>
+              <label className="tadaki-access-row"><span>Reduzir animações</span><input type="checkbox" checked={reduceMotion} onChange={e => setReduceMotion(e.target.checked)}/></label>
+              <button type="button" className="tadaki-access-reset" onClick={() => {setFontScale(100);setHighContrast(false);setReduceMotion(false);}}>Restaurar padrão</button>
+            </section>}
+          </div>
           {canCreate && !onlyLikes && (
             <button
               className="feed-action create-button"
@@ -134,23 +193,25 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
               title="Criar publicação"
               onClick={() => setComposerOpen(true)}
             >
-              <Plus size={22} />
+              <Plus size={21} /> <span>Criar publicação</span>
             </button>
           )}
-          <button
-            className="feed-action"
-            aria-label="Abrir menu"
-            aria-expanded={menuOpen}
-            onClick={() => setMenuOpen(true)}
-          >
-            <Menu size={22} />
-          </button>
         </div>
       </header>
       <section
         className="feed-shell"
-        inert={menuOpen || composerOpen || Boolean(imagePost)}
+        inert={composerOpen || Boolean(imagePost)}
       >
+        <nav className="tadaki-side-nav" aria-label="Menu principal">
+          <button className={!onlyLikes ? "active" : ""} onClick={() => navigate("/")}><Home size={20}/> Início</button>
+          <button className={onlyLikes ? "active" : ""} onClick={() => navigate("/likes")}><Heart size={20}/> Minhas curtidas</button>
+          <button onClick={goProfile}><UserRound size={20}/> Meu perfil</button>
+          {canCreate && <button onClick={() => navigate("/dashboard")}><BarChart3 size={20}/> Dashboard</button>}
+          <hr/>
+          <button onClick={() => navigate("/sobre")}><Info size={20}/> Sobre o TaDaKi</button>
+          <button onClick={() => navigate("/ajuda")}><HelpCircle size={20}/> Ajuda</button>
+          <hr/><button className="tadaki-exit" disabled={signingOut} onClick={()=>void signOut()}><LogOut size={20}/> {signingOut ? "Saindo..." : "Sair da conta"}</button>
+        </nav>
         {onlyLikes && (
           <button className="back-button" onClick={() => navigate("/")}>
             <ArrowLeft size={18} />
@@ -166,7 +227,7 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
             <p>
               {onlyLikes
                 ? "Reencontre os produtos e serviços que chamaram sua atenção."
-                : "Produtos, serviços e histórias dos pequenos negócios."}
+                : "Descubra e apoie negócios locais que fazem a sua região mais especial."}
             </p>
           </div>
           <button
@@ -303,9 +364,28 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
             </button>
           </div>
         )}
+        {!onlyLikes && !favoritesOnly && (
+          <section className="tadaki-nearby" aria-label="Organizações da comunidade">
+            <div className="tadaki-section-title"><h2>Negócios para descobrir</h2><span>{regionName}</span></div>
+            {discoveredOrganizations.length ? <div className="tadaki-nearby-grid">{discoveredOrganizations.slice(0, businessLimit).map(org => {
+              const orgPost = feed.allPosts.find(post => Number(post.id_organizacao) === Number(org.id_organizacao));
+              const cover = orgPost?.vincularImagem || photo(org);
+              return <div key={org.id_pessoa} className="tadaki-nearby-card">
+                <button className="tadaki-nearby-item" aria-label={`Conhecer ${org.nome || org.username || "organização"}`} onClick={() => navigate(`/perfil/${org.id_pessoa}`)}>
+                  {cover ? <img src={getImageUrl(cover)} alt="" loading="lazy"/> : <span className="tadaki-nearby-placeholder"><Compass/></span>}
+                  <span><strong>{org.nome || org.username || "Organização"}</strong><small>{orgPost?.descricao_categoria || "Negócio local"}</small><small><MapPin size={12}/> {orgPost ? "Ver perfil e publicações" : "Conheça esta organização"}</small></span>
+                </button>
+                {canFavorite && <button type="button" className="tadaki-nearby-favorite" aria-pressed={Boolean(feed.favorites[Number(org.id_organizacao)]?.favoritado)} aria-label={`${feed.favorites[Number(org.id_organizacao)]?.favoritado ? "Remover dos favoritos" : "Favoritar"}: ${org.nome || org.username}`} disabled={feed.pending.has(`favorite:${Number(org.id_organizacao)}`) || !Number(org.id_organizacao)} onClick={() => void feed.toggleFavorite(Number(org.id_organizacao))}><Star size={19} fill={feed.favorites[Number(org.id_organizacao)]?.favoritado ? "currentColor" : "none"}/></button>}
+                {feed.favoriteErrors[Number(org.id_organizacao)] && <small role="alert" className="post-favorite-error">{feed.favoriteErrors[Number(org.id_organizacao)]}</small>}
+              </div>;
+            })}</div> : <p>Nenhuma organização encontrada para sua busca.</p>}
+            {discoveredOrganizations.length > businessLimit && <button type="button" className="tadaki-business-more" onClick={() => setBusinessLimit(n => n + 6)}>Ver mais negócios <ChevronRight size={18}/></button>}
+          </section>
+        )}
         <div className="feed-layout">
           <section
             className="feed-main"
+            id="tadaki-publicacoes" tabIndex={-1}
             aria-label={onlyLikes ? "Publicações curtidas" : "Publicações"}
             aria-busy={feed.loading}
           >
@@ -425,127 +505,25 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
             )}
           </section>
           <aside className="feed-sidebar">
-            <div className="discovery-note">
-              <span className="note-symbol">TaDaKi</span>
-              <h2>O próximo achado pode estar ao lado.</h2>
-              <p>
-                Conheça os pequenos negócios e valorize quem faz parte da sua
-                comunidade.
-              </p>
-              <div className="note-line" />
-            </div>
-            {canCreate && !onlyLikes && (
-              <div className="business-note">
-                <h3>Mostre o que seu negócio faz de melhor</h3>
-                <p>
-                  Uma boa foto e uma descrição clara ajudam seus produtos a
-                  serem descobertos.
-                </p>
-                <button
-                  className="primary-button"
-                  onClick={() => setComposerOpen(true)}
-                >
-                  <Plus size={18} />
-                  Criar publicação
-                </button>
-              </div>
-            )}
-            <small className="feed-footnote">
-              Feito para aproximar pessoas e microempresas.
-            </small>
+            <section className="tadaki-region-panel">
+              <h2>Sua região</h2>
+              <p className="tadaki-region-title"><MapPin size={19}/>{regionName}</p>
+              <p>Descubra negócios da sua rua, bairro, cidade e estado, conforme os endereços cadastrados.</p>
+              <div className="tadaki-region-map" aria-label="Ilustração de localização; não é um mapa de navegação"><MapPin size={35}/><span>Negócios perto de você</span></div>
+              <RegionPicker initial={discovery.locations.user[0]} save={discovery.saveReference}/>
+            </section>
+            <section className="tadaki-highlights">
+              <h2>Negócios em destaque na sua região</h2>
+              {featured.slice(0, 4).map(post => <button key={post.id_organizacao} className="tadaki-highlight" disabled={!post.id_pessoa_organizacao} onClick={() => navigate(`/perfil/${post.id_pessoa_organizacao}`)}>
+                {post.vincularImagem ? <img src={getImageUrl(post.vincularImagem)} alt=""/> : <span className="tadaki-highlight-fallback"><Compass/></span>}
+                <span><strong>{post.nome_organizacao}</strong><small>{post.descricao_categoria || "Negócio local"}</small></span><ChevronRight size={18}/>
+              </button>)}
+              {!featured.length && <p>Explore organizações da sua região, mesmo que ainda não tenham publicações.</p>}
+            </section>
+            {canCreate && !onlyLikes && <div className="business-note"><h3>Mostre seu trabalho à região</h3><p>Uma boa foto ajuda seus produtos a serem descobertos.</p><button className="primary-button" onClick={() => setComposerOpen(true)}><Plus size={18}/> Criar publicação</button></div>}
           </aside>
         </div>
       </section>
-      {menuOpen && (
-        <div
-          className="menu-overlay"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) closeMenu();
-          }}
-        >
-          <aside
-            className="menu-panel"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="menu-title"
-            ref={menuRef}
-          >
-            <div className="menu-panel__top">
-              <h2 id="menu-title">Seu TaDaKi</h2>
-              <button
-                className="feed-action"
-                aria-label="Fechar menu"
-                onClick={closeMenu}
-              >
-                <X />
-              </button>
-            </div>
-            <div className="menu-account">
-              <span className="org-avatar">{(feed.person?.nome || user?.username || "T").charAt(0).toUpperCase()}</span>
-              <div><strong>{feed.person?.nome || user?.username || "Sua conta"}</strong><span>{canCreate ? "Organização" : "Cliente"}</span></div>
-            </div>
-            <p className="menu-section-label">NAVEGAÇÃO</p>
-            <nav aria-label="Menu principal">
-              <button
-                aria-current={!onlyLikes && !favoritesOnly ? "page" : undefined}
-                onClick={() => {
-                  closeMenu();
-                  navigate("/");
-                  setFavoritesOnly(false);
-                }}
-              >
-                <Home size={19} />
-                Início
-              </button>
-              <button onClick={goProfile}><UserRound size={19} />Meu perfil</button>
-              <button
-                aria-current={onlyLikes ? "page" : undefined}
-                onClick={() => {
-                  closeMenu();
-                  navigate("/likes");
-                }}
-              >
-                <Heart size={19} />
-                Curtidos
-              </button>
-              {canCreate && (
-                <button
-                  onClick={() => {
-                    closeMenu();
-                    navigate("/dashboard");
-                  }}
-                >
-                  <BarChart3 size={19} />
-                  Dashboard
-                </button>
-              )}
-              {canFavorite && (
-                <button
-                  aria-current={favoritesOnly && !onlyLikes ? "page" : undefined}
-                  onClick={() => {
-                    closeMenu();
-                    if (onlyLikes) navigate("/?favoritos=1");
-                    else setFavoritesOnly(true);
-                  }}
-                >
-                  <Star size={19} />
-                  Favoritos
-                </button>
-              )}
-              <p className="menu-section-label">CONTA</p>
-              <button
-                className="logout-button"
-                onClick={() => {
-                  void logout().then(() => navigate("/login"));
-                }}
-              >
-                <LogOut size={19} />
-                Sair da conta
-              </button>
-            </nav>
-          </aside>
-        </div>
-      )}
       {imagePost && (
         <div
           className="image-overlay"

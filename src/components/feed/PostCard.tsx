@@ -1,4 +1,4 @@
-import { Heart, ImageOff, Star, ArrowUpRight } from "lucide-react";
+import { Heart, ImageOff, Star, ArrowRight, MapPin, Store, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { getImageUrl } from "../../services/api";
 import type { Post } from "./model";
@@ -57,7 +57,7 @@ export function PostCard({
           </span>
           <span className="post-card__identity">
             <strong>{post.nome_organizacao}</strong>
-            <span>Pequenos negócios, grandes descobertas</span>
+            <span className="post-business-subtitle"><MapPin size={13} aria-hidden="true" /> {post.descricao_categoria || "Negócio local"}</span>
           </span>
         </button>
         {canFavorite && (
@@ -76,7 +76,7 @@ export function PostCard({
               <span>{busyFavorite ? "Salvando…" : favorite ? "Favoritada" : "Favoritar"}</span>
             </button>
         )}
-        <span className="category-badge">{post.descricao_categoria}</span>
+        <span className="category-badge"><Store size={13} aria-hidden="true" /> {post.descricao_categoria}</span>
         {canFavorite && favoriteError && <p className="post-favorite-error" role="alert">{favoriteError}</p>}
       </div>
       <button
@@ -99,7 +99,7 @@ export function PostCard({
           </span>
         )}
         {!imageFailed && post.vincularImagem && (
-          <span className="image-hint">Ampliar foto</span>
+          <span className="image-hint"><Sparkles size={13} aria-hidden="true" /> Ampliar foto</span>
         )}
       </button>
       <div className="post-card__footer">
@@ -140,6 +140,7 @@ export function PostCard({
               {post.descricao.length > 160 && (
                 <button
                   className="text-button"
+                  aria-expanded={expanded}
                   onClick={() => setExpanded(!expanded)}
                 >
                   {expanded ? "Mostrar menos" : "Ver descrição completa"}
@@ -153,7 +154,7 @@ export function PostCard({
           disabled={!post.id_pessoa_organizacao}
           onClick={openOrg}
         >
-          Conhecer a empresa <ArrowUpRight size={17} />
+          Conhecer organização <ArrowRight size={17} aria-hidden="true" />
         </button>
       </div>
     </article>
