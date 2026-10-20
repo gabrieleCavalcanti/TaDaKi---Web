@@ -1292,3 +1292,358 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
   display: none;
   -webkit-appearance: none;
 }
+
+/* ========================================
+   CADASTRO — MESMO VISUAL DO LOGIN
+======================================== */
+
+.cadastro-page,
+.cadastro-page input,
+.cadastro-page button,
+.cadastro-page select {
+  font-family: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+}
+
+/* ---------- FUNDO VINHO + ONDAS ---------- */
+.cadastro-page {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(255, 255, 255, 0.08), transparent 40%),
+    linear-gradient(145deg, #a3121d 0%, #79090e 55%, #4e060a 100%);
+}
+
+.cadastro-page::before,
+.cadastro-page::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  top: 50%;
+  width: 640px;
+  height: 640px;
+  margin: -320px 0 0 -320px;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  animation: cadastroRadar 14s linear infinite;
+}
+
+.cadastro-page::before { animation-delay: -9.3s; }
+.cadastro-page::after  { animation-delay: -4.6s; }
+
+@keyframes cadastroRadar {
+  0%   { transform: scale(0.8); opacity: 0; }
+  15%  { opacity: 0.7; }
+  100% { transform: scale(3); opacity: 0; }
+}
+
+/* ---------- CARD BRANCO COM PROFUNDIDADE ---------- */
+.cadastro-container {
+  background: linear-gradient(180deg, #ffffff 0%, #f6f7fa 100%);
+  border-radius: 28px;
+  box-shadow:
+    inset 0 1px 0 #fff,
+    0 2px 4px rgba(25, 0, 3, 0.1),
+    0 14px 28px rgba(25, 0, 3, 0.16),
+    0 40px 80px rgba(25, 0, 3, 0.34);
+}
+
+.form-box {
+  background: transparent;
+}
+
+.form-box h1 {
+  color: #232b36;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+/* ---------- CAMPOS ---------- */
+.form-box.cliente .input-box input,
+.form-box.organizacao .input-box input,
+.form-box.cliente .input-box-nascimento input,
+.form-box.organizacao .data-criacao-box input,
+.form-box.organizacao .area-atuacao-box select {
+  background: #f1f4f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  color: #232b36;
+  font-weight: 500;
+  box-shadow:
+    inset 0 2px 4px rgba(15, 23, 42, 0.06),
+    0 1px 0 #fff;
+  transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+}
+
+.form-box.cliente .input-box input:hover,
+.form-box.organizacao .input-box input:hover,
+.form-box.cliente .input-box-nascimento input:hover,
+.form-box.organizacao .data-criacao-box input:hover,
+.form-box.organizacao .area-atuacao-box select:hover {
+  background: #eef2f7;
+  border-color: #cbd5e1;
+}
+
+.form-box.cliente .input-box input:focus,
+.form-box.organizacao .input-box input:focus,
+.form-box.cliente .input-box-nascimento input:focus,
+.form-box.organizacao .data-criacao-box input:focus,
+.form-box.organizacao .area-atuacao-box select:focus {
+  background: #fff;
+  border-color: #c82029;
+  box-shadow: 0 0 0 4px rgba(200, 32, 41, 0.1);
+}
+
+.cadastro-page .input-box input::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+.form-box.organizacao .area-atuacao-box select:invalid,
+.form-box.organizacao .data-criacao-box input:not(:valid) {
+  color: #94a3b8;
+}
+
+.form-box.organizacao .data-criacao-box input::-webkit-datetime-edit {
+  color: #232b36;
+  font-weight: 500;
+}
+
+/* ícones */
+.input svg,
+.data-criacao-box svg,
+.input-box-nascimento svg,
+.documento-input > svg,
+.icon-button {
+  color: #64748b;
+}
+
+.area-atuacao-box::after {
+  color: #64748b;
+}
+
+.input:focus-within > svg,
+.input:focus-within .icon-button,
+.input-box-nascimento:focus-within svg,
+.data-criacao-box:focus-within svg,
+.icon-button:hover {
+  color: #c82029;
+}
+
+/* ---------- CPF / CNPJ ---------- */
+.documento-card {
+  background: #f1f4f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.documento-card:hover {
+  border-color: #c82029;
+}
+
+.documento-card.ativo {
+  background: #fff;
+  border-color: #c82029;
+  box-shadow: 0 0 0 3px rgba(200, 32, 41, 0.1);
+}
+
+.documento-icone {
+  background: #e2e8f0;
+  color: #475569;
+  border-radius: 8px;
+}
+
+.documento-card.ativo .documento-icone,
+.documento-card.ativo .documento-check {
+  background-color: #c82029;
+  border-color: #c82029;
+  color: #fff;
+}
+
+.documento-info strong { color: #232b36; }
+.documento-info span,
+.documento-ajuda       { color: #64748b; }
+
+/* ---------- BOTÃO CADASTRAR (mesmo do login) ---------- */
+.cadastro-btn,
+.cadastro-btn:hover {
+  background: linear-gradient(100deg, #d41f2b 0%, #f0414b 100%);
+}
+
+.cadastro-btn {
+  position: relative;
+  overflow: hidden;
+  border-radius: 999px;
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  box-shadow: 0 10px 24px rgba(212, 31, 43, 0.35);
+  transition:
+    transform 0.3s cubic-bezier(0.3, 1.4, 0.5, 1),
+    box-shadow 0.25s ease;
+}
+
+.form-box.organizacao .cadastro-btn {
+  border-radius: 999px;
+}
+
+.cadastro-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 -60%;
+  width: 40%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.7s ease;
+  pointer-events: none;
+}
+
+.cadastro-btn:hover:not(:disabled)::before {
+  left: 130%;
+}
+
+.cadastro-btn:hover:not(:disabled) {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 16px 32px rgba(212, 31, 43, 0.45);
+}
+
+.cadastro-btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.97);
+  box-shadow: 0 6px 14px rgba(212, 31, 43, 0.35);
+}
+
+.cadastro-btn:disabled {
+  opacity: 0.75;
+  cursor: wait;
+}
+
+/* ---------- LINK "JÁ POSSUI UMA CONTA?" ---------- */
+.login-link {
+  width: 100%;
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.login-link a {
+  color: #c82029 !important;
+  font-weight: 700 !important;
+  text-decoration: none !important;
+}
+
+.login-link a:hover {
+  color: #870b13 !important;
+  text-decoration: underline !important;
+}
+
+/* ---------- MENSAGENS ---------- */
+.error-message,
+.success-message {
+  width: 100%;
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.error-message {
+  background: #fdecee;
+  color: #b4232c;
+}
+
+.success-message {
+  background: #e8f6ee;
+  color: #146c3b;
+}
+
+/* ---------- PAINEL VINHO QUE DESLIZA ---------- */
+.toggle-box::before {
+  background: linear-gradient(145deg, #a3121d 0%, #79090e 55%, #57070b 100%);
+}
+
+.toggle-panel h1 {
+  margin: 0 0 10px;
+  font-size: 1.9rem;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+}
+
+.toggle-panel p {
+  margin: 0 0 6px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.toggle-btn {
+  border-radius: 999px;
+  font-weight: 700;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    transform 0.3s cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+
+.toggle-btn:hover {
+  background: #fff;
+  color: #9e101b;
+  transform: scale(1.05);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cadastro-page::before,
+  .cadastro-page::after {
+    animation: none;
+    opacity: 0;
+  }
+}/* ========================================
+   CARD INTERATIVO (inclina com o mouse)
+======================================== */
+
+/* o wrapper assume o tamanho que era do container */
+.cadastro-wrap {
+  position: relative;
+  width: 90%;
+  max-width: 1100px;
+}
+
+.cadastro-container {
+  width: 100%;
+  max-width: none;
+
+  transform: perspective(1500px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 0.2s ease-out;
+
+  /* "backwards" em vez de "both", senão a animação trava o transform */
+  animation: cadastroReveal 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+}
+
+/* digitando ou escolhendo algo num campo: o card fica reto */
+.cadastro-container:has(input:focus, select:focus) {
+  transform: perspective(1500px);
+}
+
+@keyframes cadastroReveal {
+  from { opacity: 0; transform: translateY(24px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* celular: sem inclinação */
+@media screen and (max-width: 800px) {
+  .cadastro-wrap {
+    width: 95%;
+  }
+
+  .cadastro-container {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cadastro-container {
+    transform: none !important;
+    animation: none;
+  }
+}

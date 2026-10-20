@@ -32,11 +32,10 @@ const formatarTelefone = (valor: string) => {
     }
 
     if (numeros.length <= 10) {
-        return `(${numeros.slice(0, 2)}) ${numeros.slice(2, 6)}${
-            numeros.length > 6
+        return `(${numeros.slice(0, 2)}) ${numeros.slice(2, 6)}${numeros.length > 6
                 ? `-${numeros.slice(6, 10)}`
                 : ""
-        }`;
+            }`;
     }
 
     return `(${numeros.slice(0, 2)}) ${numeros.slice(2, 7)}-${numeros.slice(7, 11)}`;
@@ -115,6 +114,9 @@ export const Cadastro: React.FC = () => {
 
     // data de nascimento
     const dataNascimentoRef = useRef<HTMLInputElement>(null);
+
+    // NOVO: referência do card, usada no efeito de inclinação 3D
+    const cardRef = useRef<HTMLDivElement>(null);
 
 
     // MENSAGENS
@@ -211,7 +213,7 @@ export const Cadastro: React.FC = () => {
                 );
 
                 const dataNascimento = String(
-                    formData.get("dataNascimento") || ""
+                    formData.get("data_nascimento") || ""
                 );
 
 
@@ -481,6 +483,30 @@ export const Cadastro: React.FC = () => {
     };
 
 
+    // NOVO: INCLINAÇÃO DO CARD COM O MOUSE
+
+    const handleTilt = (e: React.MouseEvent<HTMLDivElement>) => {
+        const el = cardRef.current;
+        if (!el) return;
+
+        // mede o wrapper (que não inclina), pra o card não "tremer" na borda
+        const r = e.currentTarget.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - 0.5;
+        const y = (e.clientY - r.top) / r.height - 0.5;
+
+        el.style.setProperty("--ry", `${(x * 3.5).toFixed(2)}deg`);
+        el.style.setProperty("--rx", `${(-y * 3.5).toFixed(2)}deg`);
+    };
+
+    const resetTilt = () => {
+        const el = cardRef.current;
+        if (!el) return;
+
+        el.style.setProperty("--ry", "0deg");
+        el.style.setProperty("--rx", "0deg");
+    };
+
+
 
     // JSX
 
@@ -489,7 +515,15 @@ export const Cadastro: React.FC = () => {
 
         <main className="cadastro-page">
 
+            {/* NOVO: wrapper */}
             <div
+                className="cadastro-wrap"
+                onMouseMove={handleTilt}
+                onMouseLeave={resetTilt}
+            >
+
+            <div
+                ref={cardRef}
                 className={
                     `cadastro-container ${organizacao
                         ? "active"
@@ -1104,7 +1138,7 @@ export const Cadastro: React.FC = () => {
 
                         <p className="login-link">
                             Já possui uma conta?{" "}
-                            <a href="/login">Entrar</a>
+                            <Link to="/login">Entrar</Link>
                         </p>
 
                     </form>
@@ -1177,6 +1211,9 @@ export const Cadastro: React.FC = () => {
                 </div>
 
             </div>
+
+            </div>
+            {/* NOVO: fim do wrapper */}
 
         </main>
 
