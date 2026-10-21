@@ -1,0 +1,1275 @@
+/* =========================================================
+   TaDaKi — Perfil: responsividade + animações + mapa interativo
+   Importe DEPOIS do Perfil.css:
+     import "../css/Perfil.css";
+     import "../css/PerfilAnimacoes.css";
+
+   Usa container queries (o layout reage à largura REAL da área
+   de conteúdo, já descontando o menu lateral do AppShell) em vez
+   de media queries da janela.
+   ========================================================= */
+
+/* ---------- 0. Base ---------- */
+.container.tdkPerfilRedesign {
+    --tdk-ease: cubic-bezier(.22, .8, .25, 1);
+    --tdk-mola: cubic-bezier(.34, 1.56, .64, 1);
+    --tdk-vermelho: #b01013;
+    --tdk-vermelho-escuro: #8d0b10;
+    overflow-x: clip;
+}
+
+.container.tdkPerfilRedesign .scrollContent,
+.appShell .container.tdkPerfilRedesign .scrollContent {
+    container: tdkpagina / inline-size;
+    width: 100% !important;
+    max-width: 1360px !important;
+    margin: 0 auto !important;
+    padding: clamp(12px, 2.2vw, 26px) clamp(12px, 2.4vw, 28px) 64px !important;
+}
+
+/* ---------- 1. Grade da página (perfil + localização) ---------- */
+.container.tdkPerfilRedesign .tdkPerfilPaginaGrid {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: clamp(16px, 2vw, 24px) !important;
+    align-items: start !important;
+}
+
+.container.tdkPerfilRedesign .tdkPerfilColunaLateral {
+    position: static !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    flex: none !important;
+}
+
+.container.tdkPerfilRedesign .tdkPerfilColunaLateral .tdkLocalizacaoLateral {
+    display: grid !important;
+    width: 100% !important;
+    max-width: none !important;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "cab" "mapa" "end" "btn";
+    gap: 14px 18px !important;
+    padding: 18px !important;
+}
+
+.tdkLocalizacaoCabecalho { grid-area: cab; }
+.tdkMapaEstatico { grid-area: mapa; }
+.tdkLocalizacaoEndereco { grid-area: end; }
+.tdkLocalizacaoBotao { grid-area: btn; margin-top: 0 !important; }
+
+/* Telas largas: duas colunas, localização fixa ao lado */
+@container tdkpagina (min-width: 960px) {
+    .container.tdkPerfilRedesign .tdkPerfilPaginaGrid {
+        grid-template-columns: minmax(0, 1fr) clamp(280px, 26cqi, 330px) !important;
+    }
+    .container.tdkPerfilRedesign .tdkPerfilColunaLateral {
+        position: sticky !important;
+        top: 16px !important;
+        align-self: start;
+    }
+}
+
+/* Largura média: localização vira um cartão horizontal (mapa | endereço) */
+@container tdkpagina (min-width: 600px) and (max-width: 959px) {
+    .container.tdkPerfilRedesign .tdkPerfilColunaLateral .tdkLocalizacaoLateral {
+        grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+        grid-template-areas: "cab cab" "mapa end" "mapa btn";
+        align-items: start;
+    }
+}
+
+/* ---------- 2. Hero do perfil ---------- */
+.container.tdkPerfilRedesign .topo {
+    container: tdkhero / inline-size;
+    position: relative;
+    min-height: 0 !important;
+    padding: 20px clamp(16px, 3vw, 34px) 28px !important;
+    border-radius: clamp(18px, 2vw, 24px) !important;
+    background:
+        linear-gradient(90deg, #a70d19, #d4303d 55%, #f0b4b9) top / 100% 4px no-repeat,
+        #fff !important;
+}
+
+/* bolhas decorativas flutuando no fundo */
+.container.tdkPerfilRedesign .topo::before,
+.container.tdkPerfilRedesign .topo::after {
+    content: "" !important;
+    display: block !important;
+    position: absolute !important;
+    border-radius: 50% !important;
+    pointer-events: none;
+    filter: none !important;
+    opacity: 1 !important;
+}
+.container.tdkPerfilRedesign .topo::before {
+    width: 420px; height: 420px; top: -230px; right: -120px; left: auto; bottom: auto;
+    border-radius: 50% !important;
+    background: radial-gradient(circle, rgba(211, 19, 37, .15), transparent 66%) !important;
+    animation: tdkDeriva 14s ease-in-out infinite alternate;
+}
+.container.tdkPerfilRedesign .topo::after {
+    width: 360px; height: 360px; left: -150px; bottom: -210px; top: auto; right: auto;
+    background: radial-gradient(circle, rgba(240, 180, 185, .30), transparent 66%) !important;
+    animation: tdkDeriva 18s ease-in-out infinite alternate-reverse;
+}
+
+.container.tdkPerfilRedesign .topo > * { position: relative; z-index: 1; }
+.container.tdkPerfilRedesign .botaoVoltar { margin: 0 0 18px !important; }
+
+.container.tdkPerfilRedesign .topo .perfil { display: block !important; padding: 0 !important; }
+
+/* grade interna: identidade | botão editar / contatos embaixo */
+.container.tdkPerfilRedesign .topo .informacoes:not(.tdkPerfilEmEdicao) {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 22px 28px;
+    align-items: start;
+    width: 100% !important;
+}
+.container.tdkPerfilRedesign .tdkIdentidadePerfil {
+    grid-column: 1;
+    display: flex !important;
+    align-items: center !important;
+    gap: clamp(14px, 3cqi, 32px) !important;
+    min-width: 0;
+}
+.container.tdkPerfilRedesign .tdkEditProfileEntry {
+    position: static !important;
+    grid-column: 2;
+    grid-row: 1;
+    display: flex !important;
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 8px !important;
+    width: auto !important;
+    max-width: 240px;
+    margin: 0 !important;
+}
+.container.tdkPerfilRedesign .tdkEditProfileEntry > span {
+    max-width: none !important;
+    text-align: center;
+    font-size: 12px !important;
+}
+.container.tdkPerfilRedesign .tdkEditProfileOpen {
+    width: 100% !important;
+    min-height: 46px !important;
+    padding: 0 22px !important;
+    font-size: 14px !important;
+}
+.container.tdkPerfilRedesign .tdkPerfilDadosPublicos {
+    grid-column: 1 / -1;
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)) !important;
+    gap: 12px !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+}
+.container.tdkPerfilRedesign .tdkPerfilDado {
+    min-width: 0 !important;
+    min-height: 68px !important;
+    padding: 12px 16px !important;
+}
+.container.tdkPerfilRedesign .tdkEditProfileSuccess { grid-column: 1 / -1; margin: 0; }
+
+/* avatar com anel animado */
+.container.tdkPerfilRedesign .tdkIdentidadePerfil .avatar {
+    position: relative;
+    isolation: isolate;
+    flex: 0 0 clamp(84px, 17cqi, 148px) !important;
+    width: clamp(84px, 17cqi, 148px) !important;
+    height: clamp(84px, 17cqi, 148px) !important;
+    padding: 6px !important;
+    background: #fff !important;
+    border: 3px solid #fff !important;
+    box-shadow: 0 14px 30px rgba(153, 20, 31, .18) !important;
+    transition: transform .4s var(--tdk-mola);
+}
+.container.tdkPerfilRedesign .tdkIdentidadePerfil .avatar::before {
+    content: "";
+    position: absolute;
+    inset: -5px;
+    z-index: -1;
+    border-radius: 50%;
+    background: conic-gradient(#d31325, #f6a5ab, #a30e1a, #f6a5ab, #d31325);
+    animation: tdkGirar 7s linear infinite;
+}
+.container.tdkPerfilRedesign .tdkIdentidadePerfil .avatar:hover { transform: scale(1.05) rotate(-2deg); }
+
+.container.tdkPerfilRedesign .tdkIdentidadeTexto .nomeLoja {
+    font-size: clamp(24px, 5.2cqi, 46px) !important;
+    overflow-wrap: anywhere;
+}
+.container.tdkPerfilRedesign .tdkIdentidadeTexto .categoria {
+    min-height: 0 !important;
+    padding: 6px 14px !important;
+    font-size: clamp(12px, 1.9cqi, 15px) !important;
+}
+
+/* modo edição: avatar menor para caber na coluna */
+.container.tdkPerfilRedesign .informacoes.tdkPerfilEmEdicao {
+    grid-template-columns: 110px minmax(0, 1fr) !important;
+}
+.container.tdkPerfilRedesign .tdkPerfilEmEdicao .tdkIdentidadePerfil .avatar {
+    flex-basis: 96px !important; width: 96px !important; height: 96px !important;
+}
+
+@container tdkhero (max-width: 700px) {
+    .container.tdkPerfilRedesign .topo .informacoes:not(.tdkPerfilEmEdicao) { grid-template-columns: minmax(0, 1fr); }
+    .container.tdkPerfilRedesign .tdkEditProfileEntry { grid-column: 1; grid-row: auto; max-width: none; }
+    .container.tdkPerfilRedesign .informacoes.tdkPerfilEmEdicao { grid-template-columns: minmax(0, 1fr) !important; }
+    .container.tdkPerfilRedesign .tdkPerfilEmEdicao > .tdkIdentidadePerfil { display: none !important; }
+    .container.tdkPerfilRedesign .tdkPerfilEmEdicao > .tdkEdicaoInlineCompacta { grid-column: 1 !important; }
+}
+@container tdkhero (max-width: 520px) {
+    .container.tdkPerfilRedesign .tdkIdentidadePerfil { flex-direction: column; text-align: center; }
+    .container.tdkPerfilRedesign .tdkIdentidadeTexto .linhaNomeFavorito { justify-content: center; }
+    .container.tdkPerfilRedesign .tdkEdicaoCompactaTopo,
+    .container.tdkPerfilRedesign .tdkEdicaoCompactaGrid,
+    .container.tdkPerfilRedesign .tdkEnderecoInlineGrid { grid-template-columns: 1fr !important; }
+}
+
+/* ---------- 3. Abas com rótulo ---------- */
+.container.tdkPerfilRedesign .menuNavegacao { container: tdknav / inline-size; }
+.container.tdkPerfilRedesign .menuNavegacao .iconeMenu { gap: 8px !important; flex-direction: row !important; }
+.container.tdkPerfilRedesign .tdkAbaIcone { font-size: 19px; line-height: 1; transition: transform .3s var(--tdk-mola); }
+.container.tdkPerfilRedesign .iconeMenu:hover .tdkAbaIcone { transform: scale(1.2) rotate(-6deg); }
+.container.tdkPerfilRedesign .tdkAbaRotulo { font-size: 13px; font-weight: 750; white-space: nowrap; }
+@container tdknav (max-width: 440px) {
+    .container.tdkPerfilRedesign .tdkAbaRotulo { display: none; }
+}
+
+/* ---------- 4. Números e grades fluidas ---------- */
+.container.tdkPerfilRedesign .estatisticas .numero { font-size: clamp(20px, 2.4vw, 26px) !important; font-variant-numeric: tabular-nums; }
+
+.container.tdkPerfilRedesign .destaques,
+.container.tdkPerfilRedesign .tdkReviewsPreviewGrade,
+.container.tdkPerfilRedesign .abaPosts,
+.container.tdkPerfilRedesign .arquivadosGrid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)) !important;
+    gap: clamp(12px, 1.6vw, 18px) !important;
+}
+.container.tdkPerfilRedesign .tdkDestaquesPainel,
+.container.tdkPerfilRedesign .tdkPublicacoesPainel,
+.container.tdkPerfilRedesign .tdkArquivadosPainel,
+.container.tdkPerfilRedesign .tdkReviewsPreview,
+.container.tdkPerfilRedesign .abaAvaliacoes { padding: clamp(16px, 2.4vw, 28px) !important; }
+
+/* avaliações: reage à largura do próprio painel */
+.container.tdkPerfilRedesign .abaAvaliacoes { container: tdkaval / inline-size; }
+@container tdkaval (max-width: 620px) {
+    .container.tdkPerfilRedesign .tdkResumoAvaliacoes { grid-template-columns: 1fr !important; }
+    .container.tdkPerfilRedesign .tdkResumoNota { align-items: center; text-align: center; }
+    .container.tdkPerfilRedesign .tdkResumoCards { grid-template-columns: 1fr !important; }
+}
+@container tdkaval (max-width: 520px) {
+    .container.tdkPerfilRedesign .cabecalhoAvaliacoes { flex-direction: column !important; align-items: stretch !important; }
+    .container.tdkPerfilRedesign .tdkAvaliacaoCabecalhoAcoes,
+    .container.tdkPerfilRedesign .cabecalhoAvaliacoes .botaoCriarAvaliacao { width: 100% !important; justify-content: center !important; }
+}
+
+/* ---------- 5. MAPA ESTÁTICO (sem animação) ---------- */
+.container.tdkPerfilRedesign .tdkMapaEstatico {
+    position: relative;
+    width: 100%;
+    height: 205px;
+    overflow: hidden;
+    border: 1px solid #e2e6eb;
+    border-radius: 16px;
+    background: #e9eef4;
+}
+.tdkMapaEstatico svg { display: block; width: 100%; height: 100%; }
+.tdkMapaFundo { fill: #e9eef4; }
+.tdkMapaParque { fill: #cfe8cf; }
+.tdkMapaAgua { fill: #cfe3f0; }
+.tdkMapaRuaSvg { stroke: #fff; }
+.tdkRuaGrossa { stroke-width: 12; }
+.tdkRuaFina { stroke-width: 6; }
+.tdkMapaPontoSvg { fill: #b01013; }
+.tdkMapaPino {
+    position: absolute; left: 50%; top: 50%;
+    width: 46px; height: 46px; margin: -23px 0 0 -23px;
+    display: grid; place-items: center;
+    border-radius: 50%;
+    background: #fff; color: #b01013;
+    border: 1px solid #f1d1d4;
+    box-shadow: 0 8px 18px rgba(176, 16, 19, .22), 0 0 0 8px rgba(176, 16, 19, .09);
+}
+.tdkMapaRotulo {
+    position: absolute; left: 10px; bottom: 10px;
+    display: inline-flex; align-items: center; gap: 6px;
+    max-width: calc(100% - 20px);
+    padding: 7px 11px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, .96);
+    border: 1px solid #ece6e7;
+    color: #9f0d14;
+    font-size: 11px; font-weight: 800;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* ---------- 6. Entradas escalonadas ---------- */
+.container.tdkPerfilRedesign .tdkAbaTransicao .abaRef > div > * { animation: tdkEntrar .6s var(--tdk-ease) both; }
+.container.tdkPerfilRedesign .tdkAbaTransicao .abaRef > div > *:nth-child(2) { animation-delay: .08s; }
+.container.tdkPerfilRedesign .tdkAbaTransicao .abaRef > div > *:nth-child(3) { animation-delay: .16s; }
+
+.container.tdkPerfilRedesign :is(.destaques, .tdkReviewsPreviewGrade, .abaPosts, .arquivadosGrid, .perfilAvaliacoesLista, .visualizarPostFeed, .tdkResumoBarras) > * {
+    animation: tdkEntrar .55s var(--tdk-ease) both;
+}
+.container.tdkPerfilRedesign :is(.destaques, .tdkReviewsPreviewGrade, .abaPosts, .arquivadosGrid, .perfilAvaliacoesLista, .visualizarPostFeed, .tdkResumoBarras) > :nth-child(2) { animation-delay: .07s; }
+.container.tdkPerfilRedesign :is(.destaques, .tdkReviewsPreviewGrade, .abaPosts, .arquivadosGrid, .perfilAvaliacoesLista, .visualizarPostFeed, .tdkResumoBarras) > :nth-child(3) { animation-delay: .14s; }
+.container.tdkPerfilRedesign :is(.destaques, .tdkReviewsPreviewGrade, .abaPosts, .arquivadosGrid, .perfilAvaliacoesLista, .visualizarPostFeed, .tdkResumoBarras) > :nth-child(4) { animation-delay: .21s; }
+.container.tdkPerfilRedesign :is(.destaques, .tdkReviewsPreviewGrade, .abaPosts, .arquivadosGrid, .perfilAvaliacoesLista, .visualizarPostFeed, .tdkResumoBarras) > :nth-child(5) { animation-delay: .28s; }
+.container.tdkPerfilRedesign :is(.destaques, .tdkReviewsPreviewGrade, .abaPosts, .arquivadosGrid, .perfilAvaliacoesLista, .visualizarPostFeed, .tdkResumoBarras) > :nth-child(n+6) { animation-delay: .35s; }
+
+/* barras de avaliação crescem do zero */
+.container.tdkPerfilRedesign .tdkResumoBarraTrilho i { transform-origin: left center; animation: tdkBarra .9s var(--tdk-ease) .25s both; }
+
+/* ---------- 7. Micro-interações ---------- */
+.container.tdkPerfilRedesign :is(.destaques .cardPost, .tdkReviewsPreviewCard, .visualizarPostConteudo, .perfilAvaliacaoNova) {
+    transition: transform .3s var(--tdk-ease), box-shadow .3s var(--tdk-ease), border-color .3s !important;
+}
+.container.tdkPerfilRedesign :is(.destaques .cardPost, .tdkReviewsPreviewCard, .visualizarPostConteudo):hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 16px 34px rgba(60, 20, 26, .11) !important;
+    border-color: #e3bcc0 !important;
+}
+.container.tdkPerfilRedesign .visualizarPostAreaImagem { overflow: hidden; }
+.container.tdkPerfilRedesign .visualizarPostImagem { transition: transform .7s var(--tdk-ease); }
+.container.tdkPerfilRedesign .visualizarPostConteudo:hover .visualizarPostImagem { transform: scale(1.035); }
+
+.container.tdkPerfilRedesign .tdkPerfilDado:hover .tdkPerfilDadoIcone { transform: rotate(-8deg) scale(1.12); }
+.container.tdkPerfilRedesign .tdkPerfilDadoIcone { transition: transform .3s var(--tdk-mola); }
+
+.container.tdkPerfilRedesign :is(button, .tdkLocalizacaoBotao, .tdkPerfilDado):active { transform: scale(.97); }
+
+/* brilho que atravessa os botões principais */
+.container.tdkPerfilRedesign :is(.tdkEditProfileOpen, .perfilCriarPostBotao, .botaoCriarAvaliacao, .tdkLocalizacaoBotao) {
+    position: relative; overflow: hidden;
+}
+.container.tdkPerfilRedesign :is(.tdkEditProfileOpen, .perfilCriarPostBotao, .botaoCriarAvaliacao, .tdkLocalizacaoBotao)::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, .38) 50%, transparent 70%);
+    transform: translateX(-120%);
+    transition: transform .7s var(--tdk-ease);
+}
+.container.tdkPerfilRedesign :is(.tdkEditProfileOpen, .perfilCriarPostBotao, .botaoCriarAvaliacao, .tdkLocalizacaoBotao):hover::after {
+    transform: translateX(120%);
+}
+
+/* coração "pulando" ao curtir/favoritar */
+.container.tdkPerfilRedesign .visualizarPostCurtir[aria-pressed="true"] svg,
+.container.tdkPerfilRedesign .botaoFavoritado svg { animation: tdkCoracao .55s var(--tdk-mola); }
+
+/* ---------- 8. Modais: no celular viram "gaveta" ---------- */
+@media (max-width: 520px) {
+    .modalOverlay { align-items: flex-end; padding: 0; }
+    .modalOverlay .modalAvaliacao {
+        max-width: none; max-height: 92dvh;
+        border-radius: 20px 20px 0 0;
+        animation: tdkSubir .35s var(--tdk-ease);
+    }
+}
+
+/* ---------- 9. Keyframes ---------- */
+@keyframes tdkEntrar { from { opacity: 0; transform: translateY(18px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes tdkGirar { to { transform: rotate(360deg); } }
+@keyframes tdkDeriva { to { transform: translate(-40px, 30px) scale(1.18); } }
+@keyframes tdkBarra { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes tdkCoracao { 0% { transform: scale(.6); } 50% { transform: scale(1.4); } 100% { transform: scale(1); } }
+@keyframes tdkSubir { from { transform: translateY(100%); } to { transform: none; } }
+
+/* ---------- 10. Acessibilidade: respeita "reduzir movimento" ---------- */
+@media (prefers-reduced-motion: reduce) {
+    .container.tdkPerfilRedesign *,
+    .container.tdkPerfilRedesign *::before,
+    .container.tdkPerfilRedesign *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        animation-delay: 0s !important;
+        transition-duration: .01ms !important;
+    }
+}
+
+/* ---------- 11. IMPACTO DO MARCADOR ("Ver no mapa") ----------
+   O overlay é renderizado em document.body (portal), por isso
+   não usa o prefixo .container.tdkPerfilRedesign. */
+.tdkImpacto {
+    position: fixed; inset: 0; z-index: 100000; overflow: hidden;
+    animation: tdkImpactoEntrar .2s ease-out both;
+}
+.tdkImpactoSaindo { animation: tdkImpactoSair .4s ease-in forwards; }
+
+/* a "cena" treme no momento do impacto */
+.tdkImpactoCena { position: absolute; inset: 0; animation: tdkImpactoTremer .55s linear .42s both; }
+.tdkImpactoFundo {
+    position: absolute; inset: -70px;
+    background: radial-gradient(circle at 50% 54%, rgba(150, 10, 20, .62), rgba(22, 6, 9, .86) 72%);
+    backdrop-filter: blur(7px);
+}
+.tdkImpactoPalco { position: absolute; left: 50%; top: 54%; width: 0; height: 0; }
+
+/* clarão */
+.tdkImpactoFlash {
+    position: absolute; left: -60vmax; top: -60vmax; width: 120vmax; height: 120vmax;
+    border-radius: 50%; opacity: 0;
+    background: radial-gradient(circle, rgba(255, 255, 255, .95), rgba(255, 110, 120, .45) 28%, transparent 58%);
+    animation: tdkImpactoFlash .55s ease-out .42s both;
+}
+
+/* ondas de choque no "chão" (elipses) */
+.tdkImpactoOnda {
+    position: absolute; left: -60px; top: -60px; width: 120px; height: 120px;
+    border-radius: 50%; opacity: 0;
+    border: 3px solid rgba(255, 255, 255, .9);
+    animation: tdkImpactoOnda 1s cubic-bezier(.1, .7, .2, 1) .42s both;
+}
+.tdkImpactoOnda + .tdkImpactoOnda { animation-delay: .52s; border-color: rgba(255, 170, 178, .85); }
+.tdkImpactoOnda + .tdkImpactoOnda + .tdkImpactoOnda { animation-delay: .62s; border-color: rgba(255, 255, 255, .6); }
+
+.tdkImpactoCratera {
+    position: absolute; left: -70px; top: -14px; width: 140px; height: 28px;
+    border-radius: 50%; opacity: 0;
+    background: radial-gradient(ellipse, rgba(0, 0, 0, .6), transparent 70%);
+    animation: tdkImpactoCratera .5s ease-out .38s both;
+}
+
+/* estilhaços */
+.tdkImpactoParticula {
+    position: absolute; left: 0; top: 0;
+    width: var(--s); height: var(--s); margin: calc(var(--s) / -2) 0 0 calc(var(--s) / -2);
+    border-radius: 50%; background: #fff; opacity: 0;
+    animation: tdkImpactoParticula .8s cubic-bezier(.1, .8, .3, 1) .42s both;
+}
+.tdkImpactoParticula:nth-child(odd) { background: #ffb3b9; }
+
+/* o marcador: cai, achata no chão e quica */
+.tdkImpactoPino {
+    position: absolute; left: -46px; bottom: -3px; width: 92px; height: 92px;
+    transform-origin: 50% 100%;
+    animation:
+        tdkImpactoQueda .42s cubic-bezier(.55, 0, 1, .55) both,
+        tdkImpactoQuique .75s cubic-bezier(.3, 1.4, .5, 1) .42s forwards;
+}
+.tdkImpactoPino svg {
+    display: block; width: 100%; height: 100%;
+    filter: drop-shadow(0 12px 18px rgba(0, 0, 0, .5)) drop-shadow(0 0 22px rgba(255, 80, 95, .55));
+}
+
+/* cartão com o endereço e barra de progresso */
+.tdkImpactoCartao {
+    position: absolute; left: 50%; top: calc(54% + 58px);
+    display: flex; flex-direction: column; gap: 4px;
+    width: min(86vw, 320px); padding: 14px 20px 16px;
+    border-radius: 16px; background: rgba(255, 255, 255, .97); color: #26303c;
+    box-shadow: 0 18px 44px rgba(0, 0, 0, .35);
+    text-align: center;
+    animation: tdkImpactoCartao .5s cubic-bezier(.34, 1.56, .64, 1) .55s both;
+}
+.tdkImpactoCartao strong { font-size: 15px; font-weight: 800; color: #a30e1a; }
+.tdkImpactoCartao span { font-size: 12px; color: #657386; overflow-wrap: anywhere; }
+.tdkImpactoProgresso {
+    display: block; height: 4px; margin-top: 8px; border-radius: 4px;
+    background: linear-gradient(90deg, #a30e1a, #e0434f) left / 0% 100% no-repeat, #f1e3e5;
+    animation: tdkImpactoProgresso .6s linear .6s forwards;
+}
+
+@keyframes tdkImpactoEntrar { from { opacity: 0; } to { opacity: 1; } }
+@keyframes tdkImpactoSair { to { opacity: 0; } }
+@keyframes tdkImpactoQueda {
+    0% { transform: translateY(-62vh) scale(.75) rotate(-14deg); opacity: 0; }
+    12% { opacity: 1; }
+    100% { transform: translateY(0) scale(1) rotate(0); opacity: 1; }
+}
+@keyframes tdkImpactoQuique {
+    0% { transform: scale(1.3, .68); }
+    30% { transform: translateY(-38px) scale(.94, 1.08); }
+    58% { transform: scale(1.07, .93); }
+    80% { transform: translateY(-6px); }
+    100% { transform: none; }
+}
+@keyframes tdkImpactoTremer {
+    0%, 100% { transform: none; }
+    10% { transform: translate(-10px, 6px) rotate(-.4deg); }
+    25% { transform: translate(9px, -7px) rotate(.3deg); }
+    40% { transform: translate(-6px, 5px); }
+    55% { transform: translate(5px, -3px); }
+    70% { transform: translate(-3px, 2px); }
+    85% { transform: translate(2px, -1px); }
+}
+@keyframes tdkImpactoFlash {
+    0% { opacity: 0; transform: scale(.2); }
+    18% { opacity: 1; }
+    100% { opacity: 0; transform: scale(1); }
+}
+@keyframes tdkImpactoOnda {
+    0% { transform: scale(.2, .09); opacity: 1; }
+    100% { transform: scale(7, 3.2); opacity: 0; }
+}
+@keyframes tdkImpactoCratera {
+    0% { opacity: 0; transform: scale(.4); }
+    40% { opacity: 1; }
+    100% { opacity: .75; transform: scale(1); }
+}
+@keyframes tdkImpactoParticula {
+    0% { opacity: 1; transform: translate(0, 0) scale(1); }
+    100% { opacity: 0; transform: translate(var(--x), var(--y)) scale(.2); }
+}
+@keyframes tdkImpactoCartao {
+    from { opacity: 0; transform: translate(-50%, 22px) scale(.9); }
+    to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+@keyframes tdkImpactoProgresso { to { background-size: 100% 100%; } }
+
+/* =========================================================
+   TaDaKi — Perfil da organização · AJUSTES
+   Importe DEPOIS de Perfil.css e PerfilAnimacoes.css.
+   Cobre: foto com borda girando, Início, Localização e edição.
+   ========================================================= */
+
+.tdkPerfilRedesign {
+    --tdk-ajuste-vermelho: #b01013;
+    --tdk-ajuste-vermelho-escuro: #8e0c10;
+    --tdk-ajuste-rosa: #fdecee;
+    --tdk-ajuste-linha: #ece4e5;
+    --tdk-ajuste-texto: #1d2433;
+    --tdk-ajuste-suave: #6f7685;
+}
+
+/* ---------------------------------------------------------
+   1. FOTO DE PERFIL — somente uma borda girando
+   --------------------------------------------------------- */
+.tdkPerfilRedesign .tdkIdentidadePerfil .avatar.tdkAvatarGiratorio {
+    position: relative !important;
+    flex: 0 0 112px !important;
+    width: 112px !important;
+    height: 112px !important;
+    margin: 0 8px 0 8px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 50% !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    outline: 0 !important;
+    overflow: visible !important;
+    isolation: isolate;
+}
+
+.tdkPerfilRedesign .tdkIdentidadePerfil .avatar.tdkAvatarGiratorio img {
+    position: relative;
+    z-index: 1;
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    background: #fff;
+}
+
+.tdkPerfilRedesign .avatar.tdkAvatarGiratorio::before {
+    content: "";
+    position: absolute;
+    inset: -8px;
+    z-index: 0;
+    border-radius: 50%;
+    background:
+        conic-gradient(from 0deg, rgba(176, 16, 19, 0) 0deg, rgba(176, 16, 19, 0) 150deg, #b01013 300deg, #ff5a60 350deg, rgba(255, 90, 96, 0) 360deg),
+        conic-gradient(#f3d6d8, #f3d6d8);
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 3px));
+    animation: tdkAvatarGiro 3s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes tdkAvatarGiro {
+    to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tdkPerfilRedesign .avatar.tdkAvatarGiratorio::before { animation: none; }
+}
+
+@media (max-width: 760px) {
+    .tdkPerfilRedesign .tdkIdentidadePerfil .avatar.tdkAvatarGiratorio {
+        flex-basis: 84px !important;
+        width: 84px !important;
+        height: 84px !important;
+        margin: 0 6px !important;
+    }
+}
+
+/* Durante a edição o cabeçalho continua igual; só os dados públicos saem. */
+.tdkPerfilRedesign .informacoes.tdkPerfilEditando {
+    display: block !important;
+    position: relative !important;
+    width: 100% !important;
+}
+.tdkPerfilRedesign .informacoes.tdkPerfilEditando > .tdkPerfilDadosPublicos,
+.tdkPerfilRedesign .informacoes.tdkPerfilEditando > .tdkEditProfileEntry {
+    display: none !important;
+}
+
+/* ---------------------------------------------------------
+   2. INÍCIO
+   --------------------------------------------------------- */
+.tdkPerfilRedesign .tdkIni {
+    display: grid;
+    gap: 22px;
+    margin-top: 6px;
+}
+
+/* — estatísticas — */
+.tdkPerfilRedesign .tdkIniStats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+.tdkPerfilRedesign .tdkIniStat {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+    padding: 18px 20px;
+    border: 1px solid var(--tdk-ajuste-linha);
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 6px 20px rgba(60, 20, 24, .05);
+}
+.tdkPerfilRedesign .tdkIniStatIcone {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    background: var(--tdk-ajuste-rosa);
+    color: var(--tdk-ajuste-vermelho);
+}
+.tdkPerfilRedesign .tdkIniStat strong {
+    display: block;
+    font-size: 28px;
+    line-height: 1;
+    font-weight: 850;
+    letter-spacing: -.02em;
+    color: var(--tdk-ajuste-texto);
+}
+.tdkPerfilRedesign .tdkIniStat span:not(.tdkIniStatIcone) {
+    display: block;
+    margin-top: 5px;
+    font-size: 12.5px;
+    color: var(--tdk-ajuste-suave);
+}
+
+/* — seções — */
+.tdkPerfilRedesign .tdkIniSecao {
+    margin: 0;
+    padding: 26px;
+    border: 1px solid var(--tdk-ajuste-linha);
+    border-radius: 22px;
+    background: #fff;
+    box-shadow: 0 8px 26px rgba(60, 20, 24, .05);
+}
+.tdkPerfilRedesign .tdkIniSecaoTopo {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+.tdkPerfilRedesign .tdkIniSecaoTopo h2 {
+    margin: 0;
+    font-size: 20px;
+    line-height: 1.2;
+    font-weight: 850;
+    color: var(--tdk-ajuste-texto);
+}
+.tdkPerfilRedesign .tdkIniSecaoTopo p {
+    margin: 5px 0 0;
+    font-size: 13px;
+    color: var(--tdk-ajuste-suave);
+}
+.tdkPerfilRedesign .tdkIniAcoes {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.tdkPerfilRedesign .tdkIniVerMais {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 38px;
+    padding: 0 16px;
+    border: 1px solid #e8c9cc;
+    border-radius: 999px;
+    background: #fff;
+    color: var(--tdk-ajuste-vermelho);
+    font: 750 12.5px/1 inherit;
+    cursor: pointer;
+    transition: background .2s, border-color .2s, transform .2s;
+}
+.tdkPerfilRedesign .tdkIniVerMais:hover {
+    background: var(--tdk-ajuste-rosa);
+    border-color: var(--tdk-ajuste-vermelho);
+    transform: translateY(-1px);
+}
+
+/* — cartões de publicação — */
+.tdkPerfilRedesign .tdkIniPosts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+}
+.tdkPerfilRedesign .tdkIniPost {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--tdk-ajuste-linha);
+    border-radius: 18px;
+    background: #fff;
+    text-align: left;
+    color: inherit;
+    cursor: pointer;
+    transition: transform .22s, box-shadow .22s, border-color .22s;
+}
+.tdkPerfilRedesign .tdkIniPost:hover,
+.tdkPerfilRedesign .tdkIniPost:focus-visible {
+    transform: translateY(-4px);
+    border-color: #e3b9bd;
+    box-shadow: 0 16px 34px rgba(110, 20, 28, .13);
+    outline: none;
+}
+.tdkPerfilRedesign .tdkIniPostImagem {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    background: #f4eeee;
+    overflow: hidden;
+}
+.tdkPerfilRedesign .tdkIniPostImagem img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform .4s;
+}
+.tdkPerfilRedesign .tdkIniPost:hover .tdkIniPostImagem img { transform: scale(1.05); }
+.tdkPerfilRedesign .tdkIniPostSemImagem {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 6px;
+    color: #b7a9ab;
+    font-size: 12px;
+}
+.tdkPerfilRedesign .tdkIniPostTag {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 5px 11px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .92);
+    color: var(--tdk-ajuste-vermelho);
+    font-size: 11px;
+    font-weight: 800;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .12);
+}
+.tdkPerfilRedesign .tdkIniPostCorpo {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    flex: 1;
+    padding: 16px 18px 18px;
+}
+.tdkPerfilRedesign .tdkIniPostCorpo h3 {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.25;
+    font-weight: 800;
+    color: var(--tdk-ajuste-texto);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.tdkPerfilRedesign .tdkIniPostCorpo p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--tdk-ajuste-suave);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.tdkPerfilRedesign .tdkIniPostLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: auto;
+    padding-top: 8px;
+    font-size: 12.5px;
+    font-weight: 800;
+    color: var(--tdk-ajuste-vermelho);
+}
+
+/* — avaliações — */
+.tdkPerfilRedesign .tdkIniReviews {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+.tdkPerfilRedesign .tdkIniReview {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+    padding: 18px;
+    border: 1px solid #f0dfe1;
+    border-radius: 18px;
+    background: #fffafa;
+    text-align: left;
+    color: inherit;
+    cursor: pointer;
+    transition: transform .2s, box-shadow .2s, border-color .2s;
+}
+.tdkPerfilRedesign .tdkIniReview:hover,
+.tdkPerfilRedesign .tdkIniReview:focus-visible {
+    transform: translateY(-3px);
+    border-color: #e3b9bd;
+    box-shadow: 0 12px 26px rgba(110, 20, 28, .1);
+    outline: none;
+}
+.tdkPerfilRedesign .tdkIniReviewEstrelas {
+    display: flex;
+    gap: 2px;
+    color: #f2a516;
+}
+.tdkPerfilRedesign .tdkIniReview h3 {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.3;
+    font-weight: 800;
+    color: var(--tdk-ajuste-texto);
+    overflow-wrap: anywhere;
+}
+.tdkPerfilRedesign .tdkIniReview p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--tdk-ajuste-suave);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+}
+.tdkPerfilRedesign .tdkIniReviewRodape {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid #f3e6e7;
+    font-size: 12.5px;
+    color: var(--tdk-ajuste-suave);
+}
+.tdkPerfilRedesign .tdkIniReviewAvatar {
+    flex: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #f0dfe1;
+}
+.tdkPerfilRedesign .tdkIniReviewAvatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    border-radius: 50%;
+}
+.tdkPerfilRedesign .tdkIniVazio {
+    display: grid;
+    justify-items: center;
+    gap: 6px;
+    padding: 30px 16px;
+    border: 1px dashed #e3cfd1;
+    border-radius: 16px;
+    background: #fffafa;
+    color: var(--tdk-ajuste-suave);
+    text-align: center;
+}
+.tdkPerfilRedesign .tdkIniVazio strong { color: var(--tdk-ajuste-texto); }
+
+@media (max-width: 980px) {
+    .tdkPerfilRedesign .tdkIniPosts,
+    .tdkPerfilRedesign .tdkIniReviews { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+    .tdkPerfilRedesign .tdkIniStats { grid-template-columns: 1fr; }
+    .tdkPerfilRedesign .tdkIniPosts,
+    .tdkPerfilRedesign .tdkIniReviews { grid-template-columns: 1fr; }
+    .tdkPerfilRedesign .tdkIniSecao { padding: 18px; }
+}
+
+/* ---------------------------------------------------------
+   3. LOCALIZAÇÃO
+   --------------------------------------------------------- */
+.tdkPerfilRedesign .tdkLoc {
+    overflow: hidden;
+    border: 1px solid var(--tdk-ajuste-linha);
+    border-radius: 22px;
+    background: #fff;
+    box-shadow: 0 10px 30px rgba(60, 20, 24, .07);
+}
+.tdkPerfilRedesign .tdkLocMapa {
+    position: relative;
+    height: 190px;
+    background: #eef3f8;
+}
+.tdkPerfilRedesign .tdkLocMapa .tdkMapaEstatico {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+.tdkPerfilRedesign .tdkLocMapa .tdkMapaRotulo { display: none !important; }
+.tdkPerfilRedesign .tdkLocMapa::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 46px;
+    background: linear-gradient(to top, #fff, rgba(255, 255, 255, 0));
+    pointer-events: none;
+}
+.tdkPerfilRedesign .tdkLocCorpo {
+    display: grid;
+    gap: 14px;
+    padding: 4px 22px 22px;
+}
+.tdkPerfilRedesign .tdkLocEtiqueta {
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 11px;
+    border-radius: 999px;
+    background: var(--tdk-ajuste-rosa);
+    color: var(--tdk-ajuste-vermelho);
+    font-size: 11.5px;
+    font-weight: 800;
+}
+.tdkPerfilRedesign .tdkLoc h2 {
+    margin: 0;
+    font-size: 19px;
+    line-height: 1.25;
+    font-weight: 850;
+    color: var(--tdk-ajuste-texto);
+    overflow-wrap: anywhere;
+}
+.tdkPerfilRedesign .tdkLocDetalhes {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    border: 1px solid #f1e6e7;
+    border-radius: 14px;
+    overflow: hidden;
+}
+.tdkPerfilRedesign .tdkLocDetalhes > div {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 14px;
+    font-size: 13px;
+}
+.tdkPerfilRedesign .tdkLocDetalhes > div + div { border-top: 1px solid #f6eced; }
+.tdkPerfilRedesign .tdkLocDetalhes dt { color: var(--tdk-ajuste-suave); }
+.tdkPerfilRedesign .tdkLocDetalhes dd {
+    margin: 0;
+    text-align: right;
+    font-weight: 700;
+    color: var(--tdk-ajuste-texto);
+    overflow-wrap: anywhere;
+}
+.tdkPerfilRedesign .tdkLocAcoes {
+    display: grid;
+    gap: 10px;
+}
+.tdkPerfilRedesign .tdkLoc .tdkLocalizacaoBotao {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 9px !important;
+    width: 100% !important;
+    min-height: 46px !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 14px !important;
+    background: linear-gradient(135deg, #c8141b, #8e0c10) !important;
+    color: #fff !important;
+    font-size: 14px !important;
+    font-weight: 800 !important;
+    text-decoration: none !important;
+    box-shadow: 0 8px 20px rgba(142, 12, 16, .25) !important;
+}
+.tdkPerfilRedesign .tdkLoc .tdkLocalizacaoBotao:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 12px 26px rgba(142, 12, 16, .32) !important;
+}
+.tdkPerfilRedesign .tdkLocCopiar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 42px;
+    border: 1px solid #e8c9cc;
+    border-radius: 14px;
+    background: #fff;
+    color: var(--tdk-ajuste-vermelho);
+    font: 750 13px/1 inherit;
+    cursor: pointer;
+    transition: background .2s, border-color .2s;
+}
+.tdkPerfilRedesign .tdkLocCopiar:hover {
+    background: var(--tdk-ajuste-rosa);
+    border-color: var(--tdk-ajuste-vermelho);
+}
+
+/* ---------------------------------------------------------
+   4. EDIÇÃO DO PERFIL
+   --------------------------------------------------------- */
+.tdkPerfilRedesign .tdkEditor {
+    width: 100%;
+    margin-top: 22px;
+    padding: 26px;
+    border: 1px solid var(--tdk-ajuste-linha);
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 10px 30px rgba(60, 20, 24, .07);
+    color: var(--tdk-ajuste-texto);
+    text-align: left;
+}
+.tdkPerfilRedesign .tdkEditorCab h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 850;
+}
+.tdkPerfilRedesign .tdkEditorCab p {
+    margin: 5px 0 0;
+    font-size: 13px;
+    color: var(--tdk-ajuste-suave);
+}
+.tdkPerfilRedesign .tdkEditorGrupo {
+    margin-top: 22px;
+    padding-top: 20px;
+    border-top: 1px solid #f1e6e7;
+}
+.tdkPerfilRedesign .tdkEditorGrupo > h3 {
+    margin: 0 0 14px;
+    font-size: 11.5px;
+    font-weight: 850;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--tdk-ajuste-vermelho);
+}
+.tdkPerfilRedesign .tdkEditorLinha {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    align-items: start;
+}
+
+.tdkPerfilRedesign .tdkEdCampo {
+    display: grid;
+    gap: 7px;
+    min-width: 0;
+}
+.tdkPerfilRedesign .tdkEdCampoCab {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-height: 26px;
+}
+.tdkPerfilRedesign .tdkEdCampo label,
+.tdkPerfilRedesign .tdkEdNovoEndereco label {
+    font-size: 13px;
+    font-weight: 750;
+    color: #3a4352;
+}
+.tdkPerfilRedesign .tdkEdCampo small {
+    font-size: 11.5px;
+    line-height: 1.4;
+    color: #8a8f9b;
+}
+.tdkPerfilRedesign .tdkEdObrig { color: var(--tdk-ajuste-vermelho); }
+.tdkPerfilRedesign .tdkEdOpc { font-weight: 500; color: #8a8f9b; }
+
+.tdkPerfilRedesign .tdkEditor input,
+.tdkPerfilRedesign .tdkEditor select {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 46px;
+    padding: 10px 13px;
+    border: 1px solid #dfe3ea;
+    border-radius: 12px;
+    background: #fafbfc;
+    color: var(--tdk-ajuste-texto);
+    font: 500 14px/1.3 inherit;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s, background .2s;
+}
+.tdkPerfilRedesign .tdkEditor input:focus,
+.tdkPerfilRedesign .tdkEditor select:focus {
+    border-color: var(--tdk-ajuste-vermelho);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(176, 16, 19, .1);
+}
+.tdkPerfilRedesign .tdkEditor input[readonly] {
+    background: #f3f4f6;
+    color: #667;
+}
+.tdkPerfilRedesign .tdkEditor select:disabled { opacity: .7; }
+
+.tdkPerfilRedesign .tdkEdSomenteLeitura {
+    display: flex;
+    align-items: center;
+    min-height: 46px;
+    padding: 10px 13px;
+    border: 1px dashed #dfd3d4;
+    border-radius: 12px;
+    background: #faf6f6;
+    color: #6b5f61;
+    font-size: 14px;
+    font-weight: 650;
+}
+
+.tdkPerfilRedesign .tdkEdAdd {
+    padding: 4px 11px;
+    border: 1px solid #e8c9cc;
+    border-radius: 999px;
+    background: #fff;
+    color: var(--tdk-ajuste-vermelho);
+    font: 750 12px/1.2 inherit;
+    cursor: pointer;
+    transition: background .2s, border-color .2s;
+}
+.tdkPerfilRedesign .tdkEdAdd:hover {
+    background: var(--tdk-ajuste-rosa);
+    border-color: var(--tdk-ajuste-vermelho);
+}
+
+.tdkPerfilRedesign .tdkEdNovo {
+    display: flex;
+    gap: 8px;
+    margin-top: 2px;
+}
+.tdkPerfilRedesign .tdkEdNovo input { flex: 1; min-width: 0; }
+
+.tdkPerfilRedesign .tdkEdNovoEndereco {
+    display: grid;
+    gap: 10px;
+    margin-top: 8px;
+    padding: 16px;
+    border: 1px dashed #dcc4c7;
+    border-radius: 14px;
+    background: #fffafa;
+}
+.tdkPerfilRedesign .tdkEdNaoSabe {
+    margin: 0;
+    font-size: 12px;
+    color: #7a7f8b;
+}
+.tdkPerfilRedesign .tdkEdNaoSabe button {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--tdk-ajuste-vermelho);
+    font: 700 12px/1 inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+}
+.tdkPerfilRedesign .tdkEdEnderecoGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+.tdkPerfilRedesign .tdkEdEnderecoGrid label {
+    display: grid;
+    gap: 6px;
+    min-width: 0;
+}
+.tdkPerfilRedesign .tdkEdEnderecoGrid .tdkEdLargo { grid-column: 1 / -1; }
+.tdkPerfilRedesign .tdkEdNovoEnderecoAcoes {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.tdkPerfilRedesign .tdkEdBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 20px;
+    border-radius: 12px;
+    font: 800 13.5px/1 inherit;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: transform .2s, background .2s, box-shadow .2s, border-color .2s;
+}
+.tdkPerfilRedesign .tdkEdBtn:disabled { opacity: .6; cursor: not-allowed; }
+.tdkPerfilRedesign .tdkEdBtnPrimario {
+    border: 0;
+    background: linear-gradient(135deg, #c8141b, #8e0c10);
+    color: #fff;
+    box-shadow: 0 8px 18px rgba(142, 12, 16, .22);
+}
+.tdkPerfilRedesign .tdkEdBtnPrimario:not(:disabled):hover { transform: translateY(-1px); }
+.tdkPerfilRedesign .tdkEdBtnNeutro {
+    border: 1px solid #dfe3ea;
+    background: #fff;
+    color: #3a4352;
+}
+.tdkPerfilRedesign .tdkEdBtnNeutro:not(:disabled):hover { background: #f6f7f9; }
+
+.tdkPerfilRedesign .tdkEditorRodape {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid #f1e6e7;
+}
+.tdkPerfilRedesign .tdkEdErro,
+.tdkPerfilRedesign .tdkEdSucesso {
+    margin: 18px 0 0;
+    padding: 11px 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 650;
+}
+.tdkPerfilRedesign .tdkEdErro { background: #fff1f1; color: #a31217; border: 1px solid #f3c7c9; }
+.tdkPerfilRedesign .tdkEdSucesso { background: #effaf3; color: #196a43; border: 1px solid #c5e8d3; }
+
+@media (max-width: 760px) {
+    .tdkPerfilRedesign .tdkEditor { padding: 18px; }
+    .tdkPerfilRedesign .tdkEditorLinha,
+    .tdkPerfilRedesign .tdkEdEnderecoGrid { grid-template-columns: 1fr; }
+    .tdkPerfilRedesign .tdkEditorRodape { flex-direction: column-reverse; }
+    .tdkPerfilRedesign .tdkEditorRodape .tdkEdBtn { width: 100%; }
+}
+
