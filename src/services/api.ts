@@ -46,7 +46,7 @@ export async function apiFetch<T = any>(
   let response = await request();
   if (
     response.status === 401 &&
-    !/^\/auth\/(login|refresh|logout)\/?(?:\?.*)?$/.test(path)
+    !/^\/auth\/(login|google|refresh|logout)\/?(?:\?.*)?$/.test(path)
   ) {
     const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
     // A API aceita o refresh token no cookie httpOnly ou no corpo.
@@ -98,4 +98,12 @@ export async function apiFetch<T = any>(
 }
 export async function cadastrarPessoa(dados: any) {
   return apiFetch("/pessoas", { method: "POST", body: JSON.stringify(dados) });
+}
+export async function loginComGoogle(credential: string) {
+  const data = await apiFetch<any>("/auth/google", {
+    method: "POST",
+    body: JSON.stringify({ token: credential }),
+  });
+  saveAuthTokens(data.token_acesso, data.refresh_token);
+  return data;
 }

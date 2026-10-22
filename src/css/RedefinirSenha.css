@@ -7,7 +7,11 @@
 section.recovery-page,
 .recovery-page input,
 .recovery-page button {
-  font-family: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  font-family:
+    "Plus Jakarta Sans",
+    system-ui,
+    -apple-system,
+    sans-serif;
 }
 
 /* ---------- PÁGINA: fundo vinho ---------- */
@@ -27,7 +31,11 @@ section.recovery-page {
   gap: clamp(48px, 7vw, 110px);
 
   background:
-    radial-gradient(circle at 15% 10%, rgba(255, 255, 255, 0.08), transparent 40%),
+    radial-gradient(
+      circle at 15% 10%,
+      rgba(255, 255, 255, 0.08),
+      transparent 40%
+    ),
     linear-gradient(145deg, #a3121d 0%, #79090e 55%, #4e060a 100%);
 }
 
@@ -109,7 +117,8 @@ section.recovery-page {
     0 14px 28px rgba(25, 0, 3, 0.16),
     0 40px 80px rgba(25, 0, 3, 0.34);
 
-  transform: perspective(1100px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transform: perspective(1100px) rotateX(var(--rx, 0deg))
+    rotateY(var(--ry, 0deg));
   transition: transform 0.18s ease-out;
   /* "backwards" e não "both": senão a animação de entrada trava o transform do tilt */
   animation: recoveryReveal 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
@@ -133,15 +142,23 @@ section.recovery-page {
 
   border: 2px solid rgba(255, 255, 255, 0.55);
   border-radius: 50%;
-  background: radial-gradient(circle, transparent 62%, rgba(255, 255, 255, 0.07) 100%);
+  background: radial-gradient(
+    circle,
+    transparent 62%,
+    rgba(255, 255, 255, 0.07) 100%
+  );
   opacity: 0;
   pointer-events: none;
   will-change: transform, opacity;
   animation: recoveryRadar 14s linear infinite;
 }
 
-.recovery-page .recovery-card::before { animation-delay: -9.3s; }
-.recovery-page .recovery-card::after  { animation-delay: -4.6s; }
+.recovery-page .recovery-card::before {
+  animation-delay: -9.3s;
+}
+.recovery-page .recovery-card::after {
+  animation-delay: -4.6s;
+}
 
 /* ---------- LOGO E TÍTULO ---------- */
 .recovery-page .recovery-logo-container {
@@ -228,7 +245,10 @@ section.recovery-page {
   font-size: 15px;
   font-weight: 500;
 
-  transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+  transition:
+    border-color 0.25s ease,
+    background 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
 .recovery-page .recovery-card input::placeholder {
@@ -290,7 +310,9 @@ section.recovery-page {
 
 .recovery-page .recovery-password-toggle:hover,
 .recovery-page .recovery-input-container:focus-within .recovery-input-icon,
-.recovery-page .recovery-input-container:focus-within .recovery-password-toggle {
+.recovery-page
+  .recovery-input-container:focus-within
+  .recovery-password-toggle {
   color: #c82029;
 }
 
@@ -356,13 +378,20 @@ section.recovery-page {
   position: absolute;
   inset: 0 auto 0 -60%;
   width: 40%;
-  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  background: linear-gradient(
+    100deg,
+    transparent,
+    rgba(255, 255, 255, 0.45),
+    transparent
+  );
   transform: skewX(-20deg);
   transition: left 0.7s ease;
   pointer-events: none;
 }
 
-.recovery-page .recovery-card button[type="submit"]:hover:not(:disabled)::before,
+.recovery-page
+  .recovery-card
+  button[type="submit"]:hover:not(:disabled)::before,
 .recovery-page .recovery-button:hover:not(:disabled)::before {
   left: 130%;
 }
@@ -393,7 +422,10 @@ section.recovery-page {
   padding: 5px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.22);
-  transition: transform 0.3s ease, background 0.25s ease, color 0.25s ease;
+  transition:
+    transform 0.3s ease,
+    background 0.25s ease,
+    color 0.25s ease;
 }
 
 .recovery-page .recovery-button:hover:not(:disabled) svg {
@@ -436,7 +468,12 @@ section.recovery-page {
   align-items: center;
   border-radius: 50%;
 
-  background: radial-gradient(circle at 32% 26%, #ffffff 0%, #eef1f6 55%, #cfd6e2 100%);
+  background: radial-gradient(
+    circle at 32% 26%,
+    #ffffff 0%,
+    #eef1f6 55%,
+    #cfd6e2 100%
+  );
   color: #9e101b;
   box-shadow:
     inset 0 2px 3px #fff,
@@ -482,47 +519,100 @@ section.recovery-page {
   animation-delay: -3.5s;
 }
 
-.recovery-page .recovery-marker.mk-two::after   { animation-delay: 1s; }
-.recovery-page .recovery-marker.mk-three::after { animation-delay: 2s; }
+.recovery-page .recovery-marker.mk-two::after {
+  animation-delay: 1s;
+}
+.recovery-page .recovery-marker.mk-three::after {
+  animation-delay: 2s;
+}
 
-.recovery-page .recovery-marker:hover { scale: 1.2; }
-.recovery-page .recovery-marker:hover::after { animation-duration: 1.2s; }
-.recovery-page .recovery-marker:hover svg { animation: recoveryWiggle 0.6s ease; }
-.recovery-page .recovery-marker:active { scale: 0.88; }
+.recovery-page .recovery-marker:hover {
+  scale: 1.2;
+}
+.recovery-page .recovery-marker:hover::after {
+  animation-duration: 1.2s;
+}
+.recovery-page .recovery-marker:hover svg {
+  animation: recoveryWiggle 0.6s ease;
+}
+.recovery-page .recovery-marker:active {
+  scale: 0.88;
+}
 
 /* ---------- ANIMAÇÕES ---------- */
 @keyframes recoveryReveal {
-  from { opacity: 0; transform: translate(24px, 10px); }
-  to   { opacity: 1; transform: translate(0, 0); }
+  from {
+    opacity: 0;
+    transform: translate(24px, 10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
 }
 
 @keyframes recoveryTextReveal {
-  from { opacity: 0; transform: translateX(-18px); }
-  to   { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(-18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @keyframes recoveryRadar {
-  0%   { transform: scale(0.7); opacity: 0; }
-  12%  { opacity: 1; }
-  100% { transform: scale(2.6); opacity: 0; }
+  0% {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
 }
 
 @keyframes recoveryFloat {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-8px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
 }
 
 @keyframes recoveryPulse {
-  0%   { transform: scale(1); opacity: 0.8; }
-  100% { transform: scale(1.9); opacity: 0; }
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
 }
 
 @keyframes recoveryWiggle {
-  0%   { transform: rotate(0); }
-  25%  { transform: rotate(-16deg) scale(1.1); }
-  55%  { transform: rotate(12deg) scale(1.1); }
-  80%  { transform: rotate(-6deg); }
-  100% { transform: rotate(0); }
+  0% {
+    transform: rotate(0);
+  }
+  25% {
+    transform: rotate(-16deg) scale(1.1);
+  }
+  55% {
+    transform: rotate(12deg) scale(1.1);
+  }
+  80% {
+    transform: rotate(-6deg);
+  }
+  100% {
+    transform: rotate(0);
+  }
 }
 
 /* ---------- CELULAR ---------- */
@@ -586,8 +676,12 @@ section.recovery-page {
 .recovery-page .recovery-card::after {
   animation: recoveryRadar 14s linear infinite !important;
 }
-.recovery-page .recovery-card::before { animation-delay: -9.3s !important; }
-.recovery-page .recovery-card::after  { animation-delay: -4.6s !important; }
+.recovery-page .recovery-card::before {
+  animation-delay: -9.3s !important;
+}
+.recovery-page .recovery-card::after {
+  animation-delay: -4.6s !important;
+}
 
 .recovery-page .recovery-card {
   animation: recoveryReveal 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) backwards !important;
@@ -602,25 +696,44 @@ section.recovery-page {
   animation: recoveryFloat 5s ease-in-out infinite !important;
   transition: scale 0.3s cubic-bezier(0.3, 1.5, 0.5, 1) !important;
 }
-.recovery-page .recovery-marker.mk-one   { animation-delay: 0s !important; }
-.recovery-page .recovery-marker.mk-two   { animation-delay: -2s !important; }
-.recovery-page .recovery-marker.mk-three { animation-delay: -3.5s !important; }
+.recovery-page .recovery-marker.mk-one {
+  animation-delay: 0s !important;
+}
+.recovery-page .recovery-marker.mk-two {
+  animation-delay: -2s !important;
+}
+.recovery-page .recovery-marker.mk-three {
+  animation-delay: -3.5s !important;
+}
 
 .recovery-page .recovery-marker::after {
   animation: recoveryPulse 3.2s ease-out infinite !important;
 }
-.recovery-page .recovery-marker.mk-two::after   { animation-delay: 1s !important; }
-.recovery-page .recovery-marker.mk-three::after { animation-delay: 2s !important; }
-.recovery-page .recovery-marker:hover::after    { animation-duration: 1.2s !important; }
-.recovery-page .recovery-marker:hover svg       { animation: recoveryWiggle 0.6s ease !important; }
+.recovery-page .recovery-marker.mk-two::after {
+  animation-delay: 1s !important;
+}
+.recovery-page .recovery-marker.mk-three::after {
+  animation-delay: 2s !important;
+}
+.recovery-page .recovery-marker:hover::after {
+  animation-duration: 1.2s !important;
+}
+.recovery-page .recovery-marker:hover svg {
+  animation: recoveryWiggle 0.6s ease !important;
+}
 
 .recovery-page .recovery-card button[type="submit"],
 .recovery-page .recovery-button {
-  transition: transform 0.3s cubic-bezier(0.3, 1.4, 0.5, 1), box-shadow 0.25s ease !important;
+  transition:
+    transform 0.3s cubic-bezier(0.3, 1.4, 0.5, 1),
+    box-shadow 0.25s ease !important;
 }
 
 .recovery-page .recovery-card input {
-  transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease !important;
+  transition:
+    border-color 0.25s ease,
+    background 0.25s ease,
+    box-shadow 0.25s ease !important;
 }
 
 /* ---------- ONDAS DE RADAR (saem do centro do card, ficam fixas) ---------- */
@@ -639,11 +752,134 @@ section.recovery-page {
   margin: -260px 0 0 -260px;
   border: 2px solid rgba(255, 255, 255, 0.55);
   border-radius: 50%;
-  background: radial-gradient(circle, transparent 62%, rgba(255, 255, 255, 0.07) 100%);
+  background: radial-gradient(
+    circle,
+    transparent 62%,
+    rgba(255, 255, 255, 0.07) 100%
+  );
   opacity: 0;
   will-change: transform, opacity;
   animation: recoveryRadar 14s linear infinite !important;
 }
 
-.recovery-page .recovery-radar span:nth-child(2) { animation-delay: -9.3s !important; }
-.recovery-page .recovery-radar span:nth-child(3) { animation-delay: -4.6s !important; }
+.recovery-page .recovery-radar span:nth-child(2) {
+  animation-delay: -9.3s !important;
+}
+.recovery-page .recovery-radar span:nth-child(3) {
+  animation-delay: -4.6s !important;
+}
+
+/* =========================================
+   CORREÇÃO DOS CAMPOS DE REDEFINIR SENHA
+========================================= */
+
+/* Grupos dos campos: Nova senha e Confirmar senha */
+.recovery-page .recovery-card .recovery-form-group,
+.recovery-page .recovery-card .reset-form-group {
+  width: 100%;
+  min-width: 0;
+  margin: 0 0 16px;
+}
+
+/* Rótulos alinhados à esquerda do input */
+.recovery-page .recovery-card .recovery-form-group label,
+.recovery-page .recovery-card .reset-form-group label {
+  display: block;
+  margin: 0 0 6px 0;
+  padding: 0;
+  text-align: left;
+  line-height: 1.3;
+}
+
+/* Contêiner que mantém os ícones dentro do input */
+.recovery-page .recovery-card .reset-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+/* Campos de senha */
+.recovery-page .recovery-card .reset-input {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: 50px;
+  padding: 0 46px;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  outline: none;
+
+  background: #f1f4f9;
+  color: #232b36;
+  font-size: 15px;
+}
+
+/* Cadeado dentro do campo, à esquerda */
+.recovery-page .recovery-card .reset-input-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 18px;
+  height: 18px;
+  color: #64748b;
+
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Olho dentro do campo, à direita */
+.recovery-page .recovery-card .reset-password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 28px;
+  height: 28px;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  box-shadow: none;
+
+  color: #64748b;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.recovery-page .recovery-card .reset-password-toggle svg {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+}
+
+.recovery-page .recovery-card .reset-password-toggle:hover {
+  background: rgba(100, 116, 139, 0.08);
+  color: #c82029;
+  transform: translateY(-50%);
+}
+
+/* Mantém o foco do input */
+.recovery-page .recovery-card .reset-input:focus {
+  border-color: #c82029;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(200, 32, 41, 0.1);
+}
+
+/* Espaçamento consistente entre os campos */
+.recovery-page .recovery-card .reset-form-group:last-of-type {
+  margin-bottom: 16px;
+}

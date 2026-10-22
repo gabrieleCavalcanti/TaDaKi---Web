@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import { useNavigate, Navigate, Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { GoogleLogin, type CredentialResponse } from "@react-oauth/google";
+import { loginComGoogle } from "../services/api";
 
 import logo from "../assets/Logo.png";
 
@@ -59,6 +61,24 @@ export const Login: React.FC = () => {
     }
   };
 
+  const handleGoogleSuccess = async (res: CredentialResponse) => {
+    if (!res.credential) return;
+
+    setErrorMessage(null);
+    setLoadingSubmit(true);
+
+    try {
+      await loginComGoogle(res.credential);
+
+      // Recarrega a página inicial para o AuthProvider ler a sessão nova
+      window.location.href = "/";
+    } catch (error) {
+      console.error("ERRO LOGIN GOOGLE:", error);
+      setErrorMessage("Não foi possível entrar com o Google. Tente novamente.");
+      setLoadingSubmit(false);
+    }
+  };
+
   const handleTilt = (e: React.MouseEvent<HTMLDivElement>) => {
     const el = cardRef.current;
     if (!el) return;
@@ -79,9 +99,8 @@ export const Login: React.FC = () => {
     el.style.setProperty("--rx", "0deg");
   };
 
-
   return (
-<section className="login-page">
+    <section className="login-page">
       {/* TEXTO + MARCADORES */}
       <div className="login-red-background">
         <div className="login-store-icon">
@@ -223,6 +242,18 @@ export const Login: React.FC = () => {
             <div className="login-divider-line" />
           </div>
 
+          {/* BOTÃO GOOGLE */}
+          <div className="login-google"
+          >
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => setErrorMessage("Falha no login com Google.")}
+              text="continue_with"
+              shape="pill"
+              size="large"
+              width="280"
+            />
+          </div>
           <div className="login-register">
             <span className="login-register-text">Não tem uma conta?</span>
 
