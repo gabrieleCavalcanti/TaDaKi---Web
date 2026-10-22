@@ -1,29 +1,66 @@
 import React, { useEffect, useState } from "react";
 
 import {
-  Star,
   User,
   Pencil,
   Heart,
+  Star,
+  Bookmark,
   Calendar,
-  AtSign,
+  Mail,
   Save,
   X,
   Plus,
+  Camera,
+  Search,
+  ChevronRight,
 } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
 
 import { apiFetch, getImageUrl } from "../services/api";
 
+import { AvatarBoneco, AVATARES } from "./AvataresPerfil";
+
+import { AppShell } from "../components/AppShell";
+
 import "../css/PerfilPessoal.css";
 
-const VERMELHO = "#8E0808";
+const VERMELHO = "#C1121F";
+
+// Quantos favoritos aparecem por vez (o resto fica atrás de "Ver mais").
+const LIMITE_FAVORITOS = 6;
+
+// O avatar escolhido é salvo no campo `imagem` como "avatar:<id>" (ex.: "avatar:urso").
+const PREFIXO_AVATAR = "avatar:";
+
+function obterAvatarId(imagem?: string) {
+  if (!imagem || !imagem.startsWith(PREFIXO_AVATAR)) return null;
+
+  const id = imagem.slice(PREFIXO_AVATAR.length);
+
+  return AVATARES.some((avatar) => avatar.id === id) ? id : null;
+}
+
+function fundoDoAvatar(id: string) {
+  return AVATARES.find((avatar) => avatar.id === id)?.fundo;
+}
+
+// Compara textos sem acento e sem diferença de maiúscula/minúscula.
+function normalizar(valor?: string) {
+  return String(valor ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
 
 interface Usuario {
   id_pessoa_login?: number;
 
   id_pessoa?: number;
+
+  id_cliente?: number;
 
   nome?: string;
 
@@ -46,6 +83,7 @@ interface Favorito {
   id_organizacao: number;
   nome?: string;
   username?: string;
+  area?: string;
   imagem?: string;
   id_pessoa?: number;
 }
@@ -73,6 +111,8 @@ export default function PerfilPessoal() {
   const [favoritosAbertos, setFavoritosAbertos] = useState(false);
   const [listaFavoritos, setListaFavoritos] = useState<Favorito[]>([]);
   const [carregandoFavoritos, setCarregandoFavoritos] = useState(false);
+  const [buscaFavoritos, setBuscaFavoritos] = useState("");
+  const [limiteFavoritos, setLimiteFavoritos] = useState(LIMITE_FAVORITOS);
 
   const [likes, setLikes] = useState(0);
 
@@ -99,6 +139,10 @@ export default function PerfilPessoal() {
   const [alterandoPrincipal, setAlterandoPrincipal] = useState(false);
 
   const [excluindoEmail, setExcluindoEmail] = useState<number | null>(null);
+
+  const [seletorAvatarAberto, setSeletorAvatarAberto] = useState(false);
+
+  const [salvandoAvatar, setSalvandoAvatar] = useState(false);
 
   useEffect(() => {
     carregarUsuario();
@@ -183,6 +227,8 @@ export default function PerfilPessoal() {
       };
 
       setUsuario(usuarioCarregado);
+      console.log("dadosLogin", dadosLogin);
+console.log("pessoa", pessoa);
 
       setNome(usuarioCarregado.nome || "");
 
@@ -207,87 +253,119 @@ export default function PerfilPessoal() {
     }
   }
 
-  async function carregarFavoritos(usuarioAtual: Usuario | null = usuario) {
-    const idCliente = Number(
-      usuarioAtual?.id_pessoa_login ?? usuarioAtual?.id_pessoa,
+async function carregarFavoritos(usuarioAtual: Usuario | null = usuario) {
+  const idCliente = Number(usuarioAtual?.id_cliente);
+
+  if (!idCliente) {
+    setListaFavoritos([]);
+    setFavoritos(0);
+    return;
+  }
+
+  try {
+    setCarregandoFavoritos(true);
+
+    const respostaFavoritos = await apiFetch<any>(
+      `/Favoritos?id_cliente=${idCliente}`,
     );
 
-    if (!idCliente) {
+    const todos: Favorito[] =
+      [
+        respostaFavoritos?.favoritos,
+        respostaFavoritos?.resultadoSelecionaTodos,
+      ].find((valor) => Array.isArray(valor)) ?? [];
+
+    // Mantém o filtro no front enquanto o backend ignorar o id_cliente
+    const vistos = new Set<number>();
+    const favoritosRecebidos = todos.filter((fav) => {
+      if (Number(fav.id_cliente) !== idCliente) return false;
+      const org = Number(fav.id_organizacao);
+      if (vistos.has(org)) return false;
+      vistos.add(org);
+      return true;
+    });
+
+    setFavoritos(favoritosRecebidos.length);
+
+    if (favoritosRecebidos.length === 0) {
       setListaFavoritos([]);
-      setFavoritos(0);
       return;
     }
 
+    const respostaOrganizacoes = await apiFetch<any>(
+      "/pessoas?tipo=ORGANIZACAO",
+    );
+
+    const organizacoes: any[] =
+      [
+        respostaOrganizacoes?.funcionarios,
+        respostaOrganizacoes?.organizacoes,
+        respostaOrganizacoes?.pessoas,
+        respostaOrganizacoes?.pessoaId,
+        respostaOrganizacoes,
+      ].find((valor) => Array.isArray(valor)) ?? [];
+
+    let areasPorId = new Map<number, string>();
+
     try {
-      setCarregandoFavoritos(true);
+      const respostaAreas = await apiFetch<any>("/AreaAtuacao");
 
-      const respostaFavoritos = await apiFetch<any>(
-        `/Favoritos?id_cliente=${idCliente}`,
+      const listaAreas: any[] =
+        [
+          respostaAreas?.resultadoSelecionaTodos,
+          respostaAreas?.areas,
+          respostaAreas?.dados,
+          respostaAreas?.data,
+          respostaAreas,
+        ].find((valor) => Array.isArray(valor)) ?? [];
+
+      areasPorId = new Map(
+        listaAreas.map((area: any): [number, string] => [
+          Number(area.id_area_atuacao),
+          String(area.descricao ?? ""),
+        ]),
       );
-
-      const favoritosRecebidos: Favorito[] = Array.isArray(
-        respostaFavoritos?.favoritos,
-      )
-        ? respostaFavoritos.favoritos
-        : Array.isArray(respostaFavoritos?.resultadoSelecionaTodos)
-          ? respostaFavoritos.resultadoSelecionaTodos
-          : [];
-
-      // Atualiza a quantidade assim que a API retornar.
-      setFavoritos(favoritosRecebidos.length);
-
-      if (favoritosRecebidos.length === 0) {
-        setListaFavoritos([]);
-        return;
-      }
-
-      const respostaOrganizacoes = await apiFetch<any>(
-        "/pessoas?tipo=ORGANIZACAO",
-      );
-
-      const organizacoes = Array.isArray(respostaOrganizacoes?.funcionarios)
-        ? respostaOrganizacoes.funcionarios
-        : Array.isArray(respostaOrganizacoes?.pessoas)
-          ? respostaOrganizacoes.pessoas
-          : Array.isArray(respostaOrganizacoes)
-            ? respostaOrganizacoes
-            : [];
-
-      const favoritosComDados: Favorito[] = favoritosRecebidos.map(
-        (favorito) => {
-          const organizacao = organizacoes.find(
-            (item: any) =>
-              Number(item.id_organizacao) === Number(favorito.id_organizacao) ||
-              Number(item.id_pessoa) === Number(favorito.id_organizacao) ||
-              Number(item.id_pessoa_login) === Number(favorito.id_organizacao),
-          );
-
-          return {
-            ...favorito,
-            nome:
-              organizacao?.nome ||
-              organizacao?.username ||
-              `Organização #${favorito.id_organizacao}`,
-            username: organizacao?.username || "",
-            imagem: organizacao?.imagem || "",
-            id_pessoa: organizacao?.id_pessoa,
-          };
-        },
-      );
-
-      setListaFavoritos(favoritosComDados);
     } catch (error) {
-      console.error("Erro ao carregar favoritos:", error);
-    } finally {
-      setCarregandoFavoritos(false);
+      console.error("Erro ao carregar áreas de atuação:", error);
     }
-  } 
+
+    const favoritosComDados: Favorito[] = favoritosRecebidos.map((favorito) => {
+      const organizacao = organizacoes.find(
+        (item: any) =>
+          Number(item.id_organizacao) === Number(favorito.id_organizacao) ||
+          Number(item.id_pessoa) === Number(favorito.id_organizacao) ||
+          Number(item.id_pessoa_login) === Number(favorito.id_organizacao),
+      );
+
+      return {
+        ...favorito,
+        nome:
+          organizacao?.nome ||
+          organizacao?.username ||
+          `Organização #${favorito.id_organizacao}`,
+        username: organizacao?.username || "",
+        area: areasPorId.get(Number(organizacao?.id_area_atuacao)) || "",
+        imagem: organizacao?.imagem || "",
+        id_pessoa: organizacao?.id_pessoa,
+      };
+    });
+
+    setListaFavoritos(favoritosComDados);
+  } catch (error) {
+    console.error("Erro ao carregar favoritos:", error);
+  } finally {
+    setCarregandoFavoritos(false);
+  }
+}
 
   async function alternarFavoritos() {
     const abrir = !favoritosAbertos;
     setFavoritosAbertos(abrir);
 
     if (abrir) {
+      setBuscaFavoritos("");
+      setLimiteFavoritos(LIMITE_FAVORITOS);
+
       await carregarFavoritos();
     }
   }
@@ -298,6 +376,27 @@ export default function PerfilPessoal() {
     const partes = data.split("T")[0].split("-");
 
     if (partes.length === 3) {
+      const meses = [
+        "janeiro",
+        "fevereiro",
+        "março",
+        "abril",
+        "maio",
+        "junho",
+        "julho",
+        "agosto",
+        "setembro",
+        "outubro",
+        "novembro",
+        "dezembro",
+      ];
+
+      const mes = meses[Number(partes[1]) - 1];
+
+      if (mes) {
+        return `${Number(partes[2])} de ${mes} de ${partes[0]}`;
+      }
+
       return `${partes[2]}/${partes[1]}/${partes[0]}`;
     }
 
@@ -540,294 +639,422 @@ export default function PerfilPessoal() {
     }
   }
 
+  async function escolherAvatar(idAvatar: string) {
+    if (!usuario?.id_pessoa) {
+      alert("Não foi possível identificar a pessoa.");
+
+      return;
+    }
+
+    const imagem = `${PREFIXO_AVATAR}${idAvatar}`;
+
+    try {
+      setSalvandoAvatar(true);
+
+      await apiFetch<any>(`/pessoas?id=${usuario.id_pessoa}`, {
+        method: "PATCH",
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({ imagem }),
+      });
+
+      setUsuario((anterior) => (anterior ? { ...anterior, imagem } : anterior));
+
+      setSeletorAvatarAberto(false);
+    } catch (error) {
+      console.error("Erro ao salvar avatar:", error);
+
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível salvar o avatar.",
+      );
+    } finally {
+      setSalvandoAvatar(false);
+    }
+  }
+
+  const avatarAtual = obterAvatarId(usuario?.imagem);
+
+  // Busca nos favoritos por nome ou área de atuação
+  const termoBuscaFavoritos = normalizar(buscaFavoritos);
+
+  const favoritosFiltrados = termoBuscaFavoritos
+    ? listaFavoritos.filter(
+        (favorito) =>
+          normalizar(favorito.nome).includes(termoBuscaFavoritos) ||
+          normalizar(favorito.area).includes(termoBuscaFavoritos),
+      )
+    : listaFavoritos;
+
+  const favoritosVisiveis = favoritosFiltrados.slice(0, limiteFavoritos);
+
+  const favoritosRestantes = favoritosFiltrados.length - favoritosVisiveis.length;
+
+  const atividades = [
+    {
+      chave: "likes",
+      classe: "metricaLikes",
+      titulo: "Curtidos",
+      descricao: "Publicações que você curtiu",
+      total: likes,
+      Icone: Heart,
+      aoClicar: () => navigate("/likes"),
+    },
+    {
+      chave: "favoritos",
+      classe: "metricaFavoritos",
+      titulo: "Favoritos",
+      descricao: "Negócios salvos para visitar",
+      total: favoritos,
+      Icone: Bookmark,
+      aoClicar: alternarFavoritos,
+    },
+    {
+      chave: "avaliacoes",
+      classe: "metricaAvaliacoes",
+      titulo: "Avaliações",
+      descricao: "Opiniões que você compartilhou",
+      total: avaliacoes,
+      Icone: Star,
+      aoClicar: () => navigate("/avaliacoes-cliente"),
+    },
+  ];
+
   if (loading) {
     return (
-      <div className="perfilPessoalLoading">
-        <div className="spinner" />
+      <AppShell ativo="perfil">
+        <div className="perfilPessoalLoading">
+          <div className="spinner" />
 
-        <span>Carregando perfil...</span>
-      </div>
+          <span>Carregando perfil...</span>
+        </div>
+      </AppShell>
     );
   }
 
   return (
+    <AppShell ativo="perfil">
     <div className="perfilPessoal">
       <div className="perfilPessoalConteudo">
+        <h1 className="tituloPagina">Meu perfil</h1>
 
-        <section className="cardPerfilPessoal">
-          <div className="detalheVermelho" />
+        <p className="subtituloPagina">
+          Gerencie suas informações e acompanhe suas atividades no TaDaKi.
+        </p>
 
-          <div className="topoPerfilPessoal">
-            <div className="avatarPessoal">
-              {usuario?.imagem ? (
+        {/* Cartão azul: foto, nome e botão de editar */}
+
+        <section className="topoPerfilPessoal">
+          <div className="avatarWrapper">
+            <div
+              className="avatarPessoal"
+              style={avatarAtual ? { background: fundoDoAvatar(avatarAtual) } : undefined}
+            >
+              {avatarAtual ? (
+                <AvatarBoneco id={avatarAtual} size={92} />
+              ) : usuario?.imagem ? (
                 <img src={getImageUrl(usuario.imagem)} alt="Foto de perfil" />
               ) : (
-                <User size={55} color="#fff" />
+                <User size={44} color="#fff" />
               )}
             </div>
 
-            <div className="nomePerfilPessoal">
-              {editando ? (
-                <>
-                  <label htmlFor="nomePerfil">Nome completo</label>
+            <button
+              type="button"
+              className="botaoCameraAvatar"
+              aria-label="Escolher avatar"
+              aria-expanded={seletorAvatarAberto}
+              onClick={() => setSeletorAvatarAberto((aberto) => !aberto)}
+            >
+              <Camera size={13} />
+            </button>
+          </div>
 
-                  <input
-                    id="nomePerfil"
-                    type="text"
-                    value={nome}
-                    onChange={(e) => setNome(e.target.value)}
-                    placeholder="Digite seu nome"
-                    maxLength={100}
-                  />
-
-                  <label htmlFor="usernamePerfil">Nome de usuário</label>
-
-                  <input
-                    id="usernamePerfil"
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    placeholder="Digite seu nome de usuário"
-                    maxLength={50}
-                  />
-                </>
-              ) : (
-                <>
-                  <h1>{usuario?.nome || usuario?.username || "Usuário"}</h1>
-
-                  <span>@{usuario?.username || "usuario"}</span>
-                </>
-              )}
-            </div>
-
+          <div className="nomePerfilPessoal">
             {editando ? (
-              <div className="botoesEdicaoPessoal">
-                <button
-                  type="button"
-                  className="botaoEditarPessoal"
-                  onClick={salvarEdicao}
-                  disabled={salvando}
-                >
-                  <Save size={20} />
+              <>
+                <label htmlFor="nomePerfil">Nome completo</label>
 
-                  {salvando ? "Salvando..." : "Salvar"}
-                </button>
+                <input
+                  id="nomePerfil"
+                  type="text"
+                  value={nome}
+                  onChange={(e) => setNome(e.target.value)}
+                  placeholder="Digite seu nome"
+                  maxLength={100}
+                />
 
-                <button
-                  type="button"
-                  className="botaoCancelarEdicao"
-                  onClick={cancelarEdicao}
-                  disabled={salvando}
-                >
-                  <X size={20} />
-                  Cancelar
-                </button>
-              </div>
+                <label htmlFor="usernamePerfil">Nome de usuário</label>
+
+                <input
+                  id="usernamePerfil"
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Digite seu nome de usuário"
+                  maxLength={50}
+                />
+              </>
             ) : (
-              <button
-                type="button"
-                className="botaoEditarPessoal"
-                onClick={iniciarEdicao}
-              >
-                <Pencil size={20} />
-                Editar perfil
-              </button>
+              <>
+                <h2>{usuario?.nome || usuario?.username || "Usuário"}</h2>
+
+                <span>@{usuario?.username || "usuario"}</span>
+              </>
             )}
           </div>
 
-          <div className="informacoesPessoais">
-            <h2>Informações pessoais</h2>
+          {editando ? (
+            <div className="botoesEdicaoPessoal">
+              <button
+                type="button"
+                className="botaoEditarPessoal botaoSalvarPessoal"
+                onClick={salvarEdicao}
+                disabled={salvando}
+              >
+                <Save size={16} />
 
-            <div className="informacoesGrid">
-              <div className="informacaoItem">
-                <div className="iconeInformacao">
-                  <Calendar size={22} color={VERMELHO} />
-                </div>
+                {salvando ? "Salvando..." : "Salvar"}
+              </button>
 
-                <div>
-                  <span>Data de nascimento</span>
+              <button
+                type="button"
+                className="botaoCancelarEdicao"
+                onClick={cancelarEdicao}
+                disabled={salvando}
+              >
+                <X size={16} />
+                Cancelar
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              className="botaoEditarPessoal"
+              onClick={iniciarEdicao}
+            >
+              <Pencil size={15} />
+              Editar perfil
+            </button>
+          )}
+        </section>
 
-                  {editando ? (
-                    <input
-                      type="date"
-                      value={dataNascimento}
-                      onChange={(e) => setDataNascimento(e.target.value)}
-                    />
-                  ) : (
-                    <strong>{formatarData(usuario?.data_nascimento)}</strong>
-                  )}
-                </div>
+        {/* Escolha de avatar */}
+
+        {seletorAvatarAberto && (
+          <section className="seletorAvatar" aria-label="Escolha seu avatar">
+            <div className="cabecalhoSeletorAvatar">
+              <div>
+                <h2>Escolha seu avatar</h2>
+                <span>Ele aparece no seu perfil</span>
               </div>
 
-              <div className="informacaoItem informacaoEmails">
-                <div className="iconeInformacao">
-                  <AtSign size={22} color={VERMELHO} />
-                </div>
+              <button
+                type="button"
+                onClick={() => setSeletorAvatarAberto(false)}
+                aria-label="Fechar escolha de avatar"
+              >
+                <X size={18} />
+              </button>
+            </div>
 
-                <div className="conteudoEmails">
-                  <span>E-mail principal</span>
+            <div className="gradeAvatares">
+              {AVATARES.map((avatar) => (
+                <button
+                  key={avatar.id}
+                  type="button"
+                  className={`opcaoAvatar ${
+                    avatarAtual === avatar.id ? "opcaoAvatarAtiva" : ""
+                  }`}
+                  aria-pressed={avatarAtual === avatar.id}
+                  disabled={salvandoAvatar}
+                  onClick={() => escolherAvatar(avatar.id)}
+                >
+                  <span
+                    className="opcaoAvatarImagem"
+                    style={{ background: avatar.fundo }}
+                  >
+                    <AvatarBoneco id={avatar.id} size={92} />
+                  </span>
 
-                  <strong className="emailPrincipal">
-                    {usuario?.email || "Não informado"}
-                  </strong>
+                  <span className="opcaoAvatarNome">{avatar.nome}</span>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
 
-                  {editando && (
-                    <>
-                      <div className="listaEmails">
-                        {contatos.map((contato) => {
-                          const principal =
-                            Number(contato.principal) === 1 ||
-                            contato.principal === true;
+        {/* Informações pessoais */}
 
-                          return (
-                            <div className="itemEmail" key={contato.id_contato}>
-                              <label className="selecaoEmail">
-                                <input
-                                  type="radio"
-                                  name="emailPrincipal"
-                                  checked={principal}
-                                  disabled={alterandoPrincipal}
-                                  onChange={() => {
-                                    if (contato.id_contato) {
-                                      definirEmailPrincipal(contato.id_contato);
-                                    }
-                                  }}
-                                />
+        <section className="informacoesPessoais">
+          <h2>Informações pessoais</h2>
 
-                                <span>{contato.email}</span>
-                              </label>
+          <div className="informacoesLista">
+            <div className="informacaoItem">
+              <div className="iconeInformacao">
+                <Calendar size={20} />
+              </div>
 
-                              <button
-                                type="button"
-                                className="botaoExcluirEmail"
-                                title="Excluir e-mail"
-                                disabled={
-                                  principal ||
-                                  excluindoEmail === contato.id_contato
-                                }
-                                onClick={() => {
+              <div className="textoInformacao">
+                <span>Data de nascimento</span>
+
+                {editando ? (
+                  <input
+                    type="date"
+                    value={dataNascimento}
+                    onChange={(e) => setDataNascimento(e.target.value)}
+                  />
+                ) : (
+                  <strong>{formatarData(usuario?.data_nascimento)}</strong>
+                )}
+              </div>
+            </div>
+
+            <div className="informacaoItem informacaoEmails">
+              <div className="iconeInformacao">
+                <Mail size={20} />
+              </div>
+
+              <div className="textoInformacao conteudoEmails">
+                <span>E-mail</span>
+
+                <strong className="emailPrincipal">
+                  {usuario?.email || "Não informado"}
+                </strong>
+
+                {editando && (
+                  <>
+                    <div className="listaEmails">
+                      {contatos.map((contato) => {
+                        const principal =
+                          Number(contato.principal) === 1 ||
+                          contato.principal === true;
+
+                        return (
+                          <div className="itemEmail" key={contato.id_contato}>
+                            <label className="selecaoEmail">
+                              <input
+                                type="radio"
+                                name="emailPrincipal"
+                                checked={principal}
+                                disabled={alterandoPrincipal}
+                                onChange={() => {
                                   if (contato.id_contato) {
-                                    excluirEmail(contato.id_contato);
+                                    definirEmailPrincipal(contato.id_contato);
                                   }
                                 }}
-                              >
-                                <X size={16} />
-                              </button>
-                            </div>
-                          );
-                        })}
-                      </div>
+                              />
 
-                      {adicionandoEmail ? (
-                        <div className="formAdicionarEmail">
-                          <input
-                            type="email"
-                            value={novoEmail}
-                            onChange={(e) => setNovoEmail(e.target.value)}
-                            placeholder="Digite o novo e-mail"
-                            maxLength={254}
-                          />
+                              <span>{contato.email}</span>
+                            </label>
 
-                          <button
-                            type="button"
-                            onClick={adicionarEmail}
-                            disabled={salvandoEmail}
-                          >
-                            {salvandoEmail ? "Salvando..." : "Adicionar"}
-                          </button>
+                            <button
+                              type="button"
+                              className="botaoExcluirEmail"
+                              title="Excluir e-mail"
+                              disabled={
+                                principal ||
+                                excluindoEmail === contato.id_contato
+                              }
+                              onClick={() => {
+                                if (contato.id_contato) {
+                                  excluirEmail(contato.id_contato);
+                                }
+                              }}
+                            >
+                              <X size={16} />
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
 
-                          <button
-                            type="button"
-                            className="botaoCancelarEmail"
-                            onClick={() => {
-                              setAdicionandoEmail(false);
+                    {adicionandoEmail ? (
+                      <div className="formAdicionarEmail">
+                        <input
+                          type="email"
+                          value={novoEmail}
+                          onChange={(e) => setNovoEmail(e.target.value)}
+                          placeholder="Digite o novo e-mail"
+                          maxLength={254}
+                        />
 
-                              setNovoEmail("");
-                            }}
-                            disabled={salvandoEmail}
-                          >
-                            Cancelar
-                          </button>
-                        </div>
-                      ) : (
                         <button
                           type="button"
-                          className="botaoAdicionarEmail"
-                          onClick={() => setAdicionandoEmail(true)}
+                          onClick={adicionarEmail}
+                          disabled={salvandoEmail}
                         >
-                          <Plus size={14} />
-                          Adicionar e-mail
+                          {salvandoEmail ? "Salvando..." : "Adicionar"}
                         </button>
-                      )}
-                    </>
-                  )}
-                </div>
+
+                        <button
+                          type="button"
+                          className="botaoCancelarEmail"
+                          onClick={() => {
+                            setAdicionandoEmail(false);
+
+                            setNovoEmail("");
+                          }}
+                          disabled={salvandoEmail}
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        className="botaoAdicionarEmail"
+                        onClick={() => setAdicionandoEmail(true)}
+                      >
+                        <Plus size={14} />
+                        Adicionar e-mail
+                      </button>
+                    )}
+                  </>
+                )}
               </div>
             </div>
           </div>
         </section>
 
-        <section className="secaoMetricas">
-          <div className="tituloMetricas">
-            <h2>Minha atividade</h2>
+        {/* Sua atividade */}
 
-            <span>Acesse suas atividades</span>
-          </div>
+        <section className="secaoMetricas">
+          <h2 className="tituloMetricas">Sua atividade</h2>
 
           <div className="metricasPessoal">
-            <button
-              type="button"
-              className="metricaCard metricaLikes"
-              onClick={() => navigate("/likes")}
-            >
-              <div className="iconeMetrica">
-                <Heart size={27} color={VERMELHO} fill={VERMELHO} />
-              </div>
+            {atividades.map(
+              ({ chave, classe, titulo, descricao, total, Icone, aoClicar }) => (
+                <button
+                  key={chave}
+                  type="button"
+                  className={`metricaCard ${classe}`}
+                  onClick={aoClicar}
+                >
+                  <div className="iconeMetrica">
+                    <Icone size={30} color={VERMELHO} strokeWidth={1.8} />
+                  </div>
 
-              <div className="textoMetrica">
-                <strong>{likes}</strong>
+                  <div className="textoMetrica">
+                    <strong>
+                      {titulo}
 
-                <span>Curtidas</span>
-              </div>
+                      {total > 0 && (
+                        <em className="contadorMetrica">{total}</em>
+                      )}
+                    </strong>
 
-              <span className="setaMetrica">→</span>
-            </button>
+                    <span>{descricao}</span>
+                  </div>
 
-            <button
-              type="button"
-              className="metricaCard metricaFavoritos"
-              onClick={alternarFavoritos}
-            >
-              <div className="iconeMetrica">
-                <Star size={27} color="#6685A8" fill="#6685A8" />
-              </div>
-
-              <div className="textoMetrica">
-                <strong>{favoritos}</strong>
-
-                <span>Favoritos</span>
-              </div>
-
-              <span className="setaMetrica">→</span>
-            </button>
-
-            <button
-              type="button"
-              className="metricaCard metricaAvaliacoes"
-              onClick={() => navigate("/avaliacoes-cliente")}
-            >
-              <div className="iconeMetrica">
-                <User size={27} color="#666" />
-              </div>
-
-              <div className="textoMetrica">
-                <strong>{avaliacoes}</strong>
-
-                <span>Avaliações</span>
-              </div>
-
-              <span className="setaMetrica">→</span>
-            </button>
+                  <ChevronRight className="setaMetrica" size={18} />
+                </button>
+              ),
+            )}
           </div>
         </section>
 
@@ -854,41 +1081,122 @@ export default function PerfilPessoal() {
                 Você ainda não adicionou organizações aos favoritos.
               </p>
             ) : (
-              <div className="gradeFavoritos">
-                {listaFavoritos.map((favorito) => (
-                  <button
-                    type="button"
-                    className="itemFavoritoPerfil"
-                    key={favorito.id_favorito}
-                    onClick={() => {
-                      if (favorito.id_pessoa) {
-                        navigate(`/perfil/${favorito.id_pessoa}`);
-                      }
+              <>
+                <label className="buscaFavoritos">
+                  <Search size={18} />
+
+                  <input
+                    type="search"
+                    value={buscaFavoritos}
+                    onChange={(e) => {
+                      setBuscaFavoritos(e.target.value);
+
+                      setLimiteFavoritos(LIMITE_FAVORITOS);
                     }}
-                  >
-                    {favorito.imagem ? (
-                      <img
-                        className="imagemFavoritoPerfil"
-                        src={getImageUrl(favorito.imagem)}
-                        alt={favorito.nome || "Organização"}
-                      />
-                    ) : (
-                      <div className="imagemFavoritoPerfil imagemFavoritoVazia">
-                        <User size={26} />
-                      </div>
+                    placeholder="Buscar por nome ou área de atuação"
+                    aria-label="Buscar nos favoritos por nome ou área de atuação"
+                  />
+
+                  {buscaFavoritos && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setBuscaFavoritos("");
+
+                        setLimiteFavoritos(LIMITE_FAVORITOS);
+                      }}
+                      aria-label="Limpar busca"
+                    >
+                      <X size={16} />
+                    </button>
+                  )}
+                </label>
+
+                {termoBuscaFavoritos && favoritosFiltrados.length > 0 && (
+                  <p className="resultadoFavoritos" role="status">
+                    {favoritosFiltrados.length}{" "}
+                    {favoritosFiltrados.length === 1
+                      ? "favorito encontrado"
+                      : "favoritos encontrados"}
+                  </p>
+                )}
+
+                {favoritosFiltrados.length === 0 ? (
+                  <p className="mensagemFavoritos">
+                    Nenhum favorito encontrado para essa busca.
+                  </p>
+                ) : (
+                  <>
+                    <div className="gradeFavoritos">
+                      {favoritosVisiveis.map((favorito) => (
+                        <button
+                          type="button"
+                          className="itemFavoritoPerfil"
+                          key={favorito.id_favorito}
+                          onClick={() => {
+                            if (favorito.id_pessoa) {
+                              navigate(`/perfil/${favorito.id_pessoa}`);
+                            }
+                          }}
+                        >
+                          {obterAvatarId(favorito.imagem) ? (
+                            <span
+                              className="imagemFavoritoPerfil imagemFavoritoAvatar"
+                              style={{
+                                background: fundoDoAvatar(
+                                  obterAvatarId(favorito.imagem) as string,
+                                ),
+                              }}
+                            >
+                              <AvatarBoneco
+                                id={obterAvatarId(favorito.imagem) as string}
+                                size={44}
+                              />
+                            </span>
+                          ) : favorito.imagem ? (
+                            <img
+                              className="imagemFavoritoPerfil"
+                              src={getImageUrl(favorito.imagem)}
+                              alt={favorito.nome || "Organização"}
+                            />
+                          ) : (
+                            <div className="imagemFavoritoPerfil imagemFavoritoVazia">
+                              <User size={26} />
+                            </div>
+                          )}
+                          <span className="dadosFavoritoPerfil">
+                            <strong>{favorito.nome}</strong>
+
+                            {favorito.area ? (
+                              <small>{favorito.area}</small>
+                            ) : favorito.username ? (
+                              <small>@{favorito.username}</small>
+                            ) : null}
+                          </span>
+                          <Star size={18} color={VERMELHO} fill={VERMELHO} />
+                        </button>
+                      ))}
+                    </div>
+
+                    {favoritosRestantes > 0 && (
+                      <button
+                        type="button"
+                        className="maisFavoritos"
+                        onClick={() =>
+                          setLimiteFavoritos((limite) => limite + LIMITE_FAVORITOS)
+                        }
+                      >
+                        Ver mais favoritos ({favoritosRestantes})
+                      </button>
                     )}
-                    <span className="dadosFavoritoPerfil">
-                      <strong>{favorito.nome}</strong>
-                      {favorito.username && <small>@{favorito.username}</small>}
-                    </span>
-                    <Heart size={18} color={VERMELHO} fill={VERMELHO} />
-                  </button>
-                ))}
-              </div>
+                  </>
+                )}
+              </>
             )}
           </section>
         )}
       </div>
     </div>
+    </AppShell>
   );
 }

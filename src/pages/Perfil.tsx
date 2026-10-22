@@ -1,20 +1,17 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-import { Heart, User, ArrowLeft, ImageOff, Store, Archive, MoreVertical, Star, RefreshCw, Inbox, Plus, ImagePlus, X, Search } from "lucide-react";
+import { Heart, ArrowLeft, ArrowRight, ImageOff, Store, Archive, MoreVertical, Star, RefreshCw, Inbox, Plus, ImagePlus, X, Search, MapPin, ExternalLink, FileText, MessageCircle, Copy, Check, ChevronDown, Mail, Phone, AlertCircle, CheckCircle2 } from "lucide-react";
 
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 import { useAuth } from "../hooks/useAuth";
+import { AppShell } from "../components/AppShell";
 
 import {
-
     buscarAvaliacoesPorOrganizacao,
-
     calcularMediaAvaliacoes,
-
     criarAvaliacao as criarAvaliacaoApi,
-
 } from "../pages/Avaliacao";
 
 import type { IAvaliacao } from "../pages/Avaliacao";
@@ -45,81 +42,60 @@ async function apiFetchResponse(endpoint: string, options: RequestInit = {}): Pr
 import "../css/Feed.css";
 import "../css/VisualizarPost.css";
 import "../css/Perfil.css";
+import "../css/PerfilAnimacoes.css";
+import "../css/PerfilOrganizacaoAjustes.css";
 import { CreatePostModal } from "../components/feed/CreatePostModal";
 import type { Category } from "../components/feed/model";
+
+//TIRAR ESSAS DUAS IMAGENS
+import casinhaPerfil from "../assets/foto_perfil_padrao.png";
+import userPerfil from "../assets/user.png";
 
 const NA = "N/A";
 
 interface IPessoa {
-
     id_pessoa?: number;
-
     id_organizacao?: number;
-
     id_cliente?: number;
-
     nome?: string;
-
     tipo?: string;
     email?: string;
     telefone?: string;
-
 }
 
 interface IOrganizacao extends IPessoa {
-
     cpf?: string;
-
     cnpj?: string;
     email?: string;
     telefone?: string;
-
     data_criacao?: string;
-
     id_area_atuacao?: number;
-
 }
 
 interface ICliente {
-
     id_cliente?: number;
-
     id_pessoa?: number;
-
     data_nascimento?: string;
-
 }
 
 interface IPost {
-
     id_post?: number;
-
     vincularImagem?: string;
-
     titulo?: string;
-
     descricao?: string;
-
     id_categoria?: number;
-
     status?: string;
-
     id_organizacao?: number;
-
 }
 
 type Aba = "inicio" | "arquivados" | "posts" | "avaliacoes";
 
 interface ILoadingProps {
-
     texto: string;
-
 }
 
 interface ISemPostsProps {
-
     grande?: boolean;
-
 }
 
 interface IPostCardProps {
@@ -128,105 +104,94 @@ interface IPostCardProps {
 }
 
 interface IInfoLinhaProps {
-
     icon?: string;
-
     texto: string;
-
 }
 
 interface IEstatisticaProps {
-
     numero: string;
-
     texto: string;
-
+    icone?: React.ReactNode;
 }
 
 function Loading({ texto }: ILoadingProps) {
-
     return (
-
         <div className="carregando">
-
             <div className="spinner" />
-
             <span className="carregandoTexto">{texto}</span>
-
         </div>
-
     );
-
 }
 
 function SemPosts({ grande = false }: ISemPostsProps) {
-
     return (
-
         <div className={grande ? "semPostsGrande" : "semPosts"}>
-
             <span className="semPostsTexto">
-
                 Nenhum post publicado.
-
             </span>
-
         </div>
-
     );
-
 }
 
 function InfoLinha({ icon = "", texto }: IInfoLinhaProps) {
-
     return (
-
         <div className="infoLinha">
-
             <span>{icon}</span>
-
             <span className="infoTexto">{texto}</span>
-
         </div>
-
     );
-
 }
 
-function Estatistica({ numero, texto }: IEstatisticaProps) {
+function useContador(alvo: number, casas: number, duracao = 900) {
+    const [valor, setValor] = useState(0);
+
+    useEffect(() => {
+        const reduzir = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+        if (reduzir) { setValor(alvo); return; }
+
+        let raf = 0;
+        const inicio = performance.now();
+        const passo = (agora: number) => {
+            const progresso = Math.min((agora - inicio) / duracao, 1);
+            setValor(alvo * (1 - Math.pow(1 - progresso, 3))); // easing suave no final
+            if (progresso < 1) raf = requestAnimationFrame(passo);
+        };
+        raf = requestAnimationFrame(passo);
+        return () => cancelAnimationFrame(raf);
+    }, [alvo, duracao]);
+
+    return valor.toLocaleString("pt-BR", {
+        minimumFractionDigits: casas,
+        maximumFractionDigits: casas,
+    });
+}
+
+function Estatistica({ numero, texto, icone }: IEstatisticaProps) {
+    const alvo = Number(numero.replace(",", "."));
+    const animavel = Number.isFinite(alvo);
+    const casas = numero.includes(",") ? numero.split(",")[1].length : 0;
+    const animado = useContador(animavel ? alvo : 0, casas);
 
     return (
-
-        <div className="estatistica">
-
-            <span className="numero">{numero}</span>
-
-            <span className="label">{texto}</span>
-
+        <div className="tdkIniStat">
+            <span className="tdkIniStatIcone" aria-hidden="true">{icone}</span>
+            <div>
+                <strong>{animavel ? animado : numero}</strong>
+                <span>{texto}</span>
+            </div>
         </div>
-
     );
-
 }
 
 function obterUrlImagem(nome?: string): string {
-
     if (!nome) return "";
-
     if (/^https?:\/\//i.test(nome)) {
-
         return nome;
-
     }
-
     const nomeArquivo = nome.replace(/\\/g, "/").split("/").pop();
-
     return nomeArquivo
-
         ? `${BASE_URL}/images/${nomeArquivo}`
-
         : "";
-
 }
 
 function PostCard({
@@ -240,36 +205,27 @@ function PostCard({
     useEffect(() => { setImagemFalhou(false); }, [imagem]);
 
     return (
-
-        <button
-
-            type="button"
-
-            className="cardPost"
-
-            onClick={onAbrirPosts}
-
-        >
-
-            <div className="tdkDestaqueImagem">
-                {imagem && !imagemFalhou ? <img src={imagem} alt={post.titulo ? `Imagem da publicação ${post.titulo}` : "Imagem da publicação"} loading="lazy" onError={() => setImagemFalhou(true)} /> : <div className="tdkDestaqueSemImagem"><ImageOff size={24} /><span>Publicação</span></div>}
+        <button type="button" className="tdkIniPost" onClick={onAbrirPosts}>
+            <div className="tdkIniPostImagem">
+                {imagem && !imagemFalhou ? (
+                    <img
+                        src={imagem}
+                        alt={post.titulo ? `Imagem da publicação ${post.titulo}` : "Imagem da publicação"}
+                        loading="lazy"
+                        onError={() => setImagemFalhou(true)}
+                    />
+                ) : (
+                    <div className="tdkIniPostSemImagem"><ImageOff size={26} /><span>Sem imagem</span></div>
+                )}
+                <span className="tdkIniPostTag">Publicação</span>
             </div>
-            <div className="tdkDestaqueTextoTopo">
-                <span className="tdkDestaqueMarcador">Publicação</span>
-                <span className="tdkDestaqueSeta" aria-hidden="true">↗</span>
-            </div>
-            <h3 className="tdkDestaqueTitulo">{post.titulo || NA}</h3>
-            <p className="tdkDestaqueDescricao">
-                {post.descricao?.trim() || "Clique para visualizar esta publicação."}
-            </p>
-            <div className="tdkDestaqueRodape">
-                <Store size={16} aria-hidden="true" />
-                <span>Ver publicação completa</span>
+            <div className="tdkIniPostCorpo">
+                <h3>{post.titulo || NA}</h3>
+                <p>{post.descricao?.trim() || "Clique para visualizar esta publicação."}</p>
+                <span className="tdkIniPostLink">Ver publicação <ArrowRight size={15} aria-hidden="true" /></span>
             </div>
         </button>
-
     );
-
 }
 
 interface ConfirmarPublicacaoProps {
@@ -312,16 +268,388 @@ function ConfirmarPublicacao({ acao, titulo, ocupado, aoCancelar, aoConfirmar }:
 }
 
 type ContatoPerfil = { id_contato: number; email: string | null; telefone: string | null; principal?: number };
-type EnderecoPerfil = { principal?: number; id_endereco: number; rua: string; numero: string; bairro: string; municipio: string; cep: string; uf: string };
-const chaveEnderecoPreferido = (pessoaId: number) => `tadaki:endereco-preferido:${pessoaId}`;
+type EnderecoPerfil = { principal?: number; id_endereco: number; rua: string; numero: string; bairro: string; municipio: string; cep: string; uf: string; complemento?: string | null };
+
+type OndaMapa = { id: number; x: number; y: number };
+
+
+function MapaRealEndereco({ endereco }: { endereco: EnderecoPerfil }) {
+    const rua = `${endereco.rua}, ${endereco.numero}`;
+
+    return (
+        <div className="tdkMapaEstatico" role="img" aria-label={`Mapa ilustrativo de ${rua}`}>
+            <svg viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice" focusable="false" aria-hidden="true">
+                <rect width="300" height="200" className="tdkMapaFundo" />
+                <rect x="196" y="18" width="78" height="58" rx="29" className="tdkMapaParque" />
+                <rect x="22" y="138" width="56" height="42" rx="10" className="tdkMapaAgua" />
+                <g fill="none" strokeLinecap="round">
+                    <path className="tdkMapaRuaSvg tdkRuaGrossa" d="M-10 60H310" />
+                    <path className="tdkMapaRuaSvg tdkRuaGrossa" d="M-10 134L310 122" />
+                    <path className="tdkMapaRuaSvg tdkRuaGrossa" d="M82 -10V210" />
+                    <path className="tdkMapaRuaSvg tdkRuaFina" d="M222 -10L214 210" />
+                    <path className="tdkMapaRuaSvg tdkRuaFina" d="M-10 96L310 84" />
+                </g>
+                <circle cx="48" cy="34" r="4.5" className="tdkMapaPontoSvg" />
+                <circle cx="256" cy="150" r="4.5" className="tdkMapaPontoSvg" />
+                <circle cx="156" cy="28" r="4.5" className="tdkMapaPontoSvg" />
+            </svg>
+
+            <span className="tdkMapaPino" aria-hidden="true">
+                <MapPin size={24} fill="currentColor" strokeWidth={2} />
+            </span>
+            <span className="tdkMapaRotulo" aria-hidden="true">
+                <MapPin size={13} strokeWidth={2.4} />
+                {rua}
+            </span>
+        </div>
+    );
+}
+// Tempo da animação antes de abrir o mapa (ajuste à vontade)
+const ANTES_DE_ABRIR_MS = 1600;
+
+// Estilhaços do impacto: posições calculadas uma vez só
+const PARTICULAS_IMPACTO = Array.from({ length: 14 }, (_, i) => {
+    const angulo = ((i * 360) / 14 + (i % 2 ? 9 : -9)) * (Math.PI / 180);
+    const distancia = 90 + (i % 3) * 46;
+    return {
+        x: Math.round(Math.cos(angulo) * distancia),
+        y: Math.round(Math.sin(angulo) * distancia * 0.55 - 34),
+        tamanho: 6 + (i % 4) * 3,
+    };
+});
+
+const ESTILO_BOTAO_MAPA: React.CSSProperties = {
+    boxSizing: "border-box", display: "flex", alignItems: "center", justifyContent: "center",
+    gap: 9, width: "100%", minHeight: 46, margin: 0, border: 0, borderRadius: 14,
+    background: "linear-gradient(135deg, #c8141b, #8e0c10)", color: "#fff",
+    fontSize: 14, fontWeight: 800, textDecoration: "none", cursor: "pointer",
+    boxShadow: "0 8px 20px rgba(142, 12, 16, .25)",
+};
+
+const ESTILO_BOTAO_COPIAR: React.CSSProperties = {
+    boxSizing: "border-box", display: "flex", alignItems: "center", justifyContent: "center",
+    gap: 8, width: "100%", minHeight: 42, margin: 0, border: "1px solid #e8c9cc", borderRadius: 14,
+    background: "#fff", color: "#b01013", fontSize: 13, fontWeight: 750, cursor: "pointer",
+};
+
+function BotaoVerNoMapa({ url, rotulo }: { url: string; rotulo: string }) {
+    const [fase, setFase] = useState<"off" | "on" | "out">("off");
+    const timers = useRef<number[]>([]);
+    const visivel = fase !== "off";
+
+    useEffect(() => () => timers.current.forEach(t => window.clearTimeout(t)), []);
+
+    // trava a rolagem da página enquanto a animação está na tela
+    useEffect(() => {
+        if (!visivel) return;
+        const anterior = document.body.style.overflow;
+        document.body.style.overflow = "hidden";
+        return () => { document.body.style.overflow = anterior; };
+    }, [visivel]);
+
+    function aoClicar(evento: React.MouseEvent<HTMLAnchorElement>) {
+        // Ctrl/Cmd/Shift + clique e clique do meio: comportamento normal do link
+        if (evento.button !== 0 || evento.metaKey || evento.ctrlKey || evento.shiftKey || evento.altKey) return;
+        // Quem pediu "reduzir movimento" no sistema vai direto para o mapa
+        if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+
+        evento.preventDefault();
+        if (visivel) return;
+
+        setFase("on");
+        timers.current.push(
+            window.setTimeout(() => {
+                const aba = window.open(url, "_blank");
+                if (aba) aba.opener = null;     // equivale ao noopener
+                else window.location.assign(url); // pop-up bloqueado: abre na mesma aba
+            }, ANTES_DE_ABRIR_MS),
+            window.setTimeout(() => setFase("out"), ANTES_DE_ABRIR_MS + 350),
+            window.setTimeout(() => setFase("off"), ANTES_DE_ABRIR_MS + 800),
+        );
+    }
+
+    return (
+        <>
+            <a
+                className="tdkLocBotaoMapa"
+                style={ESTILO_BOTAO_MAPA}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={aoClicar}
+            >
+                <MapPin size={17} strokeWidth={2.3} />
+                <span>Ver no mapa</span>
+                <ExternalLink size={15} strokeWidth={2.2} />
+            </a>
+
+            {visivel && createPortal(
+                <div className={`tdkImpacto${fase === "out" ? " tdkImpactoSaindo" : ""}`} role="status" aria-live="polite">
+                    <div className="tdkImpactoCena" aria-hidden="true">
+                        <div className="tdkImpactoFundo" />
+                        <div className="tdkImpactoPalco">
+                            <span className="tdkImpactoFlash" />
+                            <span className="tdkImpactoOnda" />
+                            <span className="tdkImpactoOnda" />
+                            <span className="tdkImpactoOnda" />
+                            <span className="tdkImpactoCratera" />
+                            {PARTICULAS_IMPACTO.map((p, i) => (
+                                <span
+                                    key={i}
+                                    className="tdkImpactoParticula"
+                                    style={{ "--x": `${p.x}px`, "--y": `${p.y}px`, "--s": `${p.tamanho}px` } as React.CSSProperties}
+                                />
+                            ))}
+                            <span className="tdkImpactoPino">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M12 22s8-6.2 8-12a8 8 0 1 0-16 0c0 5.8 8 12 8 12z" fill="#e11d2e" stroke="#fff" strokeWidth="1.4" strokeLinejoin="round" />
+                                    <circle cx="12" cy="10" r="3.2" fill="#fff" />
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className="tdkImpactoCartao">
+                        <strong>Abrindo no mapa…</strong>
+                        <span>{rotulo}</span>
+                        <i className="tdkImpactoProgresso" />
+                    </div>
+                </div>,
+                document.body
+            )}
+        </>
+    );
+}
+
+
+function BotaoCopiarEndereco({ texto }: { texto: string }) {
+    const [copiado, setCopiado] = useState(false);
+    const timer = useRef<number | null>(null);
+
+    useEffect(() => () => { if (timer.current) window.clearTimeout(timer.current); }, []);
+
+    async function copiar() {
+        try {
+            await navigator.clipboard.writeText(texto);
+            setCopiado(true);
+            if (timer.current) window.clearTimeout(timer.current);
+            timer.current = window.setTimeout(() => setCopiado(false), 1800);
+        } catch {
+            setCopiado(false);
+        }
+    }
+
+    return (
+        <button type="button" className="tdkLocCopiar" style={ESTILO_BOTAO_COPIAR} onClick={() => void copiar()}>
+            {copiado ? <Check size={16} /> : <Copy size={16} />}
+            <span>{copiado ? "Endereço copiado" : "Copiar endereço"}</span>
+        </button>
+    );
+}
+
+const ESTILO_FAVORITO: React.CSSProperties = {
+    appearance: "none", WebkitAppearance: "none",
+    boxSizing: "border-box", display: "inline-flex", alignItems: "center", justifyContent: "center",
+    gap: 8, minHeight: 42, padding: "0 18px", margin: 0,
+    border: "1.5px solid #ecc9cd", borderRadius: 999,
+    background: "#fff", color: "#a30e1a",
+    fontFamily: "inherit", fontSize: 13, fontWeight: 750, lineHeight: 1,
+    whiteSpace: "nowrap", cursor: "pointer",
+    boxShadow: "0 4px 12px rgba(163, 14, 26, .10)",
+    transition: "background .18s ease, box-shadow .18s ease, transform .18s ease",
+};
+
+const ESTILO_FAVORITO_ATIVO: React.CSSProperties = {
+    background: "linear-gradient(135deg, #d31325, #a30e1a)",
+    border: "1.5px solid #a30e1a",
+    color: "#fff",
+    boxShadow: "0 8px 18px rgba(163, 14, 26, .26)",
+};
+
+const chaveEnderecoPreferido =(pessoaId: number) => `tadaki:endereco-preferido:${pessoaId}`;
 const lerEnderecoPreferido = (pessoaId: number): number | null => {
     try { const id = Number(localStorage.getItem(chaveEnderecoPreferido(pessoaId))); return id > 0 ? id : null; }
     catch { return null; }
 };
 const enderecoVazio = { rua: "", numero: "", bairro: "", municipio: "", cep: "", uf: "SP" };
 
-function EditarPerfilModal({ organizacao, aoFechar, aoSalvar }: {
+/* ---------- Validações, máscara e mensagens de erro do editor de perfil ---------- */
+
+function validarEmail(valor: string): string | null {
+    const v = valor.trim();
+    if (!v) return "Digite um e-mail.";
+    if (!v.includes("@")) return "O e-mail precisa ter o símbolo @. Exemplo: nome@email.com";
+    if (/\s/.test(v) || v.split("@").length !== 2) return "Use um único @ e sem espaços. Exemplo: nome@email.com";
+    const [usuario, dominio] = v.split("@");
+    if (!usuario) return "Falta o nome antes do @. Exemplo: nome@email.com";
+    if (!/^[^\s@.]+(\.[^\s@.]+)+$/.test(dominio) || dominio.split(".").pop()!.length < 2)
+        return "O final do e-mail está incompleto. Exemplo: nome@email.com";
+    return null;
+}
+
+function validarTelefone(valor: string): string | null {
+    const d = valor.replace(/\D/g, "");
+    if (!d) return "Digite um telefone.";
+    if (d.length < 10) return "Telefone incompleto. Inclua o DDD. Exemplo: (19) 99999-9999";
+    if (d.length > 11) return "Telefone com dígitos demais. Use DDD + número (10 ou 11 dígitos).";
+    const ddd = Number(d.slice(0, 2));
+    if (ddd < 11 || ddd > 99) return "DDD inválido. Confira os dois primeiros números.";
+    if (d.length === 11 && d[2] !== "9") return "Celulares com 11 dígitos começam com 9 depois do DDD.";
+    if (/^(\d)\1+$/.test(d)) return "Esse número parece inválido. Confira os dígitos.";
+    return null;
+}
+
+function mascararTelefone(valor: string): string {
+    const d = valor.replace(/\D/g, "").slice(0, 11);
+    if (!d) return "";
+    if (d.length <= 2) return `(${d}`;
+    if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
+    if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
+    return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
+}
+
+// Exibe o telefone sempre no formato (DD) 99999-9999 ou (DD) 9999-9999,
+// mesmo que o banco guarde só os dígitos (ou com +55).
+function formatarTelefoneExibicao(valor?: string | null): string {
+    let d = String(valor ?? "").replace(/\D/g, "");
+    if ((d.length === 12 || d.length === 13) && d.startsWith("55")) d = d.slice(2);
+    if (d.length !== 10 && d.length !== 11) return String(valor ?? "").trim();
+    return mascararTelefone(d);
+}
+
+function traduzirErroApi(mensagem: string): string {
+    const m = mensagem.toLowerCase();
+    if (m.includes("incorrect date value") || m.includes("data_criacao"))
+        return "Não foi possível salvar por causa da data de criação da organização. Tente novamente.";
+    if (m.includes("duplicate entry")) return "Esse dado já está cadastrado.";
+    if (m.includes("data too long")) return "Um dos campos passou do tamanho máximo permitido.";
+    if (m.includes("sessão expirou")) return "Sua sessão expirou. Entre novamente para continuar.";
+    if (m.includes("failed to fetch") || m.includes("network"))
+        return "Sem conexão com o servidor. Verifique sua internet e tente de novo.";
+    return mensagem;
+}
+
+function Aviso({ tipo, aoFechar, children }: { tipo: "erro" | "sucesso"; aoFechar?: () => void; children: React.ReactNode }) {
+    const Icone = tipo === "erro" ? AlertCircle : CheckCircle2;
+    return (
+        <div className={`tdkAviso ${tipo === "erro" ? "tdkAvisoErro" : "tdkAvisoSucesso"}`} role={tipo === "erro" ? "alert" : "status"}>
+            <Icone size={20} aria-hidden="true" />
+            <p>{children}</p>
+            {aoFechar && (
+                <button type="button" className="tdkAvisoFechar" onClick={aoFechar} aria-label="Fechar aviso">
+                    <X size={16} />
+                </button>
+            )}
+        </div>
+    );
+}
+
+interface IOpcaoSeletor {
+    valor: string;
+    titulo: string;
+    subtitulo?: string;
+    principal?: boolean;
+}
+
+function SeletorPerfil({ id, opcoes, valor, aoEscolher, desabilitado, vazio, icone }: {
+    id: string;
+    opcoes: IOpcaoSeletor[];
+    valor: string;
+    aoEscolher: (valor: string) => void;
+    desabilitado?: boolean;
+    vazio: string;
+    icone: React.ReactNode;
+}) {
+    const [aberto, setAberto] = useState(false);
+    const [destaque, setDestaque] = useState(0);
+    const raiz = useRef<HTMLDivElement>(null);
+    const atual = opcoes.find(o => o.valor === valor) ?? opcoes[0];
+
+    useEffect(() => {
+        if (!aberto) return;
+        const fora = (evento: MouseEvent) => {
+            if (raiz.current && !raiz.current.contains(evento.target as Node)) setAberto(false);
+        };
+        document.addEventListener("mousedown", fora);
+        return () => document.removeEventListener("mousedown", fora);
+    }, [aberto]);
+
+    function abrir() {
+        if (desabilitado || opcoes.length === 0) return;
+        setDestaque(Math.max(0, opcoes.findIndex(o => o.valor === atual?.valor)));
+        setAberto(true);
+    }
+
+    function escolher(indice: number) {
+        const opcao = opcoes[indice];
+        setAberto(false);
+        if (opcao && opcao.valor !== atual?.valor) aoEscolher(opcao.valor);
+    }
+
+    function aoTeclar(evento: React.KeyboardEvent<HTMLButtonElement>) {
+        if (evento.key === "Escape") { setAberto(false); return; }
+        if (evento.key === "ArrowDown" || evento.key === "ArrowUp") {
+            evento.preventDefault();
+            if (!aberto) { abrir(); return; }
+            const passo = evento.key === "ArrowDown" ? 1 : -1;
+            setDestaque(d => (d + passo + opcoes.length) % opcoes.length);
+        } else if ((evento.key === "Enter" || evento.key === " ") && aberto) {
+            evento.preventDefault();
+            escolher(destaque);
+        }
+    }
+
+    return (
+        <div className={`tdkSel ${aberto ? "tdkSelAberto" : ""}`} ref={raiz}>
+            <button
+                type="button"
+                id={id}
+                className="tdkSelBotao"
+                aria-haspopup="listbox"
+                aria-expanded={aberto}
+                disabled={desabilitado || opcoes.length === 0}
+                onClick={() => (aberto ? setAberto(false) : abrir())}
+                onKeyDown={aoTeclar}
+            >
+                <span className="tdkSelIcone" aria-hidden="true">{icone}</span>
+                <span className="tdkSelTexto">
+                    <strong>{atual?.titulo ?? vazio}</strong>
+                    {atual?.subtitulo && <small>{atual.subtitulo}</small>}
+                </span>
+                {atual?.principal && <span className="tdkSelBadge">Principal</span>}
+                <ChevronDown size={18} className="tdkSelSeta" aria-hidden="true" />
+            </button>
+
+            {aberto && (
+                <ul className="tdkSelLista" role="listbox" aria-labelledby={id}>
+                    {opcoes.map((opcao, indice) => (
+                        <li
+                            key={opcao.valor}
+                            role="option"
+                            aria-selected={opcao.valor === atual?.valor}
+                            className={`tdkSelOpcao ${opcao.valor === atual?.valor ? "tdkSelOpcaoAtual" : ""} ${indice === destaque ? "tdkSelOpcaoDestaque" : ""}`}
+                            onMouseEnter={() => setDestaque(indice)}
+                            onMouseDown={evento => evento.preventDefault()}
+                            onClick={() => escolher(indice)}
+                        >
+                            <span className="tdkSelOpcaoIcone" aria-hidden="true">{icone}</span>
+                            <span className="tdkSelTexto">
+                                <strong>{opcao.titulo}</strong>
+                                {opcao.subtitulo && <small>{opcao.subtitulo}</small>}
+                            </span>
+                            {opcao.principal && <span className="tdkSelBadge">Principal</span>}
+                            {opcao.valor === atual?.valor && <Check size={17} className="tdkSelCheck" aria-hidden="true" />}
+                        </li>
+                    ))}
+                </ul>
+            )}
+        </div>
+    );
+}
+
+function EditarPerfilModal({ organizacao, categoria, aoFechar, aoSalvar }: {
     organizacao: IOrganizacao;
+    categoria: string;
     aoFechar: () => void;
     aoSalvar: (nome: string, email: string, telefone: string) => void;
 }) {
@@ -330,20 +658,19 @@ function EditarPerfilModal({ organizacao, aoFechar, aoSalvar }: {
     const [contatos, setContatos] = useState<ContatoPerfil[]>([]);
     const [enderecos, setEnderecos] = useState<EnderecoPerfil[]>([]);
     const [enderecoPreferidoLocal, setEnderecoPreferidoLocal] = useState<number | null>(() => lerEnderecoPreferido(pessoaId));
-    const [tipoContato, setTipoContato] = useState<"email" | "telefone">("email");
-    const [contatoId, setContatoId] = useState<number | null>(null);
-    const [valorContato, setValorContato] = useState("");
-    const [tornarContatoPrincipal, setTornarContatoPrincipal] = useState(true);
-    const [tornarEnderecoPrincipal, setTornarEnderecoPrincipal] = useState(true);
-    const [enderecoId, setEnderecoId] = useState<number | null>(null);
-    const [endereco, setEndereco] = useState(enderecoVazio);
     const [carregando, setCarregando] = useState(true);
     const [salvando, setSalvando] = useState(false);
     const [erro, setErro] = useState("");
     const [mensagem, setMensagem] = useState("");
-    const [aba, setAba] = useState<"dados" | "contatos" | "enderecos">("dados");
+    const [erroContato, setErroContato] = useState("");
+
+    const [modalContato, setModalContato] = useState<"email" | "telefone" | null>(null);
+    const [valorContato, setValorContato] = useState("");
+
+    const [cepNovo, setCepNovo] = useState("");
     const [buscandoCep, setBuscandoCep] = useState(false);
-    const consultaCepAtual = useRef(0);
+    const [modalEndereco, setModalEndereco] = useState<"cep" | "manual" | null>(null);
+    const [enderecoNovo, setEnderecoNovo] = useState({ ...enderecoVazio, complemento: "" });
 
     async function carregarDados() {
         const [resContatos, resEnderecos] = await Promise.all([
@@ -357,170 +684,439 @@ function EditarPerfilModal({ organizacao, aoFechar, aoSalvar }: {
             })
         ]);
         setContatos(resContatos.contatoPessoa ?? []);
-        const listaEnderecos: EnderecoPerfil[] = resEnderecos.enderecoPessoa ?? [];
-        setEnderecos(listaEnderecos);
+        const lista: EnderecoPerfil[] = resEnderecos.enderecoPessoa ?? [];
+        setEnderecos(lista);
         const preferido = lerEnderecoPreferido(pessoaId);
-        if (listaEnderecos.length && !listaEnderecos.some(e => e.id_endereco === preferido)) {
-            localStorage.setItem(chaveEnderecoPreferido(pessoaId), String(listaEnderecos[0].id_endereco));
-            setEnderecoPreferidoLocal(listaEnderecos[0].id_endereco);
+        if (lista.length && !lista.some(e => e.id_endereco === preferido)) {
+            localStorage.setItem(chaveEnderecoPreferido(pessoaId), String(lista[0].id_endereco));
+            setEnderecoPreferidoLocal(lista[0].id_endereco);
         }
     }
+
     useEffect(() => {
         let ativo = true;
-        carregarDados().catch(e => { if (ativo) setErro(e.message || "Não foi possível carregar os dados."); })
+        carregarDados()
+            .catch(e => { if (ativo) setErro(traduzirErroApi(e.message || "Não foi possível carregar os dados.")); })
             .finally(() => { if (ativo) setCarregando(false); });
-        const esc = (e: KeyboardEvent) => { if (e.key === "Escape" && !salvando) aoFechar(); };
-        window.addEventListener("keydown", esc);
-        return () => { ativo = false; window.removeEventListener("keydown", esc); };
+        return () => { ativo = false; };
     }, [pessoaId]);
 
     async function executar(acao: () => Promise<any>, sucesso: string) {
         setErro(""); setMensagem(""); setSalvando(true);
         try { await acao(); await carregarDados(); setMensagem(sucesso); }
-        catch (e) { setErro(e instanceof Error ? e.message : "Não foi possível salvar."); }
+        catch (e) { setErro(traduzirErroApi(e instanceof Error ? e.message : "Não foi possível salvar.")); }
         finally { setSalvando(false); }
     }
-    function selecionarContato(contato?: ContatoPerfil, tipo?: "email" | "telefone") {
-        setContatoId(contato?.id_contato ?? null);
-        setTipoContato(tipo ?? (contato?.email != null ? "email" : "telefone"));
-        setValorContato(contato?.email ?? contato?.telefone ?? "");
-        setTornarContatoPrincipal(Boolean(contato?.principal) || !contato);
-        setErro(""); setMensagem("");
-    }
-    function salvarContato() {
-        const valor = valorContato.trim();
-        if (tipoContato === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor)) { setErro("Informe um e-mail válido."); return; }
-        if (tipoContato === "telefone" && valor.replace(/\D/g, "").length < 10) { setErro("Informe um telefone com DDD."); return; }
-        executar(async () => {
-            const resultadoContato: any = await apiFetch(`/contatos${contatoId ? `?id=${contatoId}` : ""}`, {
-                method: contatoId ? "PUT" : "POST",
-                body: JSON.stringify({ id_pessoa: pessoaId, email: tipoContato === "email" ? valor : null, telefone: tipoContato === "telefone" ? valor : null })
+
+    async function selecionarContatoPrincipal(contato: ContatoPerfil) {
+        await executar(async () => {
+            await apiFetch(`/contatos/principal?id=${contato.id_contato}`, {
+                method: "PUT", body: JSON.stringify({ id_pessoa: pessoaId })
             });
-            const novoId = contatoId ?? Number(resultadoContato?.novo?.insertId ?? resultadoContato?.novo?.id_contato);
-            const jaExistePrincipal = contatos.some(c => (tipoContato === "email" ? !!c.email : !!c.telefone) && !!c.principal);
-            if ((tornarContatoPrincipal || !jaExistePrincipal) && novoId > 0) {
+        }, `${contato.email ? "E-mail" : "Telefone"} principal atualizado.`);
+    }
+
+    async function cadastrarContato() {
+        const tipo = modalContato;
+        const valor = valorContato.trim();
+        if (!tipo) return;
+        const problema = tipo === "email" ? validarEmail(valor) : validarTelefone(valor);
+        if (problema) { setErroContato(problema); return; }
+        setErroContato("");
+        await executar(async () => {
+            const resultado: any = await apiFetch(`/contatos`, {
+                method: "POST",
+                body: JSON.stringify({ id_pessoa: pessoaId, email: tipo === "email" ? valor : null, telefone: tipo === "telefone" ? valor.replace(/\D/g, "") : null })
+            });
+            const novoId = Number(resultado?.novo?.insertId ?? resultado?.novo?.id_contato);
+            const existeTipo = contatos.some(c => tipo === "email" ? !!c.email : !!c.telefone);
+            if (!existeTipo && novoId > 0) {
                 await apiFetch(`/contatos/principal?id=${novoId}`, { method: "PUT", body: JSON.stringify({ id_pessoa: pessoaId }) });
             }
-            setContatoId(null); setValorContato("");
-        }, "Contato salvo com sucesso.");
+            setModalContato(null); setValorContato("");
+        }, "Contato adicionado com sucesso.");
     }
-    async function consultarCep(cepInformado: string) {
-        const cep = cepInformado.replace(/\D/g, "");
-        const numeroConsulta = ++consultaCepAtual.current;
-        if (cep.length !== 8) { setBuscandoCep(false); return; }
-        setBuscandoCep(true);
-        setErro("");
-        try {
-            const resposta = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-            if (!resposta.ok) throw new Error("Serviço de CEP indisponível. Preencha manualmente.");
-            const dados: { erro?: boolean; logradouro?: string; bairro?: string; localidade?: string; uf?: string } = await resposta.json();
-            if (numeroConsulta !== consultaCepAtual.current) return;
-            if (dados.erro) { setErro("CEP não encontrado. Confira os números ou preencha manualmente."); return; }
-            setEndereco(atual => ({
-                ...atual,
-                rua: dados.logradouro || atual.rua,
-                bairro: dados.bairro || atual.bairro,
-                municipio: dados.localidade || atual.municipio,
-                uf: dados.uf || atual.uf
-            }));
-        } catch (e) {
-            if (numeroConsulta === consultaCepAtual.current) setErro(e instanceof Error ? e.message : "Falha na consulta do CEP.");
-        } finally {
-            if (numeroConsulta === consultaCepAtual.current) setBuscandoCep(false);
-        }
-    }
-    function preferirEndereco(id: number) {
+
+    function escolherEndereco(id: number) {
         localStorage.setItem(chaveEnderecoPreferido(pessoaId), String(id));
         setEnderecoPreferidoLocal(id);
-        setMensagem("Endereço preferido definido.");
+        setMensagem("Endereço principal atualizado.");
         setErro("");
         window.dispatchEvent(new Event("tdk-endereco-preferido"));
     }
-    function salvarEndereco() {
-        if (!endereco.rua.trim() || !endereco.numero.trim() || !endereco.bairro.trim() || !endereco.municipio.trim() || !/^\d{8}$/.test(endereco.cep.replace(/\D/g, "")) || !/^[A-Za-z]{2}$/.test(endereco.uf.trim())) {
-            setErro("Preencha rua, número, bairro, cidade, UF e CEP válido."); return;
-        }
-        executar(async () => {
-            const resultadoEndereco: any = await apiFetch(`/enderecos${enderecoId ? `?id=${enderecoId}` : ""}`, {
-                method: enderecoId ? "PUT" : "POST",
-                body: JSON.stringify({ ...endereco, cep: endereco.cep.replace(/\D/g, ""), uf: endereco.uf.toUpperCase(), id_pessoa: pessoaId })
-            });
-            const novoId = enderecoId ?? Number(resultadoEndereco?.novo?.insertId ?? resultadoEndereco?.novo?.id_endereco);
-            if (novoId > 0 && (tornarEnderecoPrincipal || !enderecos.length)) preferirEndereco(novoId);
-            setEnderecoId(null); setEndereco(enderecoVazio);
-        }, "Endereço salvo com sucesso.");
-    }
-    const emailPrincipal = contatos.find(c => c.email && c.principal)?.email ?? contatos.find(c => c.email)?.email ?? organizacao.email ?? "";
-    const telefonePrincipal = contatos.find(c => c.telefone && c.principal)?.telefone ?? contatos.find(c => c.telefone)?.telefone ?? organizacao.telefone ?? "";
-    return createPortal(
-        <div className="tdkEditOverlay" onMouseDown={e => { if (e.target === e.currentTarget && !salvando) aoFechar(); }}>
-            <section className="tdkEditModal" role="dialog" aria-modal="true" aria-labelledby="tdkEditTitle">
-                <header className="tdkEditHeader">
-                    <div className="tdkEditAvatar">{(organizacao.nome || "T").slice(0, 1).toUpperCase()}</div>
-                    <div><span className="tdkEditEyebrow">CONFIGURAÇÕES DA CONTA</span><h2 id="tdkEditTitle">Editar perfil</h2><p>Atualize seus dados e mantenha seu perfil completo.</p></div>
-                    <button className="tdkEditClose" type="button" aria-label="Fechar" onClick={aoFechar} disabled={salvando}><X size={21} /></button>
-                </header>
-                <nav className="tdkEditTabs" aria-label="Seções de edição">
-                    <button type="button" className={aba === "dados" ? "ativo" : ""} onClick={() => { setAba("dados"); setErro(""); }}>Dados básicos</button>
-                    <button type="button" className={aba === "contatos" ? "ativo" : ""} onClick={() => { setAba("contatos"); setErro(""); }}>Contatos</button>
-                    <button type="button" className={aba === "enderecos" ? "ativo" : ""} onClick={() => { setAba("enderecos"); setErro(""); }}>Endereços</button>
-                </nav>
-                <div className="tdkEditBody">
-                    {carregando && <p>Carregando informações...</p>}
-                    {aba === "dados" && <div className="tdkEditSection">
-                        <h3>Informações da organização</h3><p>Este nome aparece publicamente no seu perfil.</p>
-                        <label>Nome da organização<input value={nome} maxLength={100} onChange={e => setNome(e.target.value)} placeholder="Nome da organização" /></label>
-                        <button className="tdkEditPrimary" disabled={salvando || !nome.trim()} type="button" onClick={() => executar(async () => {
-                            await apiFetch(`/pessoas?id=${pessoaId}`, { method: "PATCH", body: JSON.stringify({ nome: nome.trim(), cpf: organizacao.cpf, cnpj: organizacao.cnpj, data_criacao: organizacao.data_criacao, id_area_atuacao: organizacao.id_area_atuacao }) });
-                            aoSalvar(nome.trim(), emailPrincipal, telefonePrincipal);
-                        }, "Nome atualizado com sucesso.")}>{salvando ? "Salvando..." : "Salvar nome"}</button>
-                    </div>}
-                    {aba === "contatos" && <div className="tdkEditSection">
-                        <h3>E-mails e telefones</h3><p>Edite seus contatos existentes ou cadastre novos.</p>
-                        <div className="tdkEditRecords">{contatos.map(c => <div className="tdkEditRecord" key={c.id_contato}>
-                            <span className="tdkEditRecordIcon">{c.email ? "✉" : "☎"}</span><span className="tdkEditRecordText"><strong>{c.email ? "E-mail" : "Telefone"}{Boolean(c.principal) ? " · Principal" : ""}</strong><small>{c.email || c.telefone}</small></span>
-                            <button type="button" onClick={() => selecionarContato(c)}>Editar</button>
-                            {!c.principal && <button type="button" disabled={salvando} onClick={() => executar(async () => { await apiFetch(`/contatos/principal?id=${c.id_contato}`, { method: "PUT", body: JSON.stringify({ id_pessoa: pessoaId }) }); }, "Contato preferido atualizado.")}>☆ Preferir</button>}
-                        </div>)}</div>
-                        <div className="tdkEditFormPanel">
-                            <h4>{contatoId ? "Editar contato" : "Adicionar contato"}</h4>
-                            <div className="tdkEditTypeButtons"><button type="button" className={tipoContato === "email" ? "ativo" : ""} onClick={() => { setTipoContato("email"); setContatoId(null); setValorContato(""); }}>E-mail</button><button type="button" className={tipoContato === "telefone" ? "ativo" : ""} onClick={() => { setTipoContato("telefone"); setContatoId(null); setValorContato(""); }}>Telefone</button></div>
-                            <label>{tipoContato === "email" ? "Endereço de e-mail" : "Número com DDD"}<input type={tipoContato === "email" ? "email" : "tel"} value={valorContato} onChange={e => setValorContato(e.target.value)} placeholder={tipoContato === "email" ? "contato@empresa.com.br" : "(19) 99999-9999"} /></label>
-                            <label className="tdkEditPreferencia"><input type="checkbox" checked={tornarContatoPrincipal} onChange={e => setTornarContatoPrincipal(e.target.checked)} /> Usar como {tipoContato === "email" ? "e-mail" : "telefone"} preferido no perfil</label>
-                            <div className="tdkEditFormActions"><button className="tdkEditPrimary" type="button" disabled={salvando || !valorContato.trim()} onClick={salvarContato}>{salvando ? "Salvando..." : contatoId ? "Salvar alterações" : "Cadastrar contato"}</button>{contatoId && <button className="tdkEditSecondary" type="button" onClick={() => selecionarContato(undefined, tipoContato)}>Cancelar edição</button>}</div>
-                        </div>
-                    </div>}
-                    {aba === "enderecos" && <div className="tdkEditSection">
-                        <h3>Endereços cadastrados</h3><p>Cadastre um endereço ou atualize as informações existentes.</p>
-                        <div className="tdkEditRecords">{enderecos.map(e => <div className="tdkEditRecord" key={e.id_endereco}><span className="tdkEditRecordIcon">⌖</span><span className="tdkEditRecordText"><strong>{e.rua}, {e.numero}{e.id_endereco === enderecoPreferidoLocal ? " · Preferido ★" : ""}</strong><small>{e.bairro} · {e.municipio}/{e.uf} · {e.cep}</small></span><button type="button" onClick={() => { setEnderecoId(e.id_endereco); setEndereco({ rua: e.rua, numero: e.numero, bairro: e.bairro, municipio: e.municipio, cep: e.cep, uf: e.uf }); setTornarEnderecoPrincipal(e.id_endereco === enderecoPreferidoLocal); setErro(""); }}>Editar</button>{e.id_endereco !== enderecoPreferidoLocal && <button type="button" disabled={salvando} onClick={() => preferirEndereco(e.id_endereco)}>☆ Preferir</button>}</div>)}</div>
-                        <div className="tdkEditFormPanel"><h4>{enderecoId ? "Editar endereço" : "Adicionar endereço"}</h4>
-                            <div className="tdkEditCepBox"><span className="tdkEditCepIcon">⌖</span><div><strong>Encontre seu endereço pelo CEP</strong><p>Digite os 8 números e preenchemos os dados automaticamente.</p></div></div>
-                            <div className="tdkEditFields">
-                                <label className="wide tdkEditCepFirst">CEP<input value={endereco.cep} inputMode="numeric" maxLength={9} onChange={e => {
-                                    const digitos = e.target.value.replace(/\D/g, "").slice(0, 8);
-                                    const formatado = digitos.length > 5 ? `${digitos.slice(0, 5)}-${digitos.slice(5)}` : digitos;
-                                    setEndereco(p => ({ ...p, cep: formatado }));
-                                    if (digitos.length === 8) void consultarCep(digitos);
-                                    else { consultaCepAtual.current++; setBuscandoCep(false); }
-                                }} placeholder="Ex.: 13183-000" />{buscandoCep ? <small className="tdkCepStatus">Consultando CEP...</small> : <small>Busca automática via ViaCEP</small>}</label>
-                                <label className="wide">Rua<input value={endereco.rua} onChange={e => setEndereco(p => ({ ...p, rua: e.target.value }))} placeholder="Rua ou avenida" /></label>
-                                <label>Número<input value={endereco.numero} onChange={e => setEndereco(p => ({ ...p, numero: e.target.value }))} placeholder="Número" /></label>
-                                <label>Bairro<input value={endereco.bairro} onChange={e => setEndereco(p => ({ ...p, bairro: e.target.value }))} placeholder="Bairro" /></label>
-                                <label>Cidade<input value={endereco.municipio} onChange={e => setEndereco(p => ({ ...p, municipio: e.target.value }))} placeholder="Município" /></label>
-                                <label>Estado (UF)<input value={endereco.uf} maxLength={2} onChange={e => setEndereco(p => ({ ...p, uf: e.target.value.toUpperCase() }))} placeholder="SP" /></label>
 
-                            </div>
-                            <label className="tdkEditPreferencia"><input type="checkbox" checked={tornarEnderecoPrincipal} onChange={e => setTornarEnderecoPrincipal(e.target.checked)} /> Usar como endereço preferido no perfil</label>
-                            <div className="tdkEditFormActions"><button className="tdkEditPrimary" type="button" disabled={salvando} onClick={salvarEndereco}>{salvando ? "Salvando..." : enderecoId ? "Salvar alterações" : "Cadastrar endereço"}</button>{enderecoId && <button type="button" className="tdkEditSecondary" onClick={() => { setEnderecoId(null); setEndereco(enderecoVazio); }}>Cancelar edição</button>}</div>
-                        </div>
-                    </div>}
-                    {erro && <p className="tdkEditError" role="alert">{erro}</p>}
-                    {mensagem && <p className="tdkEditNotice" role="status">✓ {mensagem}</p>}
+    async function confirmarCep() {
+        const cep = cepNovo.replace(/\D/g, "");
+        if (cep.length !== 8) { setErro("Digite um CEP válido com 8 números."); return; }
+        setBuscandoCep(true); setErro(""); setMensagem("");
+        try {
+            const resposta = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+            if (!resposta.ok) throw new Error("Não foi possível consultar o CEP.");
+            const dados = await resposta.json();
+            if (dados.erro) throw new Error("CEP não encontrado.");
+            setEnderecoNovo({ rua: dados.logradouro ?? "", numero: "", bairro: dados.bairro ?? "", municipio: dados.localidade ?? "", cep, uf: dados.uf ?? "", complemento: "" });
+            setModalEndereco("cep");
+        } catch (e) { setErro(traduzirErroApi(e instanceof Error ? e.message : "Não foi possível consultar o CEP.")); }
+        finally { setBuscandoCep(false); }
+    }
+
+    async function descobrirCepEnderecoManual() {
+        const e = enderecoNovo;
+        if (!e.uf.trim() || !e.municipio.trim() || !e.rua.trim() || !e.bairro.trim() || !e.numero.trim()) {
+            setErro("Preencha Estado, Cidade, Bairro, Rua e Número."); return false;
+        }
+        setBuscandoCep(true); setErro("");
+        try {
+            const uf = e.uf.trim().toUpperCase();
+            const cidade = encodeURIComponent(e.municipio.trim());
+            const rua = encodeURIComponent(e.rua.trim());
+            const resposta = await fetch(`https://viacep.com.br/ws/${uf}/${cidade}/${rua}/json/`);
+            if (!resposta.ok) throw new Error("Não foi possível localizar o CEP desse endereço.");
+            const lista = await resposta.json();
+            if (!Array.isArray(lista) || !lista.length) throw new Error("Não encontramos o CEP. Confira rua, cidade e estado.");
+            const porBairro = lista.find((item: any) => String(item.bairro ?? "").toLowerCase() === e.bairro.trim().toLowerCase()) ?? lista[0];
+            setEnderecoNovo(atual => ({ ...atual, cep: String(porBairro.cep ?? "").replace(/\D/g, ""), bairro: porBairro.bairro || atual.bairro }));
+            return true;
+        } catch (err) { setErro(traduzirErroApi(err instanceof Error ? err.message : "Não foi possível localizar o CEP.")); return false; }
+        finally { setBuscandoCep(false); }
+    }
+
+    async function cadastrarEndereco() {
+        let atual = enderecoNovo;
+        if (modalEndereco === "manual" && !atual.cep.replace(/\D/g, "")) {
+            const ok = await descobrirCepEnderecoManual();
+            if (!ok) return;
+            // O state atualiza no próximo render; consulta novamente para obter o CEP que será salvo.
+            const uf = atual.uf.trim().toUpperCase();
+            const resposta = await fetch(`https://viacep.com.br/ws/${uf}/${encodeURIComponent(atual.municipio.trim())}/${encodeURIComponent(atual.rua.trim())}/json/`);
+            const lista = await resposta.json();
+            const item = Array.isArray(lista) ? (lista.find((x: any) => String(x.bairro ?? "").toLowerCase() === atual.bairro.trim().toLowerCase()) ?? lista[0]) : null;
+            atual = { ...atual, cep: String(item?.cep ?? "").replace(/\D/g, "") };
+        }
+        if (!atual.rua.trim() || !atual.numero.trim() || !atual.bairro.trim() || !atual.municipio.trim() || !/^[A-Za-z]{2}$/.test(atual.uf.trim()) || !/^\d{8}$/.test(atual.cep.replace(/\D/g, ""))) {
+            setErro("Preencha todos os campos obrigatórios do endereço."); return;
+        }
+        await executar(async () => {
+            const resultado: any = await apiFetch(`/enderecos`, {
+                method: "POST",
+                body: JSON.stringify({ ...atual, cep: atual.cep.replace(/\D/g, ""), uf: atual.uf.toUpperCase(), id_pessoa: pessoaId })
+            });
+            const novoId = Number(resultado?.novo?.insertId ?? resultado?.novo?.id_endereco);
+            if (novoId > 0) escolherEndereco(novoId);
+            setModalEndereco(null); setCepNovo(""); setEnderecoNovo({ ...enderecoVazio, complemento: "" });
+        }, "Endereço adicionado e selecionado com sucesso.");
+    }
+
+    async function salvarTudo() {
+        setMensagem("");
+        if (!nome.trim()) { setErro("O nome da organização é obrigatório."); return; }
+        setSalvando(true); setErro("");
+        try {
+            // A API devolve ISO (2010-03-31T03:00:00.000Z); o MySQL só aceita YYYY-MM-DD.
+            const dataCriacao = organizacao.data_criacao ? String(organizacao.data_criacao).slice(0, 10) : undefined;
+            await apiFetch(`/pessoas?id=${pessoaId}`, {
+                method: "PATCH",
+                body: JSON.stringify({
+                    nome: nome.trim(),
+                    cpf: organizacao.cpf,
+                    cnpj: organizacao.cnpj,
+                    data_criacao: dataCriacao,
+                    id_area_atuacao: organizacao.id_area_atuacao,
+                })
+            });
+            const emailPrincipal = contatos.find(c => c.email && c.principal)?.email ?? contatos.find(c => c.email)?.email ?? organizacao.email ?? "";
+            const telefonePrincipal = contatos.find(c => c.telefone && c.principal)?.telefone ?? contatos.find(c => c.telefone)?.telefone ?? organizacao.telefone ?? "";
+            aoSalvar(nome.trim(), emailPrincipal, telefonePrincipal);
+        } catch (e) {
+            setErro(traduzirErroApi(e instanceof Error ? e.message : "Não foi possível salvar o perfil."));
+        } finally { setSalvando(false); }
+    }
+
+    const emails = contatos.filter(c => c.email);
+    const telefones = contatos.filter(c => c.telefone);
+    const enderecoAtual = enderecos.find(e => e.id_endereco === enderecoPreferidoLocal) ?? enderecos[0];
+
+    function campoContato(tipo: "email" | "telefone") {
+        const lista = tipo === "email" ? emails : telefones;
+        const rotulo = tipo === "email" ? "E-mail" : "Telefone";
+        const aberto = modalContato === tipo;
+        const selecionado = lista.find(c => c.principal)?.id_contato ?? lista[0]?.id_contato ?? "";
+
+        return (
+            <div className="tdkEdCampo">
+                <label htmlFor={`tdkEd-${tipo}`}>{rotulo} <span className="tdkEdObrig">*</span></label>
+                <div className="tdkEdLinhaCampo">
+                    <SeletorPerfil
+                        id={`tdkEd-${tipo}`}
+                        icone={tipo === "email" ? <Mail size={17} /> : <Phone size={17} />}
+                        vazio={tipo === "email" ? "Nenhum e-mail cadastrado" : "Nenhum telefone cadastrado"}
+                        valor={String(selecionado)}
+                        opcoes={lista.map(c => ({
+                            valor: String(c.id_contato),
+                            titulo: (tipo === "email" ? c.email : formatarTelefoneExibicao(c.telefone)) ?? "",
+                            principal: !!c.principal,
+                        }))}
+                        aoEscolher={valor => {
+                            const contato = lista.find(c => String(c.id_contato) === valor);
+                            if (contato) selecionarContatoPrincipal(contato);
+                        }}
+                        desabilitado={salvando || carregando || lista.length === 0}
+                    />
+                    <button
+                        type="button"
+                        className={`tdkEdAdd ${aberto ? "tdkEdAddAtivo" : ""}`}
+                        aria-label={aberto ? `Fechar novo ${rotulo.toLowerCase()}` : `Adicionar ${rotulo.toLowerCase()}`}
+                        title={aberto ? "Fechar" : `Adicionar ${rotulo.toLowerCase()}`}
+                        onClick={() => { setValorContato(""); setErroContato(""); setModalContato(aberto ? null : tipo); }}
+                    >
+                        {aberto ? <X size={18} /> : <Plus size={18} />}
+                    </button>
                 </div>
-                <footer className="tdkEditFooter"><span>As alterações são salvas diretamente no TaDaKi.</span><button type="button" onClick={() => { aoSalvar(nome, emailPrincipal, telefonePrincipal); }} disabled={salvando}>Concluir</button></footer>
-            </section>
-        </div>, document.body
+
+                {aberto && (
+                    <>
+                        <div className="tdkEdNovo">
+                            <input
+                                autoFocus
+                                type={tipo === "email" ? "email" : "tel"}
+                                inputMode={tipo === "email" ? "email" : "tel"}
+                                className={erroContato ? "tdkEdInvalido" : ""}
+                                aria-invalid={!!erroContato}
+                                value={valorContato}
+                                onChange={e => {
+                                    setValorContato(tipo === "telefone" ? mascararTelefone(e.target.value) : e.target.value);
+                                    setErroContato("");
+                                }}
+                                onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); void cadastrarContato(); } }}
+                                placeholder={tipo === "email" ? "novo@email.com" : "(19) 99999-9999"}
+                                aria-label={tipo === "email" ? "Novo e-mail" : "Novo telefone"}
+                            />
+                            <button type="button" className="tdkEdBtn tdkEdBtnPrimario" onClick={cadastrarContato} disabled={salvando}>Adicionar</button>
+                        </div>
+                        {erroContato && (
+                            <p className="tdkEdCampoErro" role="alert">
+                                <AlertCircle size={15} aria-hidden="true" /> {erroContato}
+                            </p>
+                        )}
+                    </>
+                )}
+            </div>
+        );
+    }
+
+    return (
+        <section className="tdkEditor" aria-label="Editar perfil">
+            <header className="tdkEditorCab">
+                <h2>Editar perfil</h2>
+                <p>Atualize as informações que os clientes veem na sua página.</p>
+            </header>
+
+            <div className="tdkEditorGrupo">
+                <h3>Informações básicas</h3>
+                <div className="tdkEditorLinha">
+                    <div className="tdkEdCampo">
+                        <label htmlFor="tdkEd-nome">Nome da organização <span className="tdkEdObrig">*</span></label>
+                        <input
+                            id="tdkEd-nome"
+                            autoFocus
+                            value={nome}
+                            maxLength={100}
+                            onChange={e => setNome(e.target.value)}
+                            placeholder="Nome da organização"
+                        />
+                    </div>
+                    <div className="tdkEdCampo">
+                        <label>Categoria</label>
+                        <div className="tdkEdSomenteLeitura" title="A categoria não é editada por aqui">{categoria}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="tdkEditorGrupo">
+                <h3>Contato <small>O item marcado como “principal” é o que aparece no perfil.</small></h3>
+                <div className="tdkEditorLinha">
+                    {campoContato("email")}
+                    {campoContato("telefone")}
+                </div>
+            </div>
+
+            <div className="tdkEditorGrupo">
+                <h3>Endereço <small>Selecione um endereço cadastrado ou adicione outro.</small></h3>
+                <div className="tdkEdCampo">
+                    <label htmlFor="tdkEd-endereco">Endereço principal <span className="tdkEdObrig">*</span></label>
+                    <div className="tdkEdLinhaCampo">
+                        <SeletorPerfil
+                            id="tdkEd-endereco"
+                            icone={<MapPin size={17} />}
+                            vazio="Nenhum endereço cadastrado"
+                            valor={String(enderecoAtual?.id_endereco ?? "")}
+                            opcoes={enderecos.map(e => ({
+                                valor: String(e.id_endereco),
+                                titulo: `${e.rua}, ${e.numero}`,
+                                subtitulo: `${e.bairro} · ${e.municipio}/${e.uf}`,
+                                principal: e.id_endereco === enderecoAtual?.id_endereco,
+                            }))}
+                            aoEscolher={valor => escolherEndereco(Number(valor))}
+                            desabilitado={salvando || carregando || enderecos.length === 0}
+                        />
+                        <button
+                            type="button"
+                            className={`tdkEdAdd ${modalEndereco ? "tdkEdAddAtivo" : ""}`}
+                            aria-label={modalEndereco ? "Fechar novo endereço" : "Adicionar endereço"}
+                            title={modalEndereco ? "Fechar" : "Adicionar endereço"}
+                            onClick={() => {
+                                setModalEndereco(modalEndereco ? null : "cep");
+                                setEnderecoNovo({ ...enderecoVazio, complemento: "" });
+                                setCepNovo("");
+                                setErro("");
+                            }}
+                        >
+                            {modalEndereco ? <X size={18} /> : <Plus size={18} />}
+                        </button>
+                    </div>
+
+                    {modalEndereco && (
+                        <div className="tdkEdNovoEndereco">
+                            {modalEndereco === "cep" && !enderecoNovo.rua ? (
+                                <>
+                                    <label htmlFor="tdkEd-cep">CEP <span className="tdkEdObrig">*</span></label>
+                                    <div className="tdkEdNovo">
+                                        <input
+                                            id="tdkEd-cep"
+                                            inputMode="numeric"
+                                            maxLength={9}
+                                            value={cepNovo}
+                                            onChange={e => {
+                                                const d = e.target.value.replace(/\D/g, "").slice(0, 8);
+                                                setCepNovo(d.length > 5 ? `${d.slice(0, 5)}-${d.slice(5)}` : d);
+                                            }}
+                                            placeholder="00000-000"
+                                        />
+                                        <button type="button" className="tdkEdBtn tdkEdBtnPrimario" disabled={buscandoCep} onClick={confirmarCep}>
+                                            {buscandoCep ? "Buscando..." : "Confirmar"}
+                                        </button>
+                                    </div>
+                                    <p className="tdkEdNaoSabe">
+                                        Não sabe seu CEP?{" "}
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setEnderecoNovo({ ...enderecoVazio, complemento: "" });
+                                                setModalEndereco("manual");
+                                                setErro("");
+                                            }}
+                                        >
+                                            Insira seu endereço aqui.
+                                        </button>
+                                    </p>
+                                </>
+                            ) : (
+                                <>
+                                    <div className="tdkEdEnderecoGrid">
+                                        <label className="tdkEdLargo">
+                                            <span className="tdkEdRotulo">Rua <span className="tdkEdObrig">*</span></span>
+                                            <input
+                                                value={enderecoNovo.rua}
+                                                readOnly={modalEndereco === "cep" && !!enderecoNovo.rua}
+                                                onChange={e => setEnderecoNovo(p => ({ ...p, rua: e.target.value }))}
+                                            />
+                                        </label>
+                                        <label>
+                                            <span className="tdkEdRotulo">Número <span className="tdkEdObrig">*</span></span>
+                                            <input
+                                                value={enderecoNovo.numero}
+                                                onChange={e => setEnderecoNovo(p => ({ ...p, numero: e.target.value }))}
+                                            />
+                                        </label>
+                                        <label>
+                                            <span className="tdkEdRotulo">Bairro <span className="tdkEdObrig">*</span></span>
+                                            <input
+                                                value={enderecoNovo.bairro}
+                                                readOnly={modalEndereco === "cep" && !!enderecoNovo.bairro}
+                                                onChange={e => setEnderecoNovo(p => ({ ...p, bairro: e.target.value }))}
+                                            />
+                                        </label>
+                                        <label>
+                                            <span className="tdkEdRotulo">Cidade <span className="tdkEdObrig">*</span></span>
+                                            <input
+                                                value={enderecoNovo.municipio}
+                                                readOnly={modalEndereco === "cep" && !!enderecoNovo.municipio}
+                                                onChange={e => setEnderecoNovo(p => ({ ...p, municipio: e.target.value }))}
+                                            />
+                                        </label>
+                                        <label>
+                                            <span className="tdkEdRotulo">Estado <span className="tdkEdObrig">*</span></span>
+                                            <input
+                                                maxLength={2}
+                                                value={enderecoNovo.uf}
+                                                readOnly={modalEndereco === "cep" && !!enderecoNovo.uf}
+                                                onChange={e => setEnderecoNovo(p => ({ ...p, uf: e.target.value.toUpperCase() }))}
+                                            />
+                                        </label>
+                                        {modalEndereco === "manual" && (
+                                            <label>
+                                                <span className="tdkEdRotulo">CEP</span>
+                                                <input
+                                                    inputMode="numeric"
+                                                    maxLength={9}
+                                                    value={enderecoNovo.cep}
+                                                    onChange={e => setEnderecoNovo(p => ({ ...p, cep: e.target.value }))}
+                                                    placeholder="Opcional"
+                                                />
+                                            </label>
+                                        )}
+                                        <label className="tdkEdLargo">
+                                            <span className="tdkEdRotulo">Complemento <span className="tdkEdOpc">(opcional)</span></span>
+                                            <input
+                                                value={enderecoNovo.complemento}
+                                                onChange={e => setEnderecoNovo(p => ({ ...p, complemento: e.target.value }))}
+                                                placeholder="Apartamento, bloco, referência..."
+                                            />
+                                        </label>
+                                    </div>
+
+                                    <div className="tdkEdNovoEnderecoAcoes">
+                                        <button
+                                            type="button"
+                                            className="tdkEdBtn tdkEdBtnNeutro"
+                                            onClick={() => {
+                                                setModalEndereco(null);
+                                                setEnderecoNovo({ ...enderecoVazio, complemento: "" });
+                                                setCepNovo("");
+                                            }}
+                                        >
+                                            Cancelar
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className="tdkEdBtn tdkEdBtnPrimario"
+                                            disabled={salvando || buscandoCep}
+                                            onClick={cadastrarEndereco}
+                                        >
+                                            {buscandoCep ? "Localizando..." : salvando ? "Salvando..." : "Adicionar endereço"}
+                                        </button>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {erro && <Aviso tipo="erro" aoFechar={() => setErro("")}>{erro}</Aviso>}
+            {mensagem && !erro && <Aviso tipo="sucesso" aoFechar={() => setMensagem("")}>{mensagem}</Aviso>}
+
+            <footer className="tdkEditorRodape">
+                <button type="button" className="tdkEdBtn tdkEdBtnNeutro" disabled={salvando} onClick={aoFechar}>
+                    Cancelar
+                </button>
+                <button type="button" className="tdkEdBtn tdkEdBtnPrimario" disabled={salvando || carregando} onClick={salvarTudo}>
+                    {salvando ? "Salvando..." : "Salvar alterações"}
+                </button>
+            </footer>
+        </section>
     );
+
 }
 
 export default function PerfilScreen() {
@@ -529,18 +1125,40 @@ export default function PerfilScreen() {
 
     const { user } = useAuth();
 
+    const tipoUsuarioMenu = String(user?.tipo ?? "").trim().toUpperCase();
+    const usuarioEhOrganizacaoMenu = tipoUsuarioMenu === "ORGANIZACAO";
+
+    const irParaMeuPerfil = () => {
+        if (tipoUsuarioMenu === "CLIENTE") {
+            navigate("/perfil-pessoal");
+            return;
+        }
+
+        const idMeuPerfil = Number(user?.id_pessoa ?? user?.id_pessoa_login);
+        if (Number.isSafeInteger(idMeuPerfil) && idMeuPerfil > 0) {
+            navigate(`/perfil/${idMeuPerfil}`);
+        }
+    };
+
     const { id_pessoa } = useParams<{ id_pessoa: string }>();
     const [parametrosUrl] = useSearchParams();
     const avaliacaoDestacada = Number(parametrosUrl.get("avaliacao"));
 
     const idPessoa = Number(id_pessoa);
 
-    const usuarioEhCliente =
+    // Só destaca "Meu perfil" quando a organização está realmente no próprio perfil.
+    // Cliente visitando uma organização não deve ter nenhum item do menu marcado.
+    const idUsuarioLogado = Number(user?.id_pessoa ?? user?.id_pessoa_login);
+    const meuPerfilOrganizacaoAtivo =
+        usuarioEhOrganizacaoMenu &&
+        Number.isSafeInteger(idUsuarioLogado) &&
+        idUsuarioLogado > 0 &&
+        idUsuarioLogado === idPessoa;
 
+    const usuarioEhCliente =
         user?.tipo?.trim().toUpperCase() === "CLIENTE";
 
     const [organizacao, setOrganizacao] =
-
         useState<IOrganizacao | null>(null);
 
     const [editandoPerfil, setEditandoPerfil] = useState(false);
@@ -639,21 +1257,57 @@ export default function PerfilScreen() {
             username?: string;
             nome_cliente?: string;
         };
+        const bruto = avaliacao as any;
         const nome = dados.nome_usuario ?? dados.nomeUsuario ??
-            dados.usuario ?? dados.username ?? dados.nome_cliente;
+            dados.usuario ?? dados.username ?? dados.nome_cliente ??
+            bruto.nome ?? bruto.nome_pessoa ?? bruto.nomePessoa ?? bruto.login ??
+            bruto.cliente?.nome ?? nomesClientes[Number(bruto.id_cliente)];
         return typeof nome === "string" && nome.trim() ? nome.trim() : "Usuário";
     }
 
     const [avaliacoes, setAvaliacoes] = useState<IAvaliacao[]>([]);
 
-    const [clienteLogado, setClienteLogado] =
+    // Quando a API de avaliações não devolve o nome do autor, busca pelo id_cliente.
+    const [nomesClientes, setNomesClientes] = useState<Record<number, string>>({});
+    useEffect(() => {
+        const semNome = (a: IAvaliacao) => {
+            const b = a as any;
+            return Number(a.anonimo) !== 1 && Number(b.id_cliente) > 0 &&
+                !(b.nome_usuario ?? b.nomeUsuario ?? b.usuario ?? b.username ??
+                    b.nome_cliente ?? b.nome ?? b.nome_pessoa ?? b.nomePessoa ?? b.login ?? b.cliente?.nome);
+        };
+        if (!avaliacoes.some(semNome)) return;
 
+        let ativo = true;
+        apiFetch<any>(`/pessoas?tipo=CLIENTE`)
+            .then(resposta => {
+                if (!ativo) return;
+                const mapa: Record<number, string> = {};
+                const percorrer = (valor: any, nivel = 0) => {
+                    if (!valor || nivel > 4) return;
+                    if (Array.isArray(valor)) { valor.forEach(item => percorrer(item, nivel + 1)); return; }
+                    if (typeof valor !== "object") return;
+                    const idCliente = Number(valor.id_cliente);
+                    if (idCliente > 0 && typeof valor.nome === "string" && valor.nome.trim()) {
+                        mapa[idCliente] = valor.nome.trim();
+                    }
+                    for (const chave of ["pessoas", "pessoa", "pessoaId", "clientes", "cliente", "dados", "data", "resultado", "funcionarios"]) {
+                        if (valor[chave] != null) percorrer(valor[chave], nivel + 1);
+                    }
+                };
+                percorrer(resposta);
+                if (Object.keys(mapa).length) setNomesClientes(mapa);
+            })
+            .catch(() => { /* sem permissão ou rota indisponível: mantém "Usuário" */ });
+        return () => { ativo = false; };
+    }, [avaliacoes]);
+
+    const [clienteLogado, setClienteLogado] =
         useState<ICliente | null>(null);
 
     const [favoritado, setFavoritado] = useState(false);
 
     const [carregandoFavorito, setCarregandoFavorito] =
-
         useState(false);
 
     const [loading, setLoading] = useState(true);
@@ -663,11 +1317,9 @@ export default function PerfilScreen() {
     const [erro, setErro] = useState("");
 
     const [abaSelecionada, setAbaSelecionada] =
-
         useState<Aba>(parametrosUrl.get("aba") === "avaliacoes" ? "avaliacoes" : "inicio");
 
     const [modalAvaliacaoAberto, setModalAvaliacaoAberto] =
-
         useState(false);
 
     const [notaSelecionada, setNotaSelecionada] = useState(0);
@@ -675,21 +1327,17 @@ export default function PerfilScreen() {
     const [tituloAvaliacao, setTituloAvaliacao] = useState("");
 
     const [comentarioAvaliacao, setComentarioAvaliacao] =
-
         useState("");
 
     const [avaliacaoAnonima, setAvaliacaoAnonima] =
-
         useState(false);
 
     const [enviandoAvaliacao, setEnviandoAvaliacao] =
-
         useState(false);
 
     const [erroAvaliacao, setErroAvaliacao] = useState("");
 
     const [sucessoAvaliacao, setSucessoAvaliacao] =
-
         useState("");
 
     const inicioRef = useRef<HTMLDivElement>(null);
@@ -709,36 +1357,36 @@ export default function PerfilScreen() {
             : 0;
         const positivas = notas.filter((nota) => nota >= 4).length;
         const melhorar = notas.filter((nota) => nota <= 2).length;
+        const distribuicao = [5, 4, 3, 2, 1].map((estrela) => {
+            const quantidade = notas.filter((nota) => Math.round(nota) === estrela).length;
+            return {
+                estrela,
+                quantidade,
+                percentual: total ? Math.round((quantidade / total) * 100) : 0,
+            };
+        });
         return {
             total,
             media: mediaNumerica.toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 }),
             positivas: total ? Math.round((positivas / total) * 100) : 0,
             melhorar,
+            distribuicao,
         };
     }, [avaliacoes]);
 
     const media = indicadoresAvaliacoes.media;
 
     const postsDestaques = useMemo(
-
         () => posts.slice(0, 3),
-
         [posts]
-
     );
 
     function limparDados() {
-
         setOrganizacao(null);
-
         setCategoria(NA);
-
         setPosts([]);
-
         setAvaliacoes([]);
-
         setFavoritado(false);
-
     }
 
     async function carregarPostsArquivados(
@@ -1015,39 +1663,27 @@ export default function PerfilScreen() {
         try {
 
             const resposta = await apiFetchResponse(`/AreaAtuacao?id_area_atuacao=${idArea}`,
-
                 { credentials: "include" }
-
             );
 
             if (!resposta.ok) {
-
                 throw new Error("Erro ao buscar área de atuação.");
-
             }
 
             const data = await resposta.json();
 
             const lista =
-
                 data?.resultadoSelecionaId ??
-
                 data?.resultadoSelecionaTodos ??
-
                 data?.dados ??
-
                 data?.data ??
-
                 [];
 
             setCategoria((Array.isArray(lista) ? lista[0]?.descricao : lista?.descricao) || NA);
 
         } catch (error) {
-
             console.error("Erro ao carregar categoria:", error);
-
             setCategoria(NA);
-
         }
 
     }
@@ -1057,25 +1693,18 @@ export default function PerfilScreen() {
         try {
 
             if (!Number.isFinite(idOrganizacao) || idOrganizacao <= 0) {
-
                 setAvaliacoes([]);
-
                 return;
-
             }
 
             const resultado =
-
                 await buscarAvaliacoesPorOrganizacao(idOrganizacao);
 
             setAvaliacoes(resultado);
 
         } catch (error) {
-
             console.error("Erro ao carregar avaliações:", error);
-
             setAvaliacoes([]);
-
         }
 
     }
@@ -1087,67 +1716,45 @@ export default function PerfilScreen() {
         try {
 
             if (!Number.isFinite(idOrganizacao) || idOrganizacao <= 0) {
-
                 setPosts([]);
-
                 return;
-
             }
 
             const resposta = await apiFetchResponse(`/posts/organizacao?id_organizacao=${idOrganizacao}`,
-
                 { credentials: "include" }
-
             );
 
             if (!resposta.ok) {
-
                 throw new Error("Não foi possível carregar os posts.");
-
             }
 
             const data = await resposta.json();
 
             const lista =
-
                 data?.posts ??
-
                 data?.data ??
-
                 data?.dados ??
-
                 data;
 
             console.log("Posts recebidos da API:", lista);
 
             if (!Array.isArray(lista)) {
-
                 setPosts([]);
-
                 return;
-
             }
 
             const postsDaOrganizacao = lista.filter(
-
                 (post: IPost) =>
-
                     Number(post.id_organizacao) === idOrganizacao
-
             );
 
             setPosts(postsDaOrganizacao);
 
         } catch (error) {
-
             console.error("Erro ao carregar posts:", error);
-
             setPosts([]);
-
         } finally {
-
             setLoadingPosts(false);
-
         }
 
     }
@@ -1161,15 +1768,11 @@ export default function PerfilScreen() {
             try {
 
                 const resposta = await apiFetchResponse(`/pessoas?tipo=ORGANIZACAO`,
-
                     { credentials: "include" }
-
                 );
 
                 if (!resposta.ok) {
-
                     throw new Error("Erro ao buscar organizações.");
-
                 }
 
                 const data = await resposta.json();
@@ -1181,55 +1784,34 @@ export default function PerfilScreen() {
                 );
 
                 const resultado = lista.find(
-
                     (item: IOrganizacao) =>
-
                         Number(item.id_pessoa) ===
-
                         Number(pessoa.id_pessoa)
-
                 );
 
                 if (!resultado) {
-
                     throw new Error(
-
                         "Não foi possível encontrar a organização na lista."
-
                     );
-
                 }
 
                 if (
-
                     !Number.isSafeInteger(Number(resultado.id_organizacao)) ||
-
                     Number(resultado.id_organizacao) <= 0
-
                 ) {
-
                     throw new Error(
-
                         "A organização encontrada não possui id_organizacao válido."
-
                     );
-
                 }
 
                 encontrada = resultado;
 
             } catch (error) {
-
                 console.error("Erro ao identificar organização:", error);
-
                 setErro(
-
                     "Não foi possível identificar a organização."
-
                 );
-
                 return;
-
             }
 
         }
@@ -1237,31 +1819,21 @@ export default function PerfilScreen() {
         const idOrganizacao = Number(encontrada.id_organizacao);
 
         if (!Number.isFinite(idOrganizacao) || idOrganizacao <= 0) {
-
             setErro("A organização não possui um ID válido.");
-
             return;
-
         }
 
         setOrganizacao(encontrada);
 
         if (encontrada.id_area_atuacao) {
-
             await carregarCategoria(encontrada.id_area_atuacao);
-
         } else {
-
             setCategoria(NA);
-
         }
 
         await Promise.all([
-
             carregarAvaliacoes(idOrganizacao),
-
             carregarPosts(idOrganizacao),
-
         ]);
 
     }
@@ -1277,27 +1849,17 @@ export default function PerfilScreen() {
             const pessoa = await buscarPessoaPorId();
 
             if (!pessoa) {
-
                 limparDados();
-
                 setErro("Organização não encontrada.");
-
                 return;
-
             }
 
             if (
-
                 pessoa.tipo?.trim().toUpperCase() !== "ORGANIZACAO"
-
             ) {
-
                 limparDados();
-
                 setErro("Esta pessoa não é uma organização.");
-
                 return;
-
             }
 
             await carregarOrganizacao(pessoa);
@@ -1312,9 +1874,7 @@ export default function PerfilScreen() {
                 "Não foi possível carregar o perfil da organização.");
 
         } finally {
-
             setLoading(false);
-
         }
 
     }
@@ -1375,41 +1935,25 @@ export default function PerfilScreen() {
     }
 
     function abrirModalAvaliacao() {
-
         if (!usuarioEhCliente) return;
-
         setNotaSelecionada(0);
-
         setTituloAvaliacao("");
-
         setComentarioAvaliacao("");
-
         setAvaliacaoAnonima(false);
-
         setErroAvaliacao("");
-
         setSucessoAvaliacao("");
-
         setModalAvaliacaoAberto(true);
-
     }
 
     function fecharModalAvaliacao() {
-
         if (enviandoAvaliacao) return;
-
         setModalAvaliacaoAberto(false);
-
         setErroAvaliacao("");
-
         setSucessoAvaliacao("");
-
     }
 
     async function enviarAvaliacao(
-
         evento: React.FormEvent<HTMLFormElement>
-
     ) {
 
         evento.preventDefault();
@@ -1417,75 +1961,47 @@ export default function PerfilScreen() {
         if (enviandoAvaliacao) return;
 
         setErroAvaliacao("");
-
         setSucessoAvaliacao("");
 
         if (!usuarioEhCliente) {
-
             setErroAvaliacao(
-
                 "Somente clientes podem criar avaliações."
-
             );
-
             return;
-
         }
 
         if (notaSelecionada < 1 || notaSelecionada > 5) {
-
             setErroAvaliacao("Selecione uma nota de 1 a 5.");
-
             return;
-
         }
 
         const titulo = tituloAvaliacao.trim();
-
         const comentario = comentarioAvaliacao.trim();
 
         if (titulo.length < 5 || titulo.length > 25) {
-
             setErroAvaliacao(
-
                 "O título deve ter entre 5 e 25 caracteres."
-
             );
-
             return;
-
         }
 
         if (comentario.length < 10 || comentario.length > 45) {
-
             setErroAvaliacao(
-
                 "O comentário deve ter entre 10 e 45 caracteres."
-
             );
-
             return;
-
         }
 
         const idOrganizacao = Number(organizacao?.id_organizacao);
 
         if (
-
             !Number.isSafeInteger(idOrganizacao) ||
-
             idOrganizacao <= 0
-
         ) {
-
             setErroAvaliacao(
-
                 "Não foi possível identificar a organização."
-
             );
-
             return;
-
         }
 
         setEnviandoAvaliacao(true);
@@ -1493,71 +2009,44 @@ export default function PerfilScreen() {
         try {
 
             // Garante que o cliente esteja carregado antes de publicar.
-
             const cliente =
-
                 clienteLogado ?? await carregarClienteLogado();
 
             const idCliente = Number(cliente?.id_cliente);
 
             if (
-
                 !Number.isSafeInteger(idCliente) ||
-
                 idCliente <= 0
-
             ) {
-
                 throw new Error(
-
                     "Não foi possível identificar o cliente logado. Entre novamente na sua conta."
-
                 );
-
             }
 
             await criarAvaliacaoApi({
-
                 comentario,
-
                 titulo,
-
                 anonimo: avaliacaoAnonima ? 1 : 0,
-
                 csat: notaSelecionada,
-
                 id_cliente: idCliente,
-
                 id_organizacao: idOrganizacao,
-
             });
 
             setSucessoAvaliacao(
-
                 "Avaliação criada com sucesso!"
-
             );
 
             // Atualiza a lista após a confirmação da API.
-
             await carregarAvaliacoes(idOrganizacao);
 
             window.setTimeout(() => {
-
                 setModalAvaliacaoAberto(false);
-
                 setNotaSelecionada(0);
-
                 setTituloAvaliacao("");
-
                 setComentarioAvaliacao("");
-
                 setAvaliacaoAnonima(false);
-
                 setErroAvaliacao("");
-
                 setSucessoAvaliacao("");
-
             }, 900);
 
         } catch (error) {
@@ -1565,19 +2054,13 @@ export default function PerfilScreen() {
             console.error("Erro ao publicar avaliação:", error);
 
             setErroAvaliacao(
-
                 error instanceof Error
-
                     ? error.message
-
                     : "Não foi possível criar a avaliação."
-
             );
 
         } finally {
-
             setEnviandoAvaliacao(false);
-
         }
 
     }
@@ -1606,27 +2089,18 @@ export default function PerfilScreen() {
     useEffect(() => {
 
         if (!usuarioEhCliente || !clienteLogado?.id_cliente) {
-
             setFavoritado(false);
-
             return;
-
         }
 
         if (organizacao?.id_pessoa) {
-
             carregarStatusFavorito();
-
         }
 
     }, [
-
         usuarioEhCliente,
-
         organizacao?.id_pessoa,
-
         clienteLogado?.id_cliente,
-
     ]);
 
     useEffect(() => {
@@ -1646,29 +2120,19 @@ export default function PerfilScreen() {
     useEffect(() => {
 
         function pressionouEsc(evento: KeyboardEvent) {
-
             if (
-
                 evento.key === "Escape" &&
-
                 modalAvaliacaoAberto &&
-
                 !enviandoAvaliacao
-
             ) {
-
                 fecharModalAvaliacao();
-
             }
-
         }
 
         document.addEventListener("keydown", pressionouEsc);
 
         return () => {
-
             document.removeEventListener("keydown", pressionouEsc);
-
         };
 
     }, [modalAvaliacaoAberto, enviandoAvaliacao]);
@@ -1676,23 +2140,14 @@ export default function PerfilScreen() {
     useEffect(() => {
 
         if (
-
             !id_pessoa ||
-
             !Number.isSafeInteger(idPessoa) ||
-
             idPessoa <= 0
-
         ) {
-
             limparDados();
-
             setErro("ID da organização inválido.");
-
             setLoading(false);
-
             return;
-
         }
 
         void carregarDados();
@@ -1700,45 +2155,25 @@ export default function PerfilScreen() {
     }, [id_pessoa]);
 
     useEffect(() => {
-
         void carregarClienteLogado();
-
     }, [
-
         user?.tipo,
-
         user?.id_pessoa_login,
-
     ]);
 
-    function BotaoAba({ aba, icon }: { aba: Aba; icon: string }) {
-
+    function BotaoAba({ aba, icon, rotulo }: { aba: Aba; icon: string; rotulo: string }) {
         return (
-
             <button
-
                 type="button"
-
-                className={`iconeMenu ${abaSelecionada === aba
-
-                    ? "iconeMenuSelecionado"
-
-                    : ""
-
-                    }`}
-
+                className={`iconeMenu ${abaSelecionada === aba ? "iconeMenuSelecionado" : ""}`}
                 onClick={() => setAbaSelecionada(aba)}
-
-                aria-label={aba}
-
+                aria-label={rotulo}
+                aria-pressed={abaSelecionada === aba}
             >
-
-                <span>{icon}</span>
-
+                <span className="tdkAbaIcone" aria-hidden="true">{icon}</span>
+                <span className="tdkAbaRotulo">{rotulo}</span>
             </button>
-
         );
-
     }
 
     function BotaoCriarAvaliacao() {
@@ -1746,23 +2181,14 @@ export default function PerfilScreen() {
         if (!usuarioEhCliente) return null;
 
         return (
-
             <button
-
                 type="button"
-
                 className="botaoCriarAvaliacao"
-
                 onClick={abrirModalAvaliacao}
-
             >
-
                 <span className="iconeBotaoAvaliacao">＋</span>
-
                 <span>Criar avaliação</span>
-
             </button>
-
         );
 
     }
@@ -1773,8 +2199,12 @@ export default function PerfilScreen() {
         return (
             <button
                 type="button"
-                className={`botaoFavoritar ${favoritado ? "botaoFavoritado" : ""
-                    }`}
+                className={`tdkFavorito ${favoritado ? "tdkFavoritoAtivo" : ""}`}
+                style={{
+                    ...ESTILO_FAVORITO,
+                    ...(favoritado ? ESTILO_FAVORITO_ATIVO : null),
+                    ...(carregandoFavorito ? { opacity: 0.65, cursor: "wait" } : null),
+                }}
                 onClick={() => void alternarFavorito()}
                 disabled={carregandoFavorito}
                 aria-pressed={favoritado}
@@ -1784,11 +2214,11 @@ export default function PerfilScreen() {
                         : "Adicionar aos favoritos"
                 }
             >
-                <Heart
-                    size={21}
+                <Star
+                    className="tdkFavoritoEstrela"
+                    size={18}
                     strokeWidth={2.2}
-                    color="#8E0808"
-                    fill={favoritado ? "#8E0808" : "none"}
+                    fill={favoritado ? "currentColor" : "none"}
                 />
 
                 <span>
@@ -1806,46 +2236,23 @@ export default function PerfilScreen() {
 
         return (
 
-            <div>
+            <div className="tdkIni">
 
-                <div className="estatisticas">
-
-                    <Estatistica
-
-                        numero={String(posts.length)}
-
-                        texto="Publicações"
-
-                    />
-
-                    <div className="divisor" />
-
-                    <Estatistica
-
-                        numero={String(avaliacoes.length)}
-
-                        texto="Avaliações recebidas"
-
-                    />
-
-                    <div className="divisor" />
-
-                    <Estatistica
-
-                        numero={String(media)}
-
-                        texto="Nota média"
-
-                    />
-
+                <div className="tdkIniStats">
+                    <Estatistica numero={String(posts.length)} texto="Publicações" icone={<FileText size={22} />} />
+                    <Estatistica numero={String(avaliacoes.length)} texto="Avaliações recebidas" icone={<MessageCircle size={22} />} />
+                    <Estatistica numero={String(media)} texto="Nota média" icone={<Star size={22} />} />
                 </div>
 
-                <section className="tdkDestaquesPainel">
-                    <div className="tituloLinha">
-
-                        <div className="tdkSecaoTexto"><h2 className="titulo">{organizacaoEhDonaDoPerfil ? "Suas publicações em destaque" : "Conheça nossas publicações"}</h2><p className="tdkSecaoDescricao">{organizacaoEhDonaDoPerfil ? "Veja como seus posts aparecem para quem visita sua página." : "Descubra novidades, produtos e conteúdos desta organização."}</p></div>
-                        <button type="button" className="perfilVerMais" onClick={() => setAbaSelecionada("posts")}>Ver todos os posts <span aria-hidden="true">→</span></button>
-
+                <section className="tdkIniSecao">
+                    <div className="tdkIniSecaoTopo">
+                        <div>
+                            <h2>{organizacaoEhDonaDoPerfil ? "Suas publicações em destaque" : "Conheça nossas publicações"}</h2>
+                            <p>{organizacaoEhDonaDoPerfil ? "Veja como seus posts aparecem para quem visita sua página." : "Descubra novidades, produtos e conteúdos desta organização."}</p>
+                        </div>
+                        <button type="button" className="tdkIniVerMais" onClick={() => setAbaSelecionada("posts")}>
+                            Ver todos os posts <ArrowRight size={15} aria-hidden="true" />
+                        </button>
                     </div>
 
                     {loadingPosts ? (
@@ -1858,16 +2265,13 @@ export default function PerfilScreen() {
 
                     ) : (
 
-                        <div className="destaques">
+                        <div className="tdkIniPosts">
 
                             {postsDestaques.map((post, index) => (
 
                                 <PostCard
-
                                     key={post.id_post ?? index}
-
                                     post={post}
-
                                     onAbrirPosts={() => {
                                         const id = Number(post.id_post);
                                         if (Number.isSafeInteger(id) && id > 0) {
@@ -1877,7 +2281,6 @@ export default function PerfilScreen() {
                                         }
                                         setAbaSelecionada("posts");
                                     }}
-
                                 />
 
                             ))}
@@ -1888,59 +2291,56 @@ export default function PerfilScreen() {
 
                 </section>
 
-                <section className="tdkReviewsPreview" aria-labelledby="tdkReviewsPreviewTitulo">
-                    <div className="tdkReviewsPreviewCabecalho">
-                        <div className="tdkReviewsPreviewTituloGrupo">
+                <section className="tdkIniSecao" aria-labelledby="tdkReviewsPreviewTitulo">
+                    <div className="tdkIniSecaoTopo">
+                        <div>
                             <h2 id="tdkReviewsPreviewTitulo">{organizacaoEhDonaDoPerfil ? "O que estão dizendo sobre você" : "Avaliações de quem já conhece"}</h2>
                             <p>{organizacaoEhDonaDoPerfil ? "Acompanhe as experiências e opiniões de seus clientes." : "Veja o que outras pessoas acharam desta organização."}</p>
                         </div>
-                        <div className="tdkReviewsPreviewAcoes"><BotaoCriarAvaliacao /><button type="button" className="perfilVerMais" onClick={() => setAbaSelecionada("avaliacoes")}>Ver todas as avaliações <span aria-hidden="true">→</span></button></div>
+                        <div className="tdkIniAcoes">
+                            <BotaoCriarAvaliacao />
+                            <button type="button" className="tdkIniVerMais" onClick={() => setAbaSelecionada("avaliacoes")}>
+                                Ver todas as avaliações <ArrowRight size={15} aria-hidden="true" />
+                            </button>
+                        </div>
                     </div>
 
                     {avaliacoes.length === 0 ? (
-                        <div className="tdkReviewsPreviewVazio">
+                        <div className="tdkIniVazio">
                             <Star size={26} />
                             <strong>Esta organização ainda não recebeu avaliações.</strong>
                             <span>Compartilhe sua experiência e ajude outras pessoas.</span>
                         </div>
                     ) : (
-                        <>
-                            <div className="tdkReviewsPreviewGrade">
-                                {avaliacoes.slice(0, 3).map((avaliacao, index) => {
-                                    const nota = Math.max(0, Math.min(5, Number(avaliacao.csat) || 0));
-                                    const idAvaliacao = Number(avaliacao.id_avaliacao);
-                                    return (
-                                        <button type="button" key={avaliacao.id_avaliacao ?? index}
-                                            className="tdkReviewsPreviewCard"
-                                            onClick={() => {
-                                                if (Number.isSafeInteger(idAvaliacao) && idAvaliacao > 0) {
-                                                    navigate(`?aba=avaliacoes&avaliacao=${idAvaliacao}`);
-                                                }
-                                                setAbaSelecionada("avaliacoes");
-                                            }}
-                                            aria-label={`Ler avaliação: ${avaliacao.titulo || "Sem título"}`}>
-                                            <div className="tdkReviewsPreviewCardTopo">
-                                                <span className="tdkReviewsPreviewAspas" aria-hidden="true">“</span>
-                                                <div className="tdkReviewsPreviewEstrelas" aria-label={`${nota} de 5 estrelas`}>
-                                                    {[1, 2, 3, 4, 5].map(estrela => (
-                                                        <Star key={estrela} size={16} fill={estrela <= nota ? "currentColor" : "none"} />
-                                                    ))}
-                                                </div>
-                                            </div>
-                                            <h3>{avaliacao.titulo || "Avaliação sem título"}</h3>
-                                            <p className="tdkReviewsPreviewComentario">
-                                                {avaliacao.comentario?.trim() || "Cliente compartilhou sua nota para esta organização."}
-                                            </p>
-                                            <div className="tdkReviewsPreviewRodape">
-                                                <span className="tdkReviewsPreviewAvatar"><User size={17} /></span>
-                                                <span className="tdkReviewsPreviewAutor">{nomeAutorAvaliacao(avaliacao)}</span>
-                                                <span className="tdkReviewsPreviewAbrir" aria-hidden="true">↗</span>
-                                            </div>
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        </>
+                        <div className="tdkIniReviews">
+                            {avaliacoes.slice(0, 3).map((avaliacao, index) => {
+                                const nota = Math.max(0, Math.min(5, Number(avaliacao.csat) || 0));
+                                const idAvaliacao = Number(avaliacao.id_avaliacao);
+                                return (
+                                    <button type="button" key={avaliacao.id_avaliacao ?? index}
+                                        className="tdkIniReview"
+                                        onClick={() => {
+                                            if (Number.isSafeInteger(idAvaliacao) && idAvaliacao > 0) {
+                                                navigate(`?aba=avaliacoes&avaliacao=${idAvaliacao}`);
+                                            }
+                                            setAbaSelecionada("avaliacoes");
+                                        }}
+                                        aria-label={`Ler avaliação: ${avaliacao.titulo || "Sem título"}`}>
+                                        <div className="tdkIniReviewEstrelas" aria-label={`${nota} de 5 estrelas`}>
+                                            {[1, 2, 3, 4, 5].map(estrela => (
+                                                <Star key={estrela} size={16} fill={estrela <= nota ? "currentColor" : "none"} />
+                                            ))}
+                                        </div>
+                                        <h3>{avaliacao.titulo || "Avaliação sem título"}</h3>
+                                        <p>{avaliacao.comentario?.trim() || "Cliente compartilhou sua nota para esta organização."}</p>
+                                        <div className="tdkIniReviewRodape">
+                                            <span className="tdkIniReviewAvatar"><img src={userPerfil} alt="" aria-hidden="true" /></span>
+                                            <span className="tdkIniReviewAutor">{nomeAutorAvaliacao(avaliacao)}</span>
+                                        </div>
+                                    </button>
+                                );
+                            })}
+                        </div>
                     )}
                 </section>
 
@@ -1995,75 +2395,73 @@ export default function PerfilScreen() {
 
     return (
 
-        <div className="container tdkPerfilRedesign">
+        <AppShell
+            ativo={meuPerfilOrganizacaoAtivo ? "perfil" : undefined}
+            aoAbrirPerfil={irParaMeuPerfil}
+        >
+            <div className="container tdkPerfilRedesign">
 
-            <div className="scrollContent">
+                <div className="scrollContent">
 
-                <header className="topo">
+                    <div className="tdkPerfilPaginaGrid">
+                        <div className="tdkPerfilColunaPrincipal">
 
-                    <button
+                            <header className="topo">
 
-                        type="button"
+                                <button
+                                    type="button"
+                                    className="botaoVoltar"
+                                    onClick={() => navigate("/")}
+                                    aria-label="Voltar para a Home"
+                                >
+                                    ←
+                                </button>
 
-                        className="botaoVoltar"
+                                <div className="perfil">
 
-                        onClick={() => navigate("/")}
+                                    <div className={`informacoes ${editandoPerfil ? "tdkPerfilEditando" : ""}`}>
+                                        <div className="tdkIdentidadePerfil">
+                                            <div className="avatar tdkAvatarGiratorio"><img src={casinhaPerfil} alt="Foto padrão da organização" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%", display: "block" }} /></div>
+                                            <div className="tdkIdentidadeTexto">
+                                                <div className="linhaNomeFavorito">
+                                                    <h1 className="nomeLoja">{organizacao.nome || "Organização"}</h1>
+                                                    <BotaoFavoritar />
+                                                </div>
+                                                <span className="categoria">{categoria}</span>
+                                            </div>
+                                        </div>
+                                        <div className="tdkPerfilDadosPublicos" aria-label="Informações de contato da organização">
+                                            {(contatosPublicos.find(c => c.email && c.principal)?.email ?? contatosPublicos.find(c => c.email)?.email ?? organizacao.email) && (
+                                                <a className="tdkPerfilDado" href={`mailto:${contatosPublicos.find(c => c.email && c.principal)?.email ?? contatosPublicos.find(c => c.email)?.email ?? organizacao.email}`}>
+                                                    <span className="tdkPerfilDadoIcone">✉</span><span><small>E-mail</small><strong>{contatosPublicos.find(c => c.email && c.principal)?.email ?? contatosPublicos.find(c => c.email)?.email ?? organizacao.email}</strong></span>
+                                                </a>
+                                            )}
+                                            {(contatosPublicos.find(c => c.telefone && c.principal)?.telefone ?? contatosPublicos.find(c => c.telefone)?.telefone ?? organizacao.telefone) && (
+                                                <a className="tdkPerfilDado" href={`tel:${(contatosPublicos.find(c => c.telefone && c.principal)?.telefone ?? contatosPublicos.find(c => c.telefone)?.telefone ?? organizacao.telefone ?? "").replace(/[^\d+]/g, "")}`}>
+                                                    <span className="tdkPerfilDadoIcone">☎</span><span><small>Telefone</small><strong>{formatarTelefoneExibicao(contatosPublicos.find(c => c.telefone && c.principal)?.telefone ?? contatosPublicos.find(c => c.telefone)?.telefone ?? organizacao.telefone)}</strong></span>
+                                                </a>
+                                            )}
 
-                        aria-label="Voltar para a Home"
-
-                    >
-
-                        ←
-
-                    </button>
-
-                    <div className="perfil">
-
-                        <div className="informacoes">
-                            <div className="tdkIdentidadePerfil">
-                                <div className="avatar" aria-hidden="true" />
-                                <div className="tdkIdentidadeTexto">
-                                    <div className="linhaNomeFavorito">
-                                        <h1 className="nomeLoja">{organizacao.nome || "Organização"}</h1>
-                                        <BotaoFavoritar />
+                                        </div>
+                                        {organizacaoEhDonaDoPerfil && (
+                                            <div className="tdkEditProfileEntry">
+                                                <button type="button" className="tdkEditProfileOpen" onClick={() => { setAvisoPerfil(""); setEditandoPerfil(true); }}>
+                                                    <span>✎</span> Editar perfil
+                                                </button>
+                                                <span>Gerencie suas informações e formas de contato</span>
+                                            </div>
+                                        )}
+                                        {avisoPerfil && <p className="tdkEditProfileSuccess" role="status">{avisoPerfil}</p>}
                                     </div>
-                                    <span className="categoria">{categoria}</span>
+
                                 </div>
-                            </div>
-                            <div className="tdkPerfilDadosPublicos" aria-label="Informações de contato da organização">
-                                {(contatosPublicos.find(c => c.email && c.principal)?.email ?? contatosPublicos.find(c => c.email)?.email ?? organizacao.email) && (
-                                    <a className="tdkPerfilDado" href={`mailto:${contatosPublicos.find(c => c.email && c.principal)?.email ?? contatosPublicos.find(c => c.email)?.email ?? organizacao.email}`}>
-                                        <span className="tdkPerfilDadoIcone">✉</span><span><small>E-mail</small><strong>{contatosPublicos.find(c => c.email && c.principal)?.email ?? contatosPublicos.find(c => c.email)?.email ?? organizacao.email}</strong></span>
-                                    </a>
-                                )}
-                                {(contatosPublicos.find(c => c.telefone && c.principal)?.telefone ?? contatosPublicos.find(c => c.telefone)?.telefone ?? organizacao.telefone) && (
-                                    <a className="tdkPerfilDado" href={`tel:${(contatosPublicos.find(c => c.telefone && c.principal)?.telefone ?? contatosPublicos.find(c => c.telefone)?.telefone ?? organizacao.telefone ?? "").replace(/[^\d+]/g, "")}`}>
-                                        <span className="tdkPerfilDadoIcone">☎</span><span><small>Telefone</small><strong>{contatosPublicos.find(c => c.telefone && c.principal)?.telefone ?? contatosPublicos.find(c => c.telefone)?.telefone ?? organizacao.telefone}</strong></span>
-                                    </a>
-                                )}
-                                {enderecoVisivel && <div className="tdkEnderecoCard">
-                                    <div className="tdkEnderecoIcone"><Store size={22} /></div>
-                                    <div className="tdkEnderecoConteudo">
-                                        <span className="tdkEnderecoRotulo">LOCALIZAÇÃO DA ORGANIZAÇÃO</span>
-                                        <strong className="tdkEnderecoRua">{enderecoVisivel.rua}, {enderecoVisivel.numero}</strong>
-                                        <span className="tdkEnderecoBairro">{enderecoVisivel.bairro} · {enderecoVisivel.municipio}/{enderecoVisivel.uf}</span>
-                                        <span className="tdkEnderecoCep">CEP {String(enderecoVisivel.cep).replace(/^(\d{5})(\d{3})$/, "$1-$2")}</span>
-                                    </div>
-                                    <a className="tdkEnderecoMapa" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${enderecoVisivel.rua}, ${enderecoVisivel.numero}, ${enderecoVisivel.bairro}, ${enderecoVisivel.municipio}, ${enderecoVisivel.uf}`)}`} target="_blank" rel="noopener noreferrer">Ver no mapa ↗</a>
-                                </div>}
-                            </div>
-                            {organizacaoEhDonaDoPerfil && (
-                                <div className="tdkEditProfileEntry">
-                                    <button type="button" className="tdkEditProfileOpen" onClick={() => { setAvisoPerfil(""); setEditandoPerfil(true); }}>
-                                        <span>✎</span> Editar perfil
-                                    </button>
-                                    <span>Gerencie suas informações e formas de contato</span>
-                                </div>
-                            )}
-                            {avisoPerfil && <p className="tdkEditProfileSuccess" role="status">{avisoPerfil}</p>}
+
+                            </header>
+
                             {organizacaoEhDonaDoPerfil && editandoPerfil && (
                                 <EditarPerfilModal
                                     organizacao={organizacao}
+                                    categoria={categoria}
                                     aoFechar={() => setEditandoPerfil(false)}
                                     aoSalvar={(nome, email, telefone) => {
                                         setOrganizacao(atual => atual ? { ...atual, nome, email, telefone } : atual);
@@ -2073,765 +2471,645 @@ export default function PerfilScreen() {
                                     }}
                                 />
                             )}
-                        </div>
 
-                    </div>
+                            <main className="areaMenu">
 
-                </header>
+                                <nav
+                                    className="menuNavegacao tdkNavegacaoAnimada"
+                                    data-aba-ativa={abaSelecionada}
+                                    data-total-abas={organizacaoEhDonaDoPerfil ? "4" : "3"}
+                                >
 
-                <main className="areaMenu">
+                                    {BotaoAba({ aba: "inicio", icon: "⌂", rotulo: "Início" })}
+                                    {organizacaoEhDonaDoPerfil && BotaoAba({ aba: "arquivados", icon: "▤", rotulo: "Arquivados" })}
+                                    {BotaoAba({ aba: "posts", icon: "▣", rotulo: "Publicações" })}
+                                    {BotaoAba({ aba: "avaliacoes", icon: "☆", rotulo: "Avaliações" })}
 
-                    <nav
-                        className="menuNavegacao tdkNavegacaoAnimada"
-                        data-aba-ativa={abaSelecionada}
-                        data-total-abas={organizacaoEhDonaDoPerfil ? "4" : "3"}
-                    >
+                                </nav>
 
-                        <BotaoAba aba="inicio" icon="⌂" />
+                                <div className="linha" />
 
-                        {organizacaoEhDonaDoPerfil && <BotaoAba aba="arquivados" icon="▤" />}
+                                <div className="tdkAbaTransicao" key={abaSelecionada}>
 
-                        <BotaoAba aba="posts" icon="▣" />
+                                    {abaSelecionada === "inicio" && (
 
-                        <BotaoAba aba="avaliacoes" icon="☆" />
+                                        <div ref={inicioRef} className="abaRef">
 
-                    </nav>
+                                            <AbaInicio />
 
-                    <div className="linha" />
+                                        </div>
 
-                    <div className="tdkAbaTransicao" key={abaSelecionada}>
-
-                        {abaSelecionada === "inicio" && (
-
-                            <div ref={inicioRef} className="abaRef">
-
-                                <AbaInicio />
-
-                            </div>
-
-                        )}
-
-                        {organizacaoEhDonaDoPerfil && abaSelecionada === "arquivados" && (
-                            <section
-                                ref={arquivadosRef}
-                                className="abaConteudo abaRef tdkArquivadosPainel"
-                            >
-                                <h2 className="tituloAba">
-                                    Publicações arquivadas
-                                </h2>
-
-                                <p className="subtituloAba">
-                                    Publicações retiradas do perfil público. Você pode restaurá-las quando quiser.
-                                </p>
-
-                                {!loadingArquivados && !erroArquivados && postsArquivados.length > 0 && (
-                                    <div className="perfilLoteBarra">
-                                        {selecionandoArquivados ? (
-                                            <>
-                                                <span className="perfilLoteContagem">
-                                                    {idsArquivadosSelecionados.length} de {postsArquivados.length} selecionadas
-                                                </span>
-                                                <button type="button" className="perfilLoteBotaoNeutro"
-                                                    disabled={processandoLote}
-                                                    onClick={() => setIdsArquivadosSelecionados(
-                                                        idsArquivadosSelecionados.length === postsArquivados.length
-                                                            ? []
-                                                            : postsArquivados.map(p => Number(p.id_post)).filter(id => Number.isSafeInteger(id) && id > 0)
-                                                    )}>
-                                                    {idsArquivadosSelecionados.length === postsArquivados.length
-                                                        ? "Desmarcar todas" : "Selecionar todas"}
-                                                </button>
-                                                <button type="button" className="perfilLoteBotaoPrincipal"
-                                                    disabled={processandoLote || idsArquivadosSelecionados.length === 0}
-                                                    onClick={() => setConfirmarDesarquivarLote(true)}>
-                                                    <Archive size={16} />
-                                                    {processandoLote ? "Processando..." : `Desarquivar (${idsArquivadosSelecionados.length})`}
-                                                </button>
-                                                <button type="button" className="perfilLoteBotaoNeutro"
-                                                    disabled={processandoLote} onClick={cancelarSelecaoArquivados}>
-                                                    Cancelar
-                                                </button>
-                                            </>
-                                        ) : (
-                                            <button type="button" className="perfilLoteBotaoNeutro"
-                                                onClick={() => { setSelecionandoArquivados(true); setErroLote(""); }}>
-                                                Selecionar publicações
-                                            </button>
-                                        )}
-                                    </div>
-                                )}
-                                {erroLote && <p className="perfilLoteErro" role="alert">{erroLote}</p>}
-                                {mensagemArquivados && !erroArquivados && (
-                                    <div role="status" className="perfilAvisoSucesso">✓ {mensagemArquivados}</div>
-                                )}
-                                {loadingArquivados ? (
-                                    <Loading texto="Carregando arquivados..." />
-                                ) : erroArquivados ? (
-                                    <div className="perfilEstadoVazio" role="alert">
-                                        <Archive size={34} />
-                                        <h3>Não foi possível consultar os arquivados</h3>
-                                        <p>{erroArquivados}</p>
-                                        <button type="button" className="perfilBotaoTentar" onClick={() => void carregarPostsArquivados(Number(organizacao.id_organizacao))}>
-                                            <RefreshCw size={16} /> Tentar novamente
-                                        </button>
-                                    </div>
-                                ) : postsArquivados.length === 0 ? (
-                                    <div className="perfilEstadoVazio">
-                                        <Inbox size={36} />
-                                        <h3>Nenhuma publicação arquivada</h3>
-                                        <p>As publicações arquivadas aparecerão aqui quando houver alguma.</p>
-                                    </div>
-                                ) : (
-                                    <div className="abaPosts">
-                                        {postsArquivados.map((post, index) => (
-                                            <article
-                                                key={post.id_post ?? index}
-                                                className="cardPost"
-                                                style={{ position: "relative" }}
-                                            >
-                                                {selecionandoArquivados && post.id_post != null && (
-                                                    <label className="perfilLoteSelecao" title="Selecionar publicação">
-                                                        <input type="checkbox"
-                                                            checked={idsArquivadosSelecionados.includes(Number(post.id_post))}
-                                                            disabled={processandoLote}
-                                                            onChange={() => alternarSelecaoArquivado(Number(post.id_post))}
-                                                            aria-label={`Selecionar ${post.titulo || "publicação"}`}
-                                                        />
-                                                    </label>
-                                                )}
-                                                {!selecionandoArquivados && organizacaoEhDonaDoPerfil && post.id_post != null && (
-                                                    <div style={{ position: "absolute", right: 12, top: 12, zIndex: 5 }}>
-                                                        <button
-                                                            type="button"
-                                                            aria-label="Opções da publicação arquivada"
-                                                            aria-expanded={menuArquivadoAberto === Number(post.id_post)}
-                                                            onClick={() => setMenuArquivadoAberto(atual =>
-                                                                atual === Number(post.id_post) ? null : Number(post.id_post)
-                                                            )}
-                                                            style={{ padding: 8, border: "1px solid #ddd", borderRadius: 8, background: "white", cursor: "pointer" }}
-                                                        >
-                                                            <MoreVertical size={20} />
-                                                        </button>
-                                                        {menuArquivadoAberto === Number(post.id_post) && (
-                                                            <div style={{ position: "absolute", top: "100%", right: 0, minWidth: 215, padding: 8, background: "white", border: "1px solid #ddd", borderRadius: 8, boxShadow: "0 4px 12px #0002", zIndex: 6 }}>
-                                                                <button
-                                                                    type="button"
-                                                                    disabled={desarquivando !== null}
-                                                                    onClick={() => void desarquivarPost(Number(post.id_post))}
-                                                                    style={{ display: "flex", alignItems: "center", gap: 8, padding: 10, width: "100%", border: 0, background: "white", cursor: desarquivando !== null ? "wait" : "pointer", textAlign: "left" }}
-                                                                >
-                                                                    <Archive size={18} />
-                                                                    {desarquivando === Number(post.id_post) ? "Desarquivando..." : "Desarquivar publicação"}
-                                                                </button>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                )}
-                                                {post.vincularImagem && (
-                                                    <img
-                                                        className="imagemPost"
-                                                        src={obterUrlImagem(post.vincularImagem)}
-                                                        alt={post.titulo || "Publicação arquivada"}
-                                                    />
-                                                )}
-
-                                                <div className="conteudoPost">
-                                                    <h3 className="tituloPost">
-                                                        {post.titulo || "Sem título"}
-                                                    </h3>
-
-                                                    <p className="descricaoPost">
-                                                        {post.descricao || "Sem descrição"}
-                                                    </p>
-
-                                                    <span className="etiquetaArquivado">
-                                                        Arquivado
-                                                    </span>
-                                                </div>
-                                            </article>
-                                        ))}
-                                    </div>
-                                )}
-                            </section>
-                        )}
-
-                        {abaSelecionada === "posts" && (
-                            <section ref={postsRef} className="abaRef tdkPublicacoesPainel">
-                                <div className="perfilCriarPostCabecalho">
-                                    <h2 className="tituloAba">Publicações da organização</h2>
-                                    {organizacaoEhDonaDoPerfil && (
-                                        <button type="button" className="perfilCriarPostBotao" onClick={() => setCriarPostAberto(true)}>
-                                            <Plus size={19} strokeWidth={2.4} /> Criar publicação
-                                        </button>
                                     )}
-                                </div>
-                                {organizacao.id_organizacao ? (
-                                    <FeedPostsPerfil
-                                        incorporado
-                                        postsIniciais={posts}
-                                        carregandoPostsIniciais={loadingPosts}
-                                        idOrganizacaoPerfil={Number(organizacao.id_organizacao)}
-                                        organizacaoDoPerfilIdPessoa={Number(organizacao.id_pessoa)}
-                                        nomeOrganizacaoPerfil={organizacao.nome || ""}
-                                        onPostArquivado={(idPost) =>
-                                            setPosts((anteriores) =>
-                                                anteriores.filter((post) => Number(post.id_post) !== idPost)
-                                            )
-                                        }
-                                    />
-                                ) : (
-                                    <SemPosts grande />
-                                )}
-                            </section>
-                        )}
 
-                        {abaSelecionada === "avaliacoes" && (
+                                    {organizacaoEhDonaDoPerfil && abaSelecionada === "arquivados" && (
+                                        <section
+                                            ref={arquivadosRef}
+                                            className="abaConteudo abaRef tdkArquivadosPainel"
+                                        >
+                                            <h2 className="tituloAba">
+                                                Publicações arquivadas
+                                            </h2>
 
-                            <div
+                                            <p className="subtituloAba">
+                                                Publicações retiradas do perfil público. Você pode restaurá-las quando quiser.
+                                            </p>
 
-                                ref={avaliacoesRef}
-
-                                className="abaAvaliacoes abaRef"
-
-                            >
-
-                                <div className="cabecalhoAvaliacoes">
-
-                                    <div>
-
-                                        <h2 className="tituloAba">
-
-                                            Avaliações
-
-                                        </h2>
-
-                                        <p className="subtituloAba">
-
-                                            O que os clientes estão dizendo
-
-                                        </p>
-
-                                    </div>
-
-                                    <div className="mediaAvaliacao">
-
-                                        <strong>{media}</strong>
-
-                                    </div>
-
-                                </div>
-
-                                {organizacaoEhDonaDoPerfil && (
-                                    <div className="tdkIndicadoresAvaliacoes" aria-label="Indicadores das avaliações da sua organização">
-                                        <div><span>Total de avaliações</span><strong>{indicadoresAvaliacoes.total}</strong><small>Opiniões recebidas</small></div>
-                                        <div><span>Nota média</span><strong>{indicadoresAvaliacoes.media} <Star size={18} fill="currentColor" /></strong><small>De 5 estrelas</small></div>
-                                        <div><span>Avaliações positivas</span><strong>{indicadoresAvaliacoes.positivas}%</strong><small>Notas de 4 e 5 estrelas</small></div>
-                                        <div><span>Avaliações a melhorar</span><strong>{indicadoresAvaliacoes.melhorar}</strong><small>Notas de 1 e 2 estrelas</small></div>
-                                    </div>
-                                )}
-                                <div className="botaoAvaliacaoTopo">
-
-                                    <BotaoCriarAvaliacao />
-
-                                </div>
-
-                                {avaliacoes.length === 0 ? (
-
-                                    <div className="semAvaliacoesContainer">
-
-                                        <span className="semAvaliacoes">
-
-                                            Nenhuma avaliação encontrada.
-
-                                        </span>
-
-                                    </div>
-
-                                ) : (
-
-                                    <div className="perfilAvaliacoesLista">
-                                        {avaliacoes.map((avaliacao, index) => (
-                                            <article key={avaliacao.id_avaliacao ?? index}
-                                                id={`perfil-avaliacao-${avaliacao.id_avaliacao}`}
-                                                className="perfilAvaliacaoNova"
-                                                style={Number(avaliacao.id_avaliacao) === avaliacaoDestacada
-                                                    ? { outline: "3px solid #B01013", outlineOffset: 3, borderRadius: 12 }
-                                                    : undefined}>
-                                                <div className="perfilAvaliacaoTopo">
-                                                    <div className="perfilAvaliacaoAvatar"><User size={20} /></div>
-                                                    <div className="perfilAvaliacaoAutor">
-                                                        <strong>{nomeAutorAvaliacao(avaliacao)}</strong>
-                                                        <span>Avaliação de cliente</span>
-                                                    </div>
-                                                    <div className="perfilAvaliacaoEstrelas" aria-label={`Nota ${avaliacao.csat} de 5`}>
-                                                        {[1, 2, 3, 4, 5].map(estrela => (
-                                                            <Star key={estrela} size={15} fill={estrela <= Number(avaliacao.csat) ? "currentColor" : "none"} />
-                                                        ))}
-                                                        <strong>{avaliacao.csat}/5</strong>
-                                                    </div>
+                                            {!loadingArquivados && !erroArquivados && postsArquivados.length > 0 && (
+                                                <div className="perfilLoteBarra">
+                                                    {selecionandoArquivados ? (
+                                                        <>
+                                                            <span className="perfilLoteContagem">
+                                                                {idsArquivadosSelecionados.length} de {postsArquivados.length} selecionadas
+                                                            </span>
+                                                            <button type="button" className="perfilLoteBotaoNeutro"
+                                                                disabled={processandoLote}
+                                                                onClick={() => setIdsArquivadosSelecionados(
+                                                                    idsArquivadosSelecionados.length === postsArquivados.length
+                                                                        ? []
+                                                                        : postsArquivados.map(p => Number(p.id_post)).filter(id => Number.isSafeInteger(id) && id > 0)
+                                                                )}>
+                                                                {idsArquivadosSelecionados.length === postsArquivados.length
+                                                                    ? "Desmarcar todas" : "Selecionar todas"}
+                                                            </button>
+                                                            <button type="button" className="perfilLoteBotaoPrincipal"
+                                                                disabled={processandoLote || idsArquivadosSelecionados.length === 0}
+                                                                onClick={() => setConfirmarDesarquivarLote(true)}>
+                                                                <Archive size={16} />
+                                                                {processandoLote ? "Processando..." : `Desarquivar (${idsArquivadosSelecionados.length})`}
+                                                            </button>
+                                                            <button type="button" className="perfilLoteBotaoNeutro"
+                                                                disabled={processandoLote} onClick={cancelarSelecaoArquivados}>
+                                                                Cancelar
+                                                            </button>
+                                                        </>
+                                                    ) : (
+                                                        <button type="button" className="perfilLoteBotaoNeutro"
+                                                            onClick={() => { setSelecionandoArquivados(true); setErroLote(""); }}>
+                                                            Selecionar publicações
+                                                        </button>
+                                                    )}
                                                 </div>
-                                                <h3>{avaliacao.titulo || "Avaliação"}</h3>
-                                                {avaliacao.comentario && <p className="perfilAvaliacaoComentario">{avaliacao.comentario}</p>}
-                                            </article>
-                                        ))}
-                                    </div>
-
-                                )}
-
-                            </div>
-
-                        )}
-
-                    </div>
-
-                </main>
-
-            </div>
-
-            {organizacaoEhDonaDoPerfil && (
-                <>
-                    {erroCategoriasCriacao && criarPostAberto && (
-                        <p className="perfilCriarPostErro" role="alert">{erroCategoriasCriacao}</p>
-                    )}
-                    <CreatePostModal
-                        open={criarPostAberto}
-                        onClose={() => setCriarPostAberto(false)}
-                        person={{
-                            id_pessoa: Number(organizacao.id_pessoa),
-                            id_organizacao: Number(organizacao.id_organizacao),
-                            nome: organizacao.nome,
-                            tipo: "ORGANIZACAO"
-                        }}
-                        categories={categoriasCriacao}
-                        onPublished={async () => {
-                            await carregarPosts(Number(organizacao.id_organizacao));
-                        }}
-                    />
-                </>
-            )}
-
-            {confirmarDesarquivarLote && (
-                <div className="perfilLoteOverlay" role="presentation"
-                    onMouseDown={e => { if (e.target === e.currentTarget && !processandoLote) setConfirmarDesarquivarLote(false); }}>
-                    <div className="perfilLoteModal" role="dialog" aria-modal="true"
-                        aria-labelledby="tituloDesarquivarLote">
-                        <div className="perfilLoteIcone"><Archive size={25} /></div>
-                        <h2 id="tituloDesarquivarLote">Desarquivar publicações?</h2>
-                        <p>
-                            As {idsArquivadosSelecionados.length} publicações selecionadas
-                            voltarão a aparecer no perfil público da organização.
-                        </p>
-                        <div className="perfilLoteAcoes">
-                            <button type="button" className="perfilLoteBotaoNeutro"
-                                disabled={processandoLote}
-                                onClick={() => setConfirmarDesarquivarLote(false)}>Cancelar</button>
-                            <button type="button" className="perfilLoteBotaoPrincipal"
-                                disabled={processandoLote}
-                                onClick={() => void executarDesarquivamentoEmLote()}>
-                                Confirmar desarquivamento
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {confirmarDesarquivarId !== null && (
-                <ConfirmarPublicacao
-                    acao="desarquivar"
-                    titulo={postsArquivados.find(p => Number(p.id_post) === confirmarDesarquivarId)?.titulo}
-                    ocupado={desarquivando !== null}
-                    aoCancelar={() => setConfirmarDesarquivarId(null)}
-                    aoConfirmar={() => void executarDesarquivamento(confirmarDesarquivarId)}
-                />
-            )}
-
-            {modalAvaliacaoAberto && usuarioEhCliente && createPortal((
-
-                <div
-
-                    className="modalOverlay"
-
-                    onMouseDown={(evento) => {
-
-                        if (
-
-                            evento.target === evento.currentTarget &&
-
-                            !enviandoAvaliacao
-
-                        ) {
-
-                            fecharModalAvaliacao();
-
-                        }
-
-                    }}
-
-                >
-
-                    <div
-
-                        className="modalAvaliacao"
-
-                        role="dialog"
-
-                        aria-modal="true"
-
-                        aria-labelledby="tituloModalAvaliacao"
-
-                    >
-
-                        <div className="modalCabecalho">
-
-                            <div>
-
-                                <h2
-
-                                    id="tituloModalAvaliacao"
-
-                                    className="modalTitulo"
-
-                                >
-
-                                    Criar avaliação
-
-                                </h2>
-
-                                <p className="modalSubtitulo">
-
-                                    Conte como foi sua experiência com
-
-                                    esta organização.
-
-                                </p>
-
-                            </div>
-
-                            <button
-
-                                type="button"
-
-                                className="modalFechar"
-
-                                onClick={fecharModalAvaliacao}
-
-                                disabled={enviandoAvaliacao}
-
-                                aria-label="Fechar modal"
-
-                            >
-
-                                ×
-
-                            </button>
-
-                        </div>
-
-                        <form
-
-                            className="formAvaliacao"
-
-                            onSubmit={enviarAvaliacao}
-
-                        >
-
-                            <div className="campoAvaliacao">
-
-                                <label className="labelAvaliacao">
-
-                                    Sua nota
-
-                                </label>
-
-                                <div
-
-                                    className="estrelasAvaliacao"
-
-                                    role="radiogroup"
-
-                                    aria-label="Escolha uma nota"
-
-                                >
-
-                                    {[1, 2, 3, 4, 5].map((nota) => (
-
-                                        <button
-
-                                            key={nota}
-
-                                            type="button"
-
-                                            className={`estrelaBotao ${nota <= notaSelecionada
-
-                                                ? "estrelaSelecionada"
-
-                                                : ""
-
-                                                }`}
-
-                                            onClick={() =>
-
-                                                setNotaSelecionada(nota)
-
-                                            }
-
-                                            disabled={enviandoAvaliacao}
-
-                                            aria-label={`${nota} estrela${nota > 1 ? "s" : ""
-
-                                                }`}
-
-                                            aria-pressed={
-
-                                                nota === notaSelecionada
-
-                                            }
-
+                                            )}
+                                            {erroLote && <p className="perfilLoteErro" role="alert">{erroLote}</p>}
+                                            {mensagemArquivados && !erroArquivados && (
+                                                <div role="status" className="perfilAvisoSucesso">✓ {mensagemArquivados}</div>
+                                            )}
+                                            {loadingArquivados ? (
+                                                <Loading texto="Carregando arquivados..." />
+                                            ) : erroArquivados ? (
+                                                <div className="perfilEstadoVazio" role="alert">
+                                                    <Archive size={34} />
+                                                    <h3>Não foi possível consultar os arquivados</h3>
+                                                    <p>{erroArquivados}</p>
+                                                    <button type="button" className="perfilBotaoTentar" onClick={() => void carregarPostsArquivados(Number(organizacao.id_organizacao))}>
+                                                        <RefreshCw size={16} /> Tentar novamente
+                                                    </button>
+                                                </div>
+                                            ) : postsArquivados.length === 0 ? (
+                                                <div className="perfilEstadoVazio">
+                                                    <Inbox size={36} />
+                                                    <h3>Nenhuma publicação arquivada</h3>
+                                                    <p>As publicações arquivadas aparecerão aqui quando houver alguma.</p>
+                                                </div>
+                                            ) : (
+                                                <div className="abaPosts">
+                                                    {postsArquivados.map((post, index) => (
+                                                        <article
+                                                            key={post.id_post ?? index}
+                                                            className="cardPost"
+                                                            style={{ position: "relative" }}
+                                                        >
+                                                            {selecionandoArquivados && post.id_post != null && (
+                                                                <label className="perfilLoteSelecao" title="Selecionar publicação">
+                                                                    <input type="checkbox"
+                                                                        checked={idsArquivadosSelecionados.includes(Number(post.id_post))}
+                                                                        disabled={processandoLote}
+                                                                        onChange={() => alternarSelecaoArquivado(Number(post.id_post))}
+                                                                        aria-label={`Selecionar ${post.titulo || "publicação"}`}
+                                                                    />
+                                                                </label>
+                                                            )}
+                                                            {!selecionandoArquivados && organizacaoEhDonaDoPerfil && post.id_post != null && (
+                                                                <div style={{ position: "absolute", right: 12, top: 12, zIndex: 5 }}>
+                                                                    <button
+                                                                        type="button"
+                                                                        aria-label="Opções da publicação arquivada"
+                                                                        aria-expanded={menuArquivadoAberto === Number(post.id_post)}
+                                                                        onClick={() => setMenuArquivadoAberto(atual =>
+                                                                            atual === Number(post.id_post) ? null : Number(post.id_post)
+                                                                        )}
+                                                                        style={{ padding: 8, border: "1px solid #ddd", borderRadius: 8, background: "white", cursor: "pointer" }}
+                                                                    >
+                                                                        <MoreVertical size={20} />
+                                                                    </button>
+                                                                    {menuArquivadoAberto === Number(post.id_post) && (
+                                                                        <div style={{ position: "absolute", top: "100%", right: 0, minWidth: 215, padding: 8, background: "white", border: "1px solid #ddd", borderRadius: 8, boxShadow: "0 4px 12px #0002", zIndex: 6 }}>
+                                                                            <button
+                                                                                type="button"
+                                                                                disabled={desarquivando !== null}
+                                                                                onClick={() => void desarquivarPost(Number(post.id_post))}
+                                                                                style={{ display: "flex", alignItems: "center", gap: 8, padding: 10, width: "100%", border: 0, background: "white", cursor: desarquivando !== null ? "wait" : "pointer", textAlign: "left" }}
+                                                                            >
+                                                                                <Archive size={18} />
+                                                                                {desarquivando === Number(post.id_post) ? "Desarquivando..." : "Desarquivar publicação"}
+                                                                            </button>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                            {post.vincularImagem && (
+                                                                <img
+                                                                    className="imagemPost"
+                                                                    src={obterUrlImagem(post.vincularImagem)}
+                                                                    alt={post.titulo || "Publicação arquivada"}
+                                                                />
+                                                            )}
+
+                                                            <div className="conteudoPost">
+                                                                <h3 className="tituloPost">
+                                                                    {post.titulo || "Sem título"}
+                                                                </h3>
+
+                                                                <p className="descricaoPost">
+                                                                    {post.descricao || "Sem descrição"}
+                                                                </p>
+
+                                                                <span className="etiquetaArquivado">
+                                                                    Arquivado
+                                                                </span>
+                                                            </div>
+                                                        </article>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </section>
+                                    )}
+
+                                    {abaSelecionada === "posts" && (
+                                        <section ref={postsRef} className="abaRef tdkPublicacoesPainel">
+                                            <div className="perfilCriarPostCabecalho">
+                                                <h2 className="tituloAba">Publicações da organização</h2>
+                                                {organizacaoEhDonaDoPerfil && (
+                                                    <button type="button" className="perfilCriarPostBotao" onClick={() => setCriarPostAberto(true)}>
+                                                        <Plus size={19} strokeWidth={2.4} /> Criar publicação
+                                                    </button>
+                                                )}
+                                            </div>
+                                            {organizacao.id_organizacao ? (
+                                                <FeedPostsPerfil
+                                                    incorporado
+                                                    postsIniciais={posts}
+                                                    carregandoPostsIniciais={loadingPosts}
+                                                    idOrganizacaoPerfil={Number(organizacao.id_organizacao)}
+                                                    organizacaoDoPerfilIdPessoa={Number(organizacao.id_pessoa)}
+                                                    nomeOrganizacaoPerfil={organizacao.nome || ""}
+                                                    onPostArquivado={(idPost) =>
+                                                        setPosts((anteriores) =>
+                                                            anteriores.filter((post) => Number(post.id_post) !== idPost)
+                                                        )
+                                                    }
+                                                />
+                                            ) : (
+                                                <SemPosts grande />
+                                            )}
+                                        </section>
+                                    )}
+
+                                    {abaSelecionada === "avaliacoes" && (
+
+                                        <div
+                                            ref={avaliacoesRef}
+                                            className="abaAvaliacoes abaRef"
                                         >
 
-                                            ★
-
-                                        </button>
-
-                                    ))}
-
-                                </div>
-
-                                {notaSelecionada > 0 && (
-
-                                    <span className="textoNota">
-
-                                        {
-
-                                            {
-
-                                                1: "Muito ruim",
-
-                                                2: "Ruim",
-
-                                                3: "Regular",
-
-                                                4: "Boa",
-
-                                                5: "Excelente",
-
-                                            }[notaSelecionada]
-
-                                        }
-
-                                    </span>
-
-                                )}
-
-                            </div>
-
-                            <div className="campoAvaliacao">
-
-                                <label
-
-                                    htmlFor="tituloAvaliacao"
-
-                                    className="labelAvaliacao"
-
-                                >
-
-                                    Título
-
-                                </label>
-
-                                <input
-
-                                    id="tituloAvaliacao"
-
-                                    type="text"
-
-                                    className="inputAvaliacao"
-
-                                    placeholder="Ex.: Excelente atendimento"
-
-                                    value={tituloAvaliacao}
-
-                                    onChange={(evento) =>
-
-                                        setTituloAvaliacao(
-
-                                            evento.target.value
-
-                                        )
-
-                                    }
-
-                                    minLength={5}
-
-                                    maxLength={25}
-
-                                    disabled={enviandoAvaliacao}
-
-                                />
-
-                            </div>
-
-                            <div className="campoAvaliacao">
-
-                                <label
-
-                                    htmlFor="comentarioAvaliacao"
-
-                                    className="labelAvaliacao"
-
-                                >
-
-                                    Comentário
-
-                                </label>
-
-                                <textarea
-
-                                    id="comentarioAvaliacao"
-
-                                    className="textareaAvaliacao"
-
-                                    placeholder="Conte um pouco sobre sua experiência..."
-
-                                    value={comentarioAvaliacao}
-
-                                    onChange={(evento) =>
-
-                                        setComentarioAvaliacao(
-
-                                            evento.target.value
-
-                                        )
-
-                                    }
-
-                                    minLength={10}
-
-                                    maxLength={45}
-
-                                    rows={5}
-
-                                    disabled={enviandoAvaliacao}
-
-                                />
-
-                                <span className="contadorCaracteres">
-
-                                    {comentarioAvaliacao.length}/45
-
-                                </span>
-
-                            </div>
-
-                            <label className="checkboxAnonimo">
-
-                                <input
-
-                                    type="checkbox"
-
-                                    checked={avaliacaoAnonima}
-
-                                    onChange={(evento) =>
-
-                                        setAvaliacaoAnonima(
-
-                                            evento.target.checked
-
-                                        )
-
-                                    }
-
-                                    disabled={enviandoAvaliacao}
-
-                                />
-
-                                <span className="checkmark" />
-
-                                <span className="textoAnonimo">
-
-                                    Publicar como anônimo
-
-                                </span>
-
-                            </label>
-
-                            {erroAvaliacao && (
-
-                                <div className="mensagemErroAvaliacao">
-
-                                    {erroAvaliacao}
-
-                                </div>
-
-                            )}
-
-                            {sucessoAvaliacao && (
-
-                                <div className="mensagemSucessoAvaliacao">
-
-                                    {sucessoAvaliacao}
-
-                                </div>
-
-                            )}
-
-                            <div className="modalRodape">
-
-                                <button
-
-                                    type="button"
-
-                                    className="botaoCancelarAvaliacao"
-
-                                    onClick={fecharModalAvaliacao}
-
-                                    disabled={enviandoAvaliacao}
-
-                                >
-
-                                    Cancelar
-
-                                </button>
-
-                                <button
-
-                                    type="submit"
-
-                                    className="botaoEnviarAvaliacao"
-
-                                    disabled={enviandoAvaliacao}
-
-                                >
-
-                                    {enviandoAvaliacao ? (
-
-                                        <>
-
-                                            <span className="spinnerBotao" />
-
-                                            Enviando...
-
-                                        </>
-
-                                    ) : (
-
-                                        "Publicar avaliação"
+                                            <div className="cabecalhoAvaliacoes">
+
+                                                <div>
+                                                    <h2 className="tituloAba">
+                                                        Avaliações
+                                                    </h2>
+                                                    <p className="subtituloAba">
+                                                        O que os clientes estão dizendo
+                                                    </p>
+                                                </div>
+
+                                                <div className="tdkAvaliacaoCabecalhoAcoes">
+                                                    <div className="mediaAvaliacao">
+                                                        <strong>{media}</strong>
+                                                    </div>
+                                                    <BotaoCriarAvaliacao />
+                                                </div>
+
+                                            </div>
+
+                                            <section className="tdkResumoAvaliacoes" aria-label="Resumo das avaliações dos clientes">
+                                                <div className="tdkResumoNota">
+                                                    <strong>{indicadoresAvaliacoes.media}</strong>
+                                                    <span>de 5</span>
+                                                    <div className="tdkResumoEstrelas" aria-hidden="true">
+                                                        {[1, 2, 3, 4, 5].map((estrela) => (
+                                                            <Star key={estrela} size={20} fill={estrela <= Math.round(Number(indicadoresAvaliacoes.media.replace(",", "."))) ? "currentColor" : "none"} />
+                                                        ))}
+                                                    </div>
+                                                    <small>{indicadoresAvaliacoes.total} {indicadoresAvaliacoes.total === 1 ? "avaliação" : "avaliações"}</small>
+                                                </div>
+                                                <div className="tdkResumoBarras">
+                                                    {indicadoresAvaliacoes.distribuicao.map((item) => (
+                                                        <div className="tdkResumoBarraLinha" key={item.estrela}>
+                                                            <span>{item.estrela}★</span>
+                                                            <div className="tdkResumoBarraTrilho">
+                                                                <i style={{ width: `${item.percentual}%` }} />
+                                                            </div>
+                                                            <strong>{item.quantidade}</strong>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                                <div className="tdkResumoCards">
+                                                    <div><b>♥ {indicadoresAvaliacoes.positivas}%</b><span>avaliações positivas</span><small>notas de 4 e 5 estrelas</small></div>
+                                                    <div><b>☆ {indicadoresAvaliacoes.melhorar}</b><span>avaliações para melhorar</span><small>notas de 1 e 2 estrelas</small></div>
+                                                </div>
+                                            </section>
+                                            {avaliacoes.length === 0 ? (
+
+                                                <div className="semAvaliacoesContainer">
+                                                    <span className="semAvaliacoes">
+                                                        Nenhuma avaliação encontrada.
+                                                    </span>
+                                                </div>
+
+                                            ) : (
+
+                                                <div className="perfilAvaliacoesLista">
+                                                    {avaliacoes.map((avaliacao, index) => (
+                                                        <article key={avaliacao.id_avaliacao ?? index}
+                                                            id={`perfil-avaliacao-${avaliacao.id_avaliacao}`}
+                                                            className="perfilAvaliacaoNova"
+                                                            style={Number(avaliacao.id_avaliacao) === avaliacaoDestacada
+                                                                ? { outline: "3px solid #B01013", outlineOffset: 3, borderRadius: 12 }
+                                                                : undefined}>
+                                                            <div className="perfilAvaliacaoTopo">
+                                                                <div className="perfilAvaliacaoAvatar"><img src={userPerfil} alt="" aria-hidden="true" style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: "50%", display: "block" }} /></div>
+                                                                <div className="perfilAvaliacaoAutor">
+                                                                    <strong>{nomeAutorAvaliacao(avaliacao)}</strong>
+                                                                    <span>{avaliacao.data ? new Date(avaliacao.data).toLocaleDateString("pt-BR") : "Avaliação de cliente"}</span>
+                                                                </div>
+                                                                <div className="perfilAvaliacaoEstrelas" aria-label={`Nota ${avaliacao.csat} de 5`}>
+                                                                    {[1, 2, 3, 4, 5].map(estrela => (
+                                                                        <Star key={estrela} size={15} fill={estrela <= Number(avaliacao.csat) ? "currentColor" : "none"} />
+                                                                    ))}
+                                                                    <strong>{avaliacao.csat}/5</strong>
+                                                                </div>
+                                                            </div>
+                                                            <h3>{avaliacao.titulo || "Avaliação"}</h3>
+                                                            {avaliacao.comentario && <p className="perfilAvaliacaoComentario">{avaliacao.comentario}</p>}
+                                                        </article>
+                                                    ))}
+                                                </div>
+
+                                            )}
+
+                                        </div>
 
                                     )}
 
-                                </button>
+                                </div>
 
-                            </div>
+                            </main>
 
-                        </form>
+                        </div>
 
+                        <div className="tdkPerfilColunaLateral">
+                            {enderecoVisivel && (
+                                <aside className="tdkLoc" aria-label="Localização da organização">
+                                    <div className="tdkLocMapa">
+                                        <MapaRealEndereco endereco={enderecoVisivel} />
+                                    </div>
+
+                                    <div className="tdkLocCorpo">
+                                        <span className="tdkLocEtiqueta">
+                                            <MapPin size={14} strokeWidth={2.4} aria-hidden="true" /> Onde nos encontrar
+                                        </span>
+
+                                        <div className="tdkLocEndereco">
+                                            <h2>{enderecoVisivel.rua}, {enderecoVisivel.numero}</h2>
+                                            <p>{enderecoVisivel.bairro} · {enderecoVisivel.municipio}/{enderecoVisivel.uf}</p>
+                                            <p>CEP {String(enderecoVisivel.cep).replace(/^(\d{5})(\d{3})$/, "$1-$2")}</p>
+                                            {enderecoVisivel.complemento?.trim() && <p>{enderecoVisivel.complemento}</p>}
+                                        </div>
+
+                                        <div className="tdkLocAcoes" style={{ display: "grid", gap: 10, width: "100%" }}>
+                                            <BotaoVerNoMapa
+                                                url={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                                                    `${enderecoVisivel.rua}, ${enderecoVisivel.numero}, ${enderecoVisivel.bairro}, ${enderecoVisivel.municipio}, ${enderecoVisivel.uf}`
+                                                )}`}
+                                                rotulo={`${enderecoVisivel.rua}, ${enderecoVisivel.numero}`}
+                                            />
+                                            <BotaoCopiarEndereco
+                                                texto={`${enderecoVisivel.rua}, ${enderecoVisivel.numero} - ${enderecoVisivel.bairro}, ${enderecoVisivel.municipio}/${enderecoVisivel.uf}, CEP ${String(enderecoVisivel.cep).replace(/^(\d{5})(\d{3})$/, "$1-$2")}`}
+                                            />
+                                        </div>
+                                    </div>
+                                </aside>
+                            )}
+                        </div>
                     </div>
 
                 </div>
 
-            ), document.body)}
+                {organizacaoEhDonaDoPerfil && (
+                    <>
+                        {erroCategoriasCriacao && criarPostAberto && (
+                            <p className="perfilCriarPostErro" role="alert">{erroCategoriasCriacao}</p>
+                        )}
+                        <CreatePostModal
+                            open={criarPostAberto}
+                            onClose={() => setCriarPostAberto(false)}
+                            person={{
+                                id_pessoa: Number(organizacao.id_pessoa),
+                                id_organizacao: Number(organizacao.id_organizacao),
+                                nome: organizacao.nome,
+                                tipo: "ORGANIZACAO"
+                            }}
+                            categories={categoriasCriacao}
+                            onPublished={async () => {
+                                await carregarPosts(Number(organizacao.id_organizacao));
+                            }}
+                        />
+                    </>
+                )}
 
-        </div>
+                {confirmarDesarquivarLote && (
+                    <div className="perfilLoteOverlay" role="presentation"
+                        onMouseDown={e => { if (e.target === e.currentTarget && !processandoLote) setConfirmarDesarquivarLote(false); }}>
+                        <div className="perfilLoteModal" role="dialog" aria-modal="true"
+                            aria-labelledby="tituloDesarquivarLote">
+                            <div className="perfilLoteIcone"><Archive size={25} /></div>
+                            <h2 id="tituloDesarquivarLote">Desarquivar publicações?</h2>
+                            <p>
+                                As {idsArquivadosSelecionados.length} publicações selecionadas
+                                voltarão a aparecer no perfil público da organização.
+                            </p>
+                            <div className="perfilLoteAcoes">
+                                <button type="button" className="perfilLoteBotaoNeutro"
+                                    disabled={processandoLote}
+                                    onClick={() => setConfirmarDesarquivarLote(false)}>Cancelar</button>
+                                <button type="button" className="perfilLoteBotaoPrincipal"
+                                    disabled={processandoLote}
+                                    onClick={() => void executarDesarquivamentoEmLote()}>
+                                    Confirmar desarquivamento
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {confirmarDesarquivarId !== null && (
+                    <ConfirmarPublicacao
+                        acao="desarquivar"
+                        titulo={postsArquivados.find(p => Number(p.id_post) === confirmarDesarquivarId)?.titulo}
+                        ocupado={desarquivando !== null}
+                        aoCancelar={() => setConfirmarDesarquivarId(null)}
+                        aoConfirmar={() => void executarDesarquivamento(confirmarDesarquivarId)}
+                    />
+                )}
+
+                {modalAvaliacaoAberto && usuarioEhCliente && createPortal((
+
+                    <div
+                        className="modalOverlay"
+                        onMouseDown={(evento) => {
+                            if (
+                                evento.target === evento.currentTarget &&
+                                !enviandoAvaliacao
+                            ) {
+                                fecharModalAvaliacao();
+                            }
+                        }}
+                    >
+
+                        <div
+                            className="modalAvaliacao"
+                            role="dialog"
+                            aria-modal="true"
+                            aria-labelledby="tituloModalAvaliacao"
+                        >
+
+                            <div className="modalCabecalho">
+
+                                <div>
+                                    <h2
+                                        id="tituloModalAvaliacao"
+                                        className="modalTitulo"
+                                    >
+                                        Criar avaliação
+                                    </h2>
+
+                                    <p className="modalSubtitulo">
+                                        Conte como foi sua experiência com
+                                        esta organização.
+                                    </p>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    className="modalFechar"
+                                    onClick={fecharModalAvaliacao}
+                                    disabled={enviandoAvaliacao}
+                                    aria-label="Fechar modal"
+                                >
+                                    ×
+                                </button>
+
+                            </div>
+
+                            <form
+                                className="formAvaliacao"
+                                onSubmit={enviarAvaliacao}
+                            >
+
+                                <div className="campoAvaliacao">
+
+                                    <label className="labelAvaliacao">
+                                        Sua nota
+                                    </label>
+
+                                    <div
+                                        className="estrelasAvaliacao"
+                                        role="radiogroup"
+                                        aria-label="Escolha uma nota"
+                                    >
+
+                                        {[1, 2, 3, 4, 5].map((nota) => (
+
+                                            <button
+                                                key={nota}
+                                                type="button"
+                                                className={`estrelaBotao ${nota <= notaSelecionada
+                                                    ? "estrelaSelecionada"
+                                                    : ""
+                                                    }`}
+                                                onClick={() =>
+                                                    setNotaSelecionada(nota)
+                                                }
+                                                disabled={enviandoAvaliacao}
+                                                aria-label={`${nota} estrela${nota > 1 ? "s" : ""
+                                                    }`}
+                                                aria-pressed={
+                                                    nota === notaSelecionada
+                                                }
+                                            >
+                                                ★
+                                            </button>
+
+                                        ))}
+
+                                    </div>
+
+                                    {notaSelecionada > 0 && (
+                                        <span className="textoNota">
+                                            {
+                                                {
+                                                    1: "Muito ruim",
+                                                    2: "Ruim",
+                                                    3: "Regular",
+                                                    4: "Boa",
+                                                    5: "Excelente",
+                                                }[notaSelecionada]
+                                            }
+                                        </span>
+                                    )}
+
+                                </div>
+
+                                <div className="campoAvaliacao">
+
+                                    <label
+                                        htmlFor="tituloAvaliacao"
+                                        className="labelAvaliacao"
+                                    >
+                                        Título
+                                    </label>
+
+                                    <input
+                                        id="tituloAvaliacao"
+                                        type="text"
+                                        className="inputAvaliacao"
+                                        placeholder="Ex.: Excelente atendimento"
+                                        value={tituloAvaliacao}
+                                        onChange={(evento) =>
+                                            setTituloAvaliacao(
+                                                evento.target.value
+                                            )
+                                        }
+                                        minLength={5}
+                                        maxLength={25}
+                                        disabled={enviandoAvaliacao}
+                                    />
+
+                                </div>
+
+                                <div className="campoAvaliacao">
+
+                                    <label
+                                        htmlFor="comentarioAvaliacao"
+                                        className="labelAvaliacao"
+                                    >
+                                        Comentário
+                                    </label>
+
+                                    <textarea
+                                        id="comentarioAvaliacao"
+                                        className="textareaAvaliacao"
+                                        placeholder="Conte um pouco sobre sua experiência..."
+                                        value={comentarioAvaliacao}
+                                        onChange={(evento) =>
+                                            setComentarioAvaliacao(
+                                                evento.target.value
+                                            )
+                                        }
+                                        minLength={10}
+                                        maxLength={45}
+                                        rows={5}
+                                        disabled={enviandoAvaliacao}
+                                    />
+
+                                    <span className="contadorCaracteres">
+                                        {comentarioAvaliacao.length}/45
+                                    </span>
+
+                                </div>
+
+                                <label className="checkboxAnonimo">
+
+                                    <input
+                                        type="checkbox"
+                                        checked={avaliacaoAnonima}
+                                        onChange={(evento) =>
+                                            setAvaliacaoAnonima(
+                                                evento.target.checked
+                                            )
+                                        }
+                                        disabled={enviandoAvaliacao}
+                                    />
+
+                                    <span className="checkmark" />
+
+                                    <span className="textoAnonimo">
+                                        Publicar como anônimo
+                                    </span>
+
+                                </label>
+
+                                {erroAvaliacao && (
+                                    <div className="mensagemErroAvaliacao">
+                                        {erroAvaliacao}
+                                    </div>
+                                )}
+
+                                {sucessoAvaliacao && (
+                                    <div className="mensagemSucessoAvaliacao">
+                                        {sucessoAvaliacao}
+                                    </div>
+                                )}
+
+                                <div className="modalRodape">
+
+                                    <button
+                                        type="button"
+                                        className="botaoCancelarAvaliacao"
+                                        onClick={fecharModalAvaliacao}
+                                        disabled={enviandoAvaliacao}
+                                    >
+                                        Cancelar
+                                    </button>
+
+                                    <button
+                                        type="submit"
+                                        className="botaoEnviarAvaliacao"
+                                        disabled={enviandoAvaliacao}
+                                    >
+                                        {enviandoAvaliacao ? (
+                                            <>
+                                                <span className="spinnerBotao" />
+                                                Enviando...
+                                            </>
+                                        ) : (
+                                            "Publicar avaliação"
+                                        )}
+                                    </button>
+
+                                </div>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                ), document.body)}
+
+            </div>
+        </AppShell>
 
     );
 
@@ -2839,43 +3117,26 @@ export default function PerfilScreen() {
 
 /* Publicações integradas diretamente ao perfil da organização. */
 interface IPostFeed {
-
     id_post?: number;
-
     vincularImagem?: string;
-
     titulo?: string;
-
     descricao?: string;
-
     id_categoria?: number;
-
     status?: string;
-
     id_organizacao?: number;
-
     nome_organizacao?: string;
-
     nome?: string;
-
 }
 
 interface IOrganizacaoFeed {
-
     id_pessoa?: number;
-
     id_organizacao?: number;
-
     nome?: string;
-
 }
 
 interface ILikeState {
-
     curtiu: boolean;
-
     totalLikes: number;
-
 }
 
 interface VisualizarPostProps {
@@ -2932,19 +3193,14 @@ function FeedPostsPerfil({
     const [tentativaPosts, setTentativaPosts] = useState(0);
 
     const [imagensIndisponiveis, setImagensIndisponiveis] =
-
         useState<number[]>([]);
 
     const [likes, setLikes] = useState<
-
         Record<number, ILikeState>
-
     >({});
 
     const [likesCarregando, setLikesCarregando] = useState<
-
         Record<number, boolean>
-
     >({});
 
     const [erroLike, setErroLike] = useState("");
@@ -3012,13 +3268,9 @@ function FeedPostsPerfil({
                 setErro("");
 
                 if ((!incorporado && !id_post) || !idOrganizacao) {
-
                     throw new Error(
-
                         "Não foi possível identificar o post ou a empresa."
-
                     );
-
                 }
 
                 // Aguarda a API responder; tenta novamente em falhas transitórias.
@@ -3053,31 +3305,20 @@ function FeedPostsPerfil({
                 if (!lista) throw ultimoErro ?? new Error("Não foi possível carregar os posts.");
 
                 const postsOrganizacao = lista.filter(
-
                     (post: IPostFeed) =>
-
                         Number(post.id_organizacao) ===
-
                         Number(idOrganizacao)
-
                 );
 
                 const selecionadoExiste = incorporado || postsOrganizacao.some(
-
                     (post: IPostFeed) =>
-
                         Number(post.id_post) === Number(id_post)
-
                 );
 
                 if (!selecionadoExiste) {
-
                     throw new Error(
-
                         "O post selecionado não foi encontrado."
-
                     );
-
                 }
 
                 if (!cancelado) {
@@ -3089,25 +3330,16 @@ function FeedPostsPerfil({
                     setLikes({});
 
                     const postComNome = postsOrganizacao.find(
-
                         (post: IPostFeed) =>
-
                             post.nome_organizacao || post.nome
-
                     );
 
                     if (postComNome) {
-
                         setNomeEmpresa(
-
                             postComNome.nome_organizacao ||
-
                             postComNome.nome ||
-
                             ""
-
                         );
-
                     }
 
                 }
@@ -3115,45 +3347,31 @@ function FeedPostsPerfil({
                 try {
 
                     const respostaEmpresa = await apiFetchResponse(`/pessoas?tipo=ORGANIZACAO`,
-
                         { credentials: "include" }
-
                     );
 
                     if (respostaEmpresa.ok) {
 
                         const dadosEmpresa =
-
                             await respostaEmpresa.json();
 
                         const listaPessoas =
-
                             dadosEmpresa?.funcionarios ??
-
                             dadosEmpresa?.pessoas ??
-
                             dadosEmpresa?.dados ??
-
                             dadosEmpresa?.data ??
-
                             [];
 
                         if (Array.isArray(listaPessoas)) {
 
                             const empresa = listaPessoas.find(
-
                                 (pessoa: IOrganizacaoFeed) =>
-
                                     Number(pessoa.id_organizacao) ===
-
                                     Number(idOrganizacao)
-
                             );
 
                             if (!cancelado && empresa?.nome) {
-
                                 setNomeEmpresa(empresa.nome);
-
                             }
 
                         }
@@ -3161,39 +3379,26 @@ function FeedPostsPerfil({
                     }
 
                 } catch (error) {
-
                     console.error(
-
                         "Não foi possível carregar o nome da empresa:",
-
                         error
-
                     );
-
                 }
 
             } catch (error) {
 
                 if (!cancelado) {
-
                     setErro(
-
                         error instanceof Error
-
                             ? error.message
-
                             : "Erro ao carregar os posts."
-
                     );
-
                 }
 
             } finally {
 
                 if (!cancelado) {
-
                     setLoading(false);
-
                 }
 
             }
@@ -3203,9 +3408,7 @@ function FeedPostsPerfil({
         void carregarPosts();
 
         return () => {
-
             cancelado = true;
-
         };
 
     }, [id_post, idOrganizacao, incorporado, tentativaPosts, postsIniciais !== undefined]);
@@ -3229,29 +3432,20 @@ function FeedPostsPerfil({
                     try {
 
                         const respostaContagem = await apiFetchResponse(`/likes/contar?id_post=${id}`,
-
                             { credentials: "include" }
-
                         );
 
                         if (!respostaContagem.ok) {
-
                             throw new Error(
-
                                 "Não foi possível carregar as curtidas."
-
                             );
-
                         }
 
                         const dadosContagem =
-
                             await respostaContagem.json();
 
                         const totalLikes = Number(
-
                             dadosContagem?.total ?? 0
-
                         );
 
                         let curtiu = false;
@@ -3259,61 +3453,41 @@ function FeedPostsPerfil({
                         if (usuarioPodeCurtir) {
 
                             const respostaVerificacao = await apiFetchResponse(`/likes/verificar?id_post=${id}`,
-
                                 { credentials: "include" }
-
                             );
 
                             if (!respostaVerificacao.ok) {
-
                                 throw new Error(
-
                                     "Não foi possível verificar sua curtida."
-
                                 );
-
                             }
 
                             const dadosVerificacao =
-
                                 await respostaVerificacao.json();
 
                             curtiu = Boolean(
-
                                 dadosVerificacao?.curtiu
-
                             );
 
                         }
 
                         return {
-
                             id,
-
                             curtiu,
-
                             totalLikes,
-
                         };
 
                     } catch (error) {
 
                         console.error(
-
                             `Erro ao carregar curtidas do post ${id}:`,
-
                             error
-
                         );
 
                         return {
-
                             id,
-
                             curtiu: false,
-
                             totalLikes: 0,
-
                         };
 
                     }
@@ -3327,17 +3501,11 @@ function FeedPostsPerfil({
             const novoEstado: Record<number, ILikeState> = {};
 
             resultados.forEach((resultado) => {
-
                 if (!resultado) return;
-
                 novoEstado[resultado.id] = {
-
                     curtiu: resultado.curtiu,
-
                     totalLikes: resultado.totalLikes,
-
                 };
-
             });
 
             setLikes(novoEstado);
@@ -3347,9 +3515,7 @@ function FeedPostsPerfil({
         void carregarLikes();
 
         return () => {
-
             cancelado = true;
-
         };
 
     }, [loading, posts, usuarioPodeCurtir]);
@@ -3361,39 +3527,26 @@ function FeedPostsPerfil({
         if (!nome) return "";
 
         if (/^https?:\/\//i.test(nome)) {
-
             return nome;
-
         }
 
         const nomeArquivo = nome
-
             .replace(/\\/g, "/")
-
             .split("/")
-
             .pop();
 
         return nomeArquivo
-
             ? `${BASE_URL}/images/${nomeArquivo}`
-
             : "";
 
     }
 
     function marcarImagemIndisponivel(id: number) {
-
         setImagensIndisponiveis((anteriores) =>
-
             anteriores.includes(id)
-
                 ? anteriores
-
                 : [...anteriores, id]
-
         );
-
     }
 
     function abrirEdicaoPost(post: IPostFeed) {
@@ -3464,41 +3617,25 @@ function FeedPostsPerfil({
         // Confere a organização dona da publicação.
 
         const post = posts.find(
-
             (item) => Number(item.id_post) === id
-
         );
 
         if (!organizacaoLogada || !post) {
-
             setErroArquivar(
-
                 "Não foi possível confirmar a propriedade desta publicação."
-
             );
-
             setMenuAberto(null);
-
             return;
-
         }
 
         if (
-
             Number(post.id_organizacao) !== organizacaoLogada
-
         ) {
-
             setErroArquivar(
-
                 "Você só pode arquivar publicações da sua organização."
-
             );
-
             setMenuAberto(null);
-
             return;
-
         }
 
         setConfirmarArquivarId(null);
@@ -3512,41 +3649,26 @@ function FeedPostsPerfil({
         try {
 
             const resposta = await apiFetchResponse(`/posts?id_post=${id}`,
-
                 {
-
                     method: "DELETE",
-
                     credentials: "include",
-
                 }
-
             );
 
             const dados = await resposta.json().catch(() => ({}));
 
             if (!resposta.ok) {
-
                 throw new Error(
-
                     dados?.message ||
-
                     dados?.error ||
-
                     "Não foi possível arquivar a publicação."
-
                 );
-
             }
 
             setPosts((anteriores) =>
-
                 anteriores.filter(
-
                     (item) => Number(item.id_post) !== id
-
                 )
-
             );
 
             onPostArquivado?.(id);
@@ -3554,21 +3676,15 @@ function FeedPostsPerfil({
             setMenuAberto(null);
 
             setMensagemSucesso(
-
                 "Publicação arquivada com sucesso!"
-
             );
 
         } catch (error) {
 
             setErroArquivar(
-
                 error instanceof Error
-
                     ? error.message
-
                     : "Ocorreu um erro ao arquivar a publicação."
-
             );
 
         } finally {
@@ -3582,15 +3698,10 @@ function FeedPostsPerfil({
     async function alternarLike(id: number) {
 
         if (!usuarioPodeCurtir) {
-
             setErroLike(
-
                 "Somente clientes podem curtir publicações."
-
             );
-
             return;
-
         }
 
         if (likesCarregando[id]) return;
@@ -3598,37 +3709,23 @@ function FeedPostsPerfil({
         setErroLike("");
 
         setLikesCarregando((anterior) => ({
-
             ...anterior,
-
             [id]: true,
-
         }));
 
         try {
 
             const resposta = await apiFetchResponse(`/likes/toggle`,
-
                 {
-
                     method: "POST",
-
                     credentials: "include",
-
                     headers: {
-
                         "Content-Type": "application/json",
-
                     },
-
                     body: JSON.stringify({
-
                         id_post: id,
-
                     }),
-
                 }
-
             );
 
             const dados = await resposta.json().catch(() => ({}));
@@ -3636,59 +3733,39 @@ function FeedPostsPerfil({
             if (!resposta.ok) {
 
                 if (resposta.status === 401) {
-
                     throw new Error(
-
                         "Sua sessão expirou. Entre novamente para curtir."
-
                     );
-
                 }
 
                 throw new Error(
-
                     dados?.message ||
-
                     "Não foi possível registrar sua curtida."
-
                 );
 
             }
 
             setLikes((anterior) => ({
-
                 ...anterior,
-
                 [id]: {
-
                     curtiu: Boolean(dados?.curtiu),
-
                     totalLikes: Number(dados?.totalLikes ?? 0),
-
                 },
-
             }));
 
         } catch (error) {
 
             setErroLike(
-
                 error instanceof Error
-
                     ? error.message
-
                     : "Erro ao curtir a publicação."
-
             );
 
         } finally {
 
             setLikesCarregando((anterior) => ({
-
                 ...anterior,
-
                 [id]: false,
-
             }));
 
         }
@@ -3744,7 +3821,6 @@ function FeedPostsPerfil({
             </main>
         );
     }
-
     return (
 
         <main className={incorporado ? "visualizarPostPagina visualizarPostIncorporado" : "visualizarPostPagina"}>
@@ -3753,45 +3829,30 @@ function FeedPostsPerfil({
                 <header className="visualizarPostTopo">
 
                     <button
-
                         type="button"
-
                         className="visualizarPostVoltar"
-
                         onClick={() => navigate(-1)}
-
                     >
-
                         <ArrowLeft size={19} />
-
                         Voltar
-
                     </button>
 
                     <div className="visualizarPostCabecalho">
 
                         <div className="visualizarPostLogo">
-
                             <Store size={25} />
-
                         </div>
 
                         <div>
-
                             <span className="visualizarPostEyebrow">
-
                                 PUBLICAÇÕES DE
-
                             </span>
 
                             <h1>{nomeEmpresa || "Empresa"}</h1>
 
                             <p>
-
                                 Confira os produtos e serviços publicados.
-
                             </p>
-
                         </div>
 
                     </div>
@@ -3804,31 +3865,20 @@ function FeedPostsPerfil({
                 <div className="visualizarPostSucesso" role="status">
 
                     <span className="visualizarPostSucessoIcone">
-
                         ✓
-
                     </span>
 
                     <div>
-
                         <strong>Pronto!</strong>
-
                         <p>{mensagemSucesso}</p>
-
                     </div>
 
                     <button
-
                         type="button"
-
                         onClick={() => setMensagemSucesso("")}
-
                         aria-label="Fechar mensagem"
-
                     >
-
                         ×
-
                     </button>
 
                 </div>
@@ -3866,7 +3916,18 @@ function FeedPostsPerfil({
                 )}
             </div>
 
-            <section className="visualizarPostFeed">
+            <section
+                className="visualizarPostFeed"
+                style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    flexWrap: "nowrap",
+                    alignItems: "stretch",
+                    gap: 24,
+                    width: "100%",
+                    columnCount: 1,
+                }}
+            >
 
                 {postsExibidos.length === 0 && (
                     <div className="perfilEstadoVazio" role="status">
@@ -3881,27 +3942,19 @@ function FeedPostsPerfil({
                     const id = Number(post.id_post ?? index);
 
                     const selecionado =
-
                         Number(post.id_post) === (temPostDestacado ? postDestacado : Number(id_post));
 
                     const imagem = obterUrlImagem(
-
                         post.vincularImagem
-
                     );
 
                     const imagemIndisponivel =
-
                         !imagem ||
-
                         imagensIndisponiveis.includes(id);
 
                     const like = likes[id] ?? {
-
                         curtiu: false,
-
                         totalLikes: 0,
-
                     };
 
                     const enviando = Boolean(likesCarregando[id]);
@@ -3909,33 +3962,29 @@ function FeedPostsPerfil({
                     return (
 
                         <article
-
                             key={post.id_post ?? index}
-
                             ref={
-
                                 selecionado
-
                                     ? postSelecionadoRef
-
                                     : null
-
                             }
-
+                            style={{
+                                width: "100%",
+                                maxWidth: 720,
+                                margin: "0 auto",
+                                float: "none",
+                                boxSizing: "border-box",
+                            }}
                             className={`visualizarPostConteudo ${selecionado
-
                                 ? "visualizarPostSelecionado"
-
                                 : ""
-
                                 }`}
-
                         >
 
                             <div className="visualizarPostCardTopo">
 
-                                <div className="visualizarPostMiniLogo visualizarPostInicialEmpresa" aria-hidden="true">
-                                    {(String(nomeOrganizacaoPerfil || nomeEmpresa || post.nome_organizacao || post.nome || "O").trim().charAt(0) || "O").toLocaleUpperCase("pt-BR")}
+                                <div className="visualizarPostMiniLogo visualizarPostInicialEmpresa">
+                                    <img src={casinhaPerfil} alt="Foto padrão da organização" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%", display: "block" }} />
                                 </div>
 
                                 <div className="visualizarPostDadosEmpresa">
@@ -3944,81 +3993,46 @@ function FeedPostsPerfil({
 
                                 {ehOrganizacao && idOrganizacaoLogada !== null && idOrganizacaoLogada === Number(post.id_organizacao) && (
                                     <div
-
                                         style={{
-
                                             position: "relative",
-
                                             display: "inline-flex",
-
                                             alignItems: "center",
-
                                             zIndex: 9999,
-
                                         }}
-
                                     >
 
                                         <button
-
                                             type="button"
-
                                             className="visualizarPostPonto"
-
                                             aria-label="Opções da publicação"
-
                                             aria-expanded={menuAberto === id}
-
                                             onClick={() => {
-
                                                 setMenuAberto((atual) =>
-
                                                     atual === id ? null : id
-
                                                 );
-
                                             }}
-
                                         >
-
                                             <MoreVertical size={22} />
-
                                         </button>
 
                                         {menuAberto === id && (
 
                                             <div
-
                                                 style={{
-
                                                     position: "absolute",
-
                                                     top: "100%",
-
                                                     right: 0,
-
                                                     zIndex: 99999,
-
                                                     display: "block",
-
                                                     visibility: "visible",
-
                                                     opacity: 1,
-
                                                     minWidth: 220,
-
                                                     padding: 8,
-
                                                     backgroundColor: "#fff",
-
                                                     border: "1px solid #ddd",
-
                                                     borderRadius: 10,
-
                                                     boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
-
                                                 }}
-
                                             >
 
                                                 <button type="button" className="tdkPostMenuItem"
@@ -4027,49 +4041,29 @@ function FeedPostsPerfil({
                                                 </button>
 
                                                 <button
-
                                                     type="button"
-
                                                     disabled={arquivando === id}
-
                                                     onClick={() => void arquivarPost(id)}
-
                                                     style={{
-
                                                         display: "flex",
-
                                                         alignItems: "center",
-
                                                         gap: 10,
-
                                                         width: "100%",
-
                                                         padding: 12,
-
                                                         border: 0,
-
                                                         background: "#fff",
-
                                                         color: "#333",
-
                                                         cursor: "pointer",
-
                                                         textAlign: "left",
-
                                                     }}
-
                                                 >
 
                                                     <Archive size={18} />
 
                                                     <span>
-
                                                         {arquivando === id
-
                                                             ? "Arquivando..."
-
                                                             : "Arquivar publicação"}
-
                                                     </span>
 
                                                 </button>
@@ -4090,23 +4084,16 @@ function FeedPostsPerfil({
                                     <div className="visualizarPostSemImagem">
 
                                         <div className="visualizarPostIconeImagem">
-
                                             <ImageOff size={36} />
-
                                         </div>
 
                                         <strong>
-
                                             Imagem indisponível
-
                                         </strong>
 
                                         <span>
-
                                             Esta publicação não possui
-
                                             uma imagem disponível.
-
                                         </span>
 
                                     </div>
@@ -4114,25 +4101,15 @@ function FeedPostsPerfil({
                                 ) : (
 
                                     <img
-
                                         src={imagem}
-
                                         alt={
-
                                             post.titulo ||
-
                                             "Imagem da publicação"
-
                                         }
-
                                         className="visualizarPostImagem"
-
                                         onError={() =>
-
                                             marcarImagemIndisponivel(id)
-
                                         }
-
                                     />
 
                                 )}
@@ -4142,17 +4119,12 @@ function FeedPostsPerfil({
                             <div className="visualizarPostTexto">
 
                                 <h2>
-
                                     {post.titulo || "Sem título"}
-
                                 </h2>
 
                                 <p>
-
                                     {post.descricao ||
-
                                         "Nenhuma descrição disponível."}
-
                                 </p>
 
                                 <div className="visualizarPostAcoes">
@@ -4160,89 +4132,50 @@ function FeedPostsPerfil({
                                     {usuarioPodeCurtir ? (
 
                                         <button
-
                                             type="button"
-
                                             className="visualizarPostCurtir"
-
                                             onClick={() =>
-
                                                 void alternarLike(id)
-
                                             }
-
                                             disabled={enviando}
-
                                             aria-pressed={like.curtiu}
-
                                             aria-label={
-
                                                 like.curtiu
-
                                                     ? "Descurtir publicação"
-
                                                     : "Curtir publicação"
-
                                             }
-
                                             title={
-
                                                 like.curtiu
-
                                                     ? "Descurtir"
-
                                                     : "Curtir"
-
                                             }
-
                                         >
 
                                             <Heart
-
                                                 size={21}
-
                                                 fill={
-
                                                     like.curtiu
-
                                                         ? "#B01013"
-
                                                         : "none"
-
                                                 }
-
                                                 color={
-
                                                     like.curtiu
-
                                                         ? "#B01013"
-
                                                         : "currentColor"
-
                                                 }
-
                                                 strokeWidth={2}
-
                                             />
 
                                             <span>
-
                                                 {enviando
-
                                                     ? "Curtido"
-
                                                     : like.curtiu
-
                                                         ? "Curtido"
-
                                                         : "Curtir"}
-
                                             </span>
 
                                             <span>
-
                                                 {like.totalLikes}
-
                                             </span>
 
                                         </button>
@@ -4250,9 +4183,7 @@ function FeedPostsPerfil({
                                     ) : (
 
                                         <span>
-
                                             {like.totalLikes} curtidas
-
                                         </span>
 
                                     )}
@@ -4272,25 +4203,17 @@ function FeedPostsPerfil({
             {erroArquivar && (
 
                 <div
-
                     role="alert"
-
                     className="visualizarPostErro"
-
                 >
 
                     {erroArquivar}
 
                     <button
-
                         type="button"
-
                         onClick={() => setErroArquivar("")}
-
                     >
-
                         Fechar
-
                     </button>
 
                 </div>
@@ -4300,71 +4223,40 @@ function FeedPostsPerfil({
             {erroLike && (
 
                 <div
-
                     role="alert"
-
                     style={{
-
                         position: "fixed",
-
                         bottom: 20,
-
                         left: 16,
-
                         right: 16,
-
                         zIndex: 1000,
-
                         maxWidth: 500,
-
                         margin: "0 auto",
-
                         padding: "14px 18px",
-
                         background: "#FFFFFF",
-
                         border: "1px solid #B01013",
-
                         borderRadius: 12,
-
                         color: "#7f2a2a",
-
                         boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
-
                     }}
-
                 >
 
                     {erroLike}
 
                     <button
-
                         type="button"
-
                         onClick={() => setErroLike("")}
-
                         style={{
-
                             display: "block",
-
                             marginTop: 8,
-
                             border: 0,
-
                             background: "transparent",
-
                             color: "#B01013",
-
                             cursor: "pointer",
-
                             fontWeight: 700,
-
                         }}
-
                     >
-
                         Fechar
-
                     </button>
 
                 </div>

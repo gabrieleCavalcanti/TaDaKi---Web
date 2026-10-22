@@ -2711,3 +2711,2329 @@ button:not(:disabled) {transition:background-color .18s ease,color .18s ease,box
     padding: 22px 18px;
   }
 }
+.perfilAvaliacaoAvatar,
+.tdkReviewsPreviewAvatar {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    overflow: hidden;
+    border-radius: 50%;
+}
+
+.perfilAvaliacaoAvatar img,
+.tdkReviewsPreviewAvatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+
+/* =========================================================
+   TaDaKi — Card lateral de localização (branco + vermelho)
+   ========================================================= */
+
+.tdkPerfilRedesign .tdkPerfilHeroGrid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 330px;
+    gap: 28px;
+    align-items: stretch;
+    margin-top: 20px;
+}
+
+.tdkPerfilRedesign .tdkPerfilHeroGrid > .perfil {
+    min-width: 0;
+    margin: 0;
+    padding-top: 0;
+    align-items: flex-start;
+}
+
+.tdkPerfilRedesign .tdkLocalizacaoLateral {
+    width: 100%;
+    min-width: 0;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid #eadfe1;
+    border-radius: 21px;
+    box-shadow: 0 10px 28px rgba(85, 25, 31, 0.07);
+    box-sizing: border-box;
+}
+
+.tdkPerfilRedesign .tdkLocalizacaoCabecalho {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+}
+
+.tdkPerfilRedesign .tdkLocalizacaoIcone {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: #fff0f1;
+    color: #b01013;
+}
+
+.tdkPerfilRedesign .tdkLocalizacaoCabecalho h2 {
+    margin: 1px 0 3px;
+    color: #242a33;
+    font-size: 18px;
+    line-height: 1.2;
+    font-weight: 800;
+    letter-spacing: -0.25px;
+}
+
+.tdkPerfilRedesign .tdkLocalizacaoCabecalho p {
+    margin: 0;
+    color: #7a8491;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+/* Mini mapa ilustrativo do endereço */
+.tdkPerfilRedesign .tdkMiniMapa {
+    position: relative;
+    width: 100%;
+    height: 190px;
+    overflow: hidden;
+    border-radius: 16px;
+    border: 1px solid #eadfe1;
+    background:
+        linear-gradient(135deg, rgba(176,16,19,.025), rgba(176,16,19,.06)),
+        #f4f5f7;
+}
+
+.tdkPerfilRedesign .tdkMiniMapaBloco {
+    position: absolute;
+    border-radius: 999px;
+    opacity: .9;
+}
+
+.tdkPerfilRedesign .tdkMiniMapaBloco1 {
+    width: 74px;
+    height: 74px;
+    right: 24px;
+    top: 17px;
+    background: #f7d9dc;
+}
+
+.tdkPerfilRedesign .tdkMiniMapaBloco2 {
+    width: 52px;
+    height: 52px;
+    left: 22px;
+    bottom: 20px;
+    background: #eef1f4;
+}
+
+.tdkPerfilRedesign .tdkMiniMapaBloco3 {
+    width: 62px;
+    height: 62px;
+    left: 50%;
+    top: 48%;
+    transform: translate(-50%, -50%);
+    background: rgba(176, 16, 19, .08);
+}
+
+.tdkPerfilRedesign .tdkMiniMapaRua {
+    position: absolute;
+    z-index: 2;
+    display: block;
+    border-radius: 999px;
+    background: #ffffff;
+    box-shadow: 0 0 0 1px rgba(226, 229, 234, .8);
+}
+
+.tdkPerfilRedesign .tdkMiniMapaRuaH1 {
+    left: -18px;
+    right: -18px;
+    top: 54px;
+    height: 12px;
+    transform: rotate(-2deg);
+}
+
+.tdkPerfilRedesign .tdkMiniMapaRuaH2 {
+    left: -18px;
+    right: -18px;
+    bottom: 47px;
+    height: 12px;
+    transform: rotate(1.6deg);
+}
+
+.tdkPerfilRedesign .tdkMiniMapaRuaV1 {
+    top: -25px;
+    bottom: -25px;
+    left: 82px;
+    width: 12px;
+    transform: rotate(4deg);
+}
+
+.tdkPerfilRedesign .tdkMiniMapaRuaV2 {
+    top: -25px;
+    bottom: -25px;
+    right: 72px;
+    width: 12px;
+    transform: rotate(-5deg);
+}
+
+.tdkPerfilRedesign .tdkMiniMapaPonto {
+    position: absolute;
+    z-index: 3;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #c9868c;
+    box-shadow: 0 0 0 5px rgba(176, 16, 19, .06);
+}
+
+.tdkPerfilRedesign .tdkMiniMapaPonto1 {
+    left: 43px;
+    top: 37px;
+}
+
+.tdkPerfilRedesign .tdkMiniMapaPonto2 {
+    right: 37px;
+    bottom: 30px;
+}
+
+.tdkPerfilRedesign .tdkMiniMapaPin {
+    position: absolute;
+    z-index: 5;
+    left: 50%;
+    top: 48%;
+    width: 48px;
+    height: 48px;
+    transform: translate(-50%, -50%);
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #ffffff;
+    color: #b01013;
+    border: 1px solid #f1d1d4;
+    box-shadow:
+        0 10px 24px rgba(176, 16, 19, .18),
+        0 0 0 10px rgba(176, 16, 19, .09);
+}
+
+.tdkPerfilRedesign .tdkMiniMapaPin svg {
+    transform: translateY(-1px);
+}
+
+.tdkPerfilRedesign .tdkMiniMapaLegenda {
+    position: absolute;
+    z-index: 6;
+    left: 11px;
+    bottom: 11px;
+    padding: 7px 10px;
+    border-radius: 9px;
+    background: rgba(255,255,255,.95);
+    border: 1px solid #ece6e7;
+    color: #505966;
+    font-size: 10px;
+    font-weight: 800;
+    box-shadow: 0 4px 12px rgba(42, 34, 35, .07);
+}
+
+.tdkPerfilRedesign .tdkLocalizacaoEndereco {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.tdkPerfilRedesign .tdkLocalizacaoEndereco strong {
+    color: #252b34;
+    font-size: 14px;
+    line-height: 1.45;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+}
+
+.tdkPerfilRedesign .tdkLocalizacaoEndereco span {
+    color: #747e8c;
+    font-size: 12px;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+}
+
+.tdkPerfilRedesign .tdkLocalizacaoBotao {
+    min-height: 45px;
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border: 1px solid #b01013;
+    border-radius: 12px;
+    background: #b01013;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 800;
+    box-shadow: 0 8px 18px rgba(176, 16, 19, .16);
+    transition:
+        background .18s ease,
+        border-color .18s ease,
+        transform .18s ease,
+        box-shadow .18s ease;
+}
+
+.tdkPerfilRedesign .tdkLocalizacaoBotao:hover {
+    background: #8d0b10;
+    border-color: #8d0b10;
+    transform: translateY(-1px);
+    box-shadow: 0 11px 22px rgba(176, 16, 19, .22);
+}
+
+.tdkPerfilRedesign .tdkLocalizacaoBotao:focus-visible {
+    outline: 3px solid rgba(176, 16, 19, .22);
+    outline-offset: 3px;
+}
+
+/* O endereço antigo não é mais usado, mas as regras são neutralizadas
+   para evitar que algum trecho legado reapareça no layout. */
+.tdkPerfilRedesign .tdkEnderecoCard {
+    display: none;
+}
+
+@media (max-width: 920px) {
+    .tdkPerfilRedesign .tdkPerfilHeroGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .tdkPerfilRedesign .tdkLocalizacaoLateral {
+        max-width: none;
+    }
+
+    .tdkPerfilRedesign .tdkMiniMapa {
+        height: 210px;
+    }
+}
+
+@media (max-width: 600px) {
+    .tdkPerfilRedesign .tdkPerfilHeroGrid {
+        gap: 18px;
+        margin-top: 14px;
+    }
+
+    .tdkPerfilRedesign .tdkLocalizacaoLateral {
+        padding: 16px;
+        border-radius: 17px;
+    }
+
+    .tdkPerfilRedesign .tdkMiniMapa {
+        height: 175px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tdkPerfilRedesign .tdkLocalizacaoBotao {
+        transition: none;
+    }
+
+    .tdkPerfilRedesign .tdkLocalizacaoBotao:hover {
+        transform: none;
+    }
+}
+
+
+/* =========================================================
+   CORREÇÃO: localização realmente AO LADO do perfil
+   ========================================================= */
+
+/* A página inteira vira duas colunas no desktop:
+   conteúdo do perfil à esquerda e localização à direita. */
+.tdkPerfilRedesign .scrollContent {
+    max-width: 1420px !important;
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+}
+
+.tdkPerfilRedesign .tdkPerfilPaginaGrid {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 340px !important;
+    gap: 28px !important;
+    align-items: start !important;
+    width: 100% !important;
+}
+
+.tdkPerfilRedesign .tdkPerfilColunaPrincipal {
+    min-width: 0 !important;
+}
+
+.tdkPerfilRedesign .tdkPerfilColunaLateral {
+    min-width: 0 !important;
+    position: sticky;
+    top: 22px;
+    align-self: start;
+}
+
+/* Desativa o grid anterior que colocava a localização dentro do cabeçalho. */
+.tdkPerfilRedesign .tdkPerfilHeroGrid {
+    display: block !important;
+    margin: 0 !important;
+}
+
+/* Card lateral com contraste TaDaKi: branco + vermelho. */
+.tdkPerfilRedesign .tdkLocalizacaoLateral {
+    max-width: none !important;
+    width: 100% !important;
+    background: #ffffff !important;
+    border: 1px solid #eadcdf !important;
+    border-radius: 22px !important;
+    padding: 20px !important;
+    box-shadow: 0 12px 34px rgba(73, 17, 25, .08) !important;
+}
+
+/* O cabeçalho principal ocupa somente a coluna esquerda. */
+.tdkPerfilRedesign .topo {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Mini mapa mais parecido com o painel da referência. */
+.tdkPerfilRedesign .tdkMiniMapa {
+    height: 215px !important;
+    background:
+        linear-gradient(90deg, transparent 0 22%, rgba(176,16,19,.025) 22% 23%, transparent 23% 100%),
+        linear-gradient(180deg, #f7f8fa 0%, #f0f2f5 100%) !important;
+    border: 1px solid #ece4e5 !important;
+}
+
+/* Mantém o card visível abaixo do conteúdo em telas menores. */
+@media (max-width: 1100px) {
+    .tdkPerfilRedesign .tdkPerfilPaginaGrid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .tdkPerfilRedesign .tdkPerfilColunaLateral {
+        position: static;
+    }
+
+    .tdkPerfilRedesign .tdkLocalizacaoLateral {
+        max-width: 100% !important;
+    }
+}
+
+@media (max-width: 600px) {
+    .tdkPerfilRedesign .scrollContent {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+
+    .tdkPerfilRedesign .tdkPerfilPaginaGrid {
+        gap: 18px !important;
+    }
+}
+
+
+/* =========================================================
+   AJUSTE FINAL — FORÇA A LOCALIZAÇÃO NA LATERAL DIREITA
+   ========================================================= */
+
+.tdkPerfilRedesign .scrollContent {
+    width: 100% !important;
+    max-width: 1500px !important;
+    margin: 0 auto !important;
+    padding: 18px 24px 65px !important;
+    box-sizing: border-box !important;
+}
+
+.tdkPerfilRedesign .tdkPerfilPaginaGrid {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-start !important;
+    gap: 26px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+}
+
+.tdkPerfilRedesign .tdkPerfilColunaPrincipal {
+    flex: 1 1 auto !important;
+    width: calc(100% - 366px) !important;
+    min-width: 0 !important;
+}
+
+.tdkPerfilRedesign .tdkPerfilColunaLateral {
+    flex: 0 0 340px !important;
+    width: 340px !important;
+    min-width: 340px !important;
+    max-width: 340px !important;
+    position: sticky !important;
+    top: 20px !important;
+    align-self: flex-start !important;
+}
+
+.tdkPerfilRedesign .tdkPerfilColunaLateral .tdkLocalizacaoLateral {
+    display: flex !important;
+    width: 340px !important;
+    max-width: 340px !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+}
+
+.tdkPerfilRedesign .tdkPerfilColunaLateral .tdkMiniMapa {
+    width: 100% !important;
+    height: 205px !important;
+}
+
+/* Só passa para baixo quando realmente faltar espaço. */
+@media screen and (max-width: 900px) {
+    .tdkPerfilRedesign .tdkPerfilPaginaGrid {
+        flex-direction: column !important;
+    }
+
+    .tdkPerfilRedesign .tdkPerfilColunaPrincipal {
+        width: 100% !important;
+        flex: 1 1 100% !important;
+    }
+
+    .tdkPerfilRedesign .tdkPerfilColunaLateral {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: none !important;
+        flex: 1 1 100% !important;
+        position: static !important;
+    }
+
+    .tdkPerfilRedesign .tdkPerfilColunaLateral .tdkLocalizacaoLateral {
+        width: 100% !important;
+        max-width: none !important;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .tdkPerfilRedesign .scrollContent {
+        padding: 12px !important;
+    }
+}
+
+
+/* =========================================================
+   PERFIL COMPACTO + MAPA REAL
+   Preparado para receber um menu lateral externo depois.
+   ========================================================= */
+
+.tdkPerfilRedesign .scrollContent {
+    width: 100% !important;
+    max-width: 1280px !important;
+    margin: 0 auto !important;
+    padding: 14px 18px 55px !important;
+}
+
+.tdkPerfilRedesign .tdkPerfilPaginaGrid {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 300px !important;
+    gap: 20px !important;
+    align-items: start !important;
+}
+
+.tdkPerfilRedesign .tdkPerfilColunaPrincipal {
+    width: 100% !important;
+    min-width: 0 !important;
+}
+
+.tdkPerfilRedesign .tdkPerfilColunaLateral {
+    width: 300px !important;
+    min-width: 300px !important;
+    max-width: 300px !important;
+    position: sticky !important;
+    top: 16px !important;
+}
+
+.tdkPerfilRedesign .tdkPerfilColunaLateral .tdkLocalizacaoLateral {
+    width: 300px !important;
+    max-width: 300px !important;
+    padding: 16px !important;
+    gap: 14px !important;
+    border-radius: 18px !important;
+}
+
+.tdkPerfilRedesign .topo {
+    padding: 20px 22px 22px !important;
+    border-radius: 18px !important;
+}
+
+.tdkPerfilRedesign .topo .perfil {
+    padding-top: 15px !important;
+    gap: 18px !important;
+}
+
+.tdkPerfilRedesign .avatar {
+    width: 92px !important;
+    height: 92px !important;
+}
+
+.tdkPerfilRedesign .nomeLoja {
+    font-size: clamp(24px, 2.3vw, 30px) !important;
+}
+
+.tdkPerfilRedesign .tdkPerfilDadosPublicos {
+    gap: 10px !important;
+    margin-top: 12px !important;
+}
+
+.tdkPerfilRedesign .tdkPerfilDado {
+    min-height: 64px !important;
+    padding: 11px 13px !important;
+}
+
+/* Mapa de verdade */
+.tdkPerfilRedesign .tdkMapaReal {
+    position: relative;
+    width: 100%;
+    height: 205px;
+    overflow: hidden;
+    border: 1px solid #eadfe1;
+    border-radius: 14px;
+    background: #f3f4f6;
+}
+
+.tdkPerfilRedesign .tdkMapaRealFrame {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #f3f4f6;
+}
+
+.tdkPerfilRedesign .tdkMapaRealCarregando {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    background: #f7f7f8;
+    color: #687384;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.tdkPerfilRedesign .tdkMapaRealSpinner {
+    width: 25px;
+    height: 25px;
+    border: 3px solid #eadbdd;
+    border-top-color: #b01013;
+    border-radius: 50%;
+    animation: tdkMapaRealGirar .75s linear infinite;
+}
+
+.tdkPerfilRedesign .tdkMapaRealSelo {
+    position: absolute;
+    z-index: 4;
+    left: 10px;
+    bottom: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 8px;
+    border: 1px solid #eadfe1;
+    border-radius: 8px;
+    background: rgba(255,255,255,.96);
+    color: #9f0d14;
+    font-size: 10px;
+    font-weight: 800;
+    box-shadow: 0 3px 10px rgba(31, 25, 26, .08);
+    pointer-events: none;
+}
+
+@keyframes tdkMapaRealGirar {
+    to { transform: rotate(360deg); }
+}
+
+/* O mapa ilustrativo antigo deixa de ser usado. */
+.tdkPerfilRedesign .tdkMiniMapa {
+    display: none !important;
+}
+
+/* Breakpoint pensado para quando o menu lateral do sistema for adicionado.
+   Enquanto houver espaço, mapa e perfil continuam lado a lado. */
+@media (max-width: 1080px) {
+    .tdkPerfilRedesign .tdkPerfilPaginaGrid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .tdkPerfilRedesign .tdkPerfilColunaLateral {
+        position: static !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: none !important;
+    }
+
+    .tdkPerfilRedesign .tdkPerfilColunaLateral .tdkLocalizacaoLateral {
+        width: 100% !important;
+        max-width: none !important;
+    }
+
+    .tdkPerfilRedesign .tdkMapaReal {
+        height: 260px;
+    }
+}
+
+@media (max-width: 600px) {
+    .tdkPerfilRedesign .scrollContent {
+        padding: 10px !important;
+    }
+
+    .tdkPerfilRedesign .topo {
+        padding: 15px !important;
+    }
+
+    .tdkPerfilRedesign .topo .perfil {
+        gap: 12px !important;
+    }
+
+    .tdkPerfilRedesign .avatar {
+        width: 70px !important;
+        height: 70px !important;
+    }
+
+    .tdkPerfilRedesign .tdkMapaReal {
+        height: 210px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tdkPerfilRedesign .tdkMapaRealSpinner {
+        animation: none;
+    }
+}
+
+
+/* =========================================================
+   MAPA REAL SIMPLES — sem botões, sem setas e sem controles
+   ========================================================= */
+
+.tdkPerfilRedesign .tdkMapaReal.tdkMapaRealLimpo {
+    position: relative;
+    width: 100%;
+    height: 205px !important;
+    overflow: hidden;
+    border: 1px solid #e4e7eb;
+    border-radius: 14px;
+    background: #edf1f5;
+    isolation: isolate;
+}
+
+.tdkPerfilRedesign .tdkMapaTile {
+    position: absolute;
+    width: 256px;
+    height: 256px;
+    max-width: none;
+    user-select: none;
+    pointer-events: none;
+    filter: saturate(.72) brightness(1.04) contrast(.92);
+}
+
+.tdkPerfilRedesign .tdkMapaReal.tdkMapaRealLimpo::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: rgba(255,255,255,.10);
+}
+
+.tdkPerfilRedesign .tdkMapaPinSimples {
+    position: absolute;
+    z-index: 5;
+    width: 42px;
+    height: 42px;
+    transform: translate(-50%, -68%);
+    display: grid;
+    place-items: center;
+    color: #b01013;
+    background: #fff;
+    border: 1px solid #f0d3d5;
+    border-radius: 50%;
+    box-shadow:
+        0 5px 14px rgba(176,16,19,.18),
+        0 0 0 8px rgba(176,16,19,.09);
+    pointer-events: none;
+}
+
+.tdkPerfilRedesign .tdkMapaRealIndisponivel {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    color: #a10d14;
+    background:
+        linear-gradient(135deg, #f7f8fa, #eef1f4);
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.tdkPerfilRedesign .tdkMapaCredito {
+    position: absolute;
+    z-index: 6;
+    right: 7px;
+    bottom: 5px;
+    padding: 2px 5px;
+    border-radius: 4px;
+    background: rgba(255,255,255,.88);
+    color: #687384;
+    font-size: 8px;
+    line-height: 1.2;
+    pointer-events: none;
+}
+
+/* Remove qualquer visual do iframe/selos da versão anterior. */
+.tdkPerfilRedesign .tdkMapaRealFrame,
+.tdkPerfilRedesign .tdkMapaRealSelo {
+    display: none !important;
+}
+
+
+/* =========================================================
+   MAPA ILUSTRATIVO CLEAN — estilo simples da referência
+   ========================================================= */
+
+.tdkPerfilRedesign .tdkMapaReal,
+.tdkPerfilRedesign .tdkMapaRealLimpo,
+.tdkPerfilRedesign .tdkMapaRealFrameLimpo,
+.tdkPerfilRedesign .tdkMapaMascara,
+.tdkPerfilRedesign .tdkMapaPinCentral,
+.tdkPerfilRedesign .tdkMapaTile,
+.tdkPerfilRedesign .tdkMapaCredito,
+.tdkPerfilRedesign .tdkMapaRealIndisponivel,
+.tdkPerfilRedesign .tdkMapaRealSelo,
+.tdkPerfilRedesign .tdkMapaRealFrame,
+.tdkPerfilRedesign .tdkMapaPinSimples {
+    display: none !important;
+}
+
+.tdkPerfilRedesign .tdkMapaIlustrativo {
+    position: relative;
+    width: 100%;
+    height: 205px;
+    overflow: hidden;
+    border: 1px solid #e2e6eb;
+    border-radius: 14px;
+    background: #e9eef4;
+}
+
+/* Áreas suaves, como quarteirões/parques */
+.tdkPerfilRedesign .tdkMapaBloco {
+    position: absolute;
+    display: block;
+    border-radius: 999px;
+    opacity: .88;
+}
+
+.tdkPerfilRedesign .tdkMapaBlocoA {
+    width: 82px;
+    height: 82px;
+    right: 17px;
+    top: 18px;
+    background: #cae6c5;
+}
+
+.tdkPerfilRedesign .tdkMapaBlocoB {
+    width: 56px;
+    height: 56px;
+    left: 23px;
+    bottom: 19px;
+    border-radius: 12px;
+    background: #cde1ed;
+}
+
+.tdkPerfilRedesign .tdkMapaBlocoC {
+    width: 60px;
+    height: 60px;
+    left: 50%;
+    top: 52%;
+    transform: translate(-50%, -50%);
+    background: #e4a8ad;
+}
+
+/* Ruas brancas */
+.tdkPerfilRedesign .tdkMapaRua {
+    position: absolute;
+    z-index: 2;
+    display: block;
+    background: rgba(255,255,255,.96);
+    border-radius: 999px;
+    box-shadow: 0 0 0 1px rgba(226,231,237,.7);
+}
+
+.tdkPerfilRedesign .tdkMapaRuaH1 {
+    left: -20px;
+    right: -20px;
+    top: 57px;
+    height: 12px;
+    transform: rotate(-1deg);
+}
+
+.tdkPerfilRedesign .tdkMapaRuaH2 {
+    left: -20px;
+    right: -20px;
+    top: 115px;
+    height: 12px;
+    transform: rotate(1.4deg);
+}
+
+.tdkPerfilRedesign .tdkMapaRuaH3 {
+    left: -20px;
+    right: -20px;
+    bottom: 24px;
+    height: 11px;
+    transform: rotate(-.6deg);
+}
+
+.tdkPerfilRedesign .tdkMapaRuaV1 {
+    top: -25px;
+    bottom: -25px;
+    left: 78px;
+    width: 12px;
+    transform: rotate(3deg);
+}
+
+.tdkPerfilRedesign .tdkMapaRuaV2 {
+    top: -25px;
+    bottom: -25px;
+    right: 74px;
+    width: 12px;
+    transform: rotate(-4deg);
+}
+
+/* Pontos vermelhos decorativos */
+.tdkPerfilRedesign .tdkMapaPontoDecorativo {
+    position: absolute;
+    z-index: 3;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #b01013;
+}
+
+.tdkPerfilRedesign .tdkMapaPontoA {
+    left: 42px;
+    top: 37px;
+}
+
+.tdkPerfilRedesign .tdkMapaPontoB {
+    right: 35px;
+    bottom: 42px;
+}
+
+/* Marcador central */
+.tdkPerfilRedesign .tdkMapaMarcadorPrincipal {
+    position: absolute;
+    z-index: 5;
+    left: 50%;
+    top: 50%;
+    width: 48px;
+    height: 48px;
+    transform: translate(-50%, -50%);
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(176,16,19,.13);
+    color: #b01013;
+}
+
+.tdkPerfilRedesign .tdkMapaMarcadorPrincipal::before {
+    content: "";
+    position: absolute;
+    inset: 8px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 5px 14px rgba(176,16,19,.12);
+}
+
+.tdkPerfilRedesign .tdkMapaMarcadorPrincipal svg {
+    position: relative;
+    z-index: 1;
+}
+
+/* Mantém o card visualmente leve */
+.tdkPerfilRedesign .tdkLocalizacaoLateral {
+    background: #ffffff !important;
+}
+
+@media (max-width: 600px) {
+    .tdkPerfilRedesign .tdkMapaIlustrativo {
+        height: 185px;
+    }
+}
+
+
+/* =========================================================
+   ESPAÇAMENTO RESERVADO PARA O MENU LATERAL DO SISTEMA
+   Deixe este valor igual à largura do menu que será colocado depois.
+   ========================================================= */
+.tdkPerfilRedesign {
+    --tdk-espaco-menu-futuro: 240px;
+}
+
+.tdkPerfilRedesign .scrollContent {
+    width: calc(100% - var(--tdk-espaco-menu-futuro)) !important;
+    max-width: 1280px !important;
+    margin-left: var(--tdk-espaco-menu-futuro) !important;
+    margin-right: auto !important;
+    padding: 18px 24px 55px !important;
+    box-sizing: border-box !important;
+}
+
+.tdkPerfilRedesign .tdkPerfilPaginaGrid {
+    width: 100% !important;
+    grid-template-columns: minmax(0, 1fr) 300px !important;
+    gap: 24px !important;
+}
+
+/* Em telas menores o espaço reservado some para não apertar o perfil. */
+@media (max-width: 1080px) {
+    .tdkPerfilRedesign {
+        --tdk-espaco-menu-futuro: 0px;
+    }
+
+    .tdkPerfilRedesign .scrollContent {
+        width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        padding-left: 18px !important;
+        padding-right: 18px !important;
+    }
+}
+
+@media (max-width: 600px) {
+    .tdkPerfilRedesign .scrollContent {
+        padding: 10px 12px 40px !important;
+    }
+}
+
+
+/* Indicador visual de campos obrigatórios */
+.tdkPerfilRedesign .tdkObrigatorio,
+.tdkEditModal .tdkObrigatorio {
+    color: #b01013;
+    font-weight: 800;
+    margin-left: 2px;
+}
+
+/* =========================================================
+   EDIÇÃO DE PERFIL INTEGRADA À PÁGINA
+   ========================================================= */
+.tdkPerfilRedesign .tdkEdicaoInline{margin-top:18px;padding:24px;border:1px solid #dfe5ec;border-radius:20px;background:#fff;box-shadow:0 10px 30px rgba(28,39,55,.06);color:#273447}
+.tdkPerfilRedesign .tdkEdicaoTopo{display:flex;justify-content:space-between;gap:24px;align-items:flex-start;padding-bottom:22px;border-bottom:1px solid #e7ebf0}
+.tdkPerfilRedesign .tdkEdicaoTopo h2{margin:4px 0 5px;font-size:25px;color:#202b3b}.tdkPerfilRedesign .tdkEdicaoTopo p{margin:0;color:#758093;font-size:13px}.tdkPerfilRedesign .tdkEditEyebrow{font-size:10px;font-weight:850;letter-spacing:1.35px;color:#a30c1b}
+.tdkPerfilRedesign .tdkEdicaoTopoAcoes,.tdkPerfilRedesign .tdkEdicaoRodape{display:flex;gap:10px;align-items:center}.tdkPerfilRedesign .tdkEdicaoSalvar,.tdkPerfilRedesign .tdkEdicaoCancelar{min-height:43px;padding:0 20px;border-radius:11px;font:750 13px inherit;cursor:pointer}.tdkPerfilRedesign .tdkEdicaoSalvar{border:1px solid #a50c18;background:#a50c18;color:#fff}.tdkPerfilRedesign .tdkEdicaoCancelar{border:1px solid #dce2e9;background:#fff;color:#526071}.tdkPerfilRedesign .tdkEdicaoSalvar:disabled,.tdkPerfilRedesign .tdkEdicaoCancelar:disabled{opacity:.55;cursor:not-allowed}
+.tdkPerfilRedesign .tdkEdicaoBloco{padding:24px 0;border-bottom:1px solid #edf0f4}.tdkPerfilRedesign .tdkEdicaoBloco h3{margin:0 0 5px;font-size:19px;color:#263245}.tdkPerfilRedesign .tdkEdicaoTituloLinha p{margin:0;color:#7b8595;font-size:12px}.tdkPerfilRedesign .tdkObrigatorio{color:#a40d19;font-weight:900}.tdkOpcional{color:#8a94a3;font-size:11px;font-weight:500}
+.tdkPerfilRedesign .tdkEdicaoCampo{max-width:650px;margin-top:16px}.tdkPerfilRedesign .tdkEdicaoCampo label,.tdkPerfilRedesign .tdkNovoEndereco>label{display:block;margin-bottom:7px;font-size:12px;font-weight:750;color:#3a4658}.tdkPerfilRedesign .tdkEdicaoCampo input,.tdkPerfilRedesign .tdkCepLinha input{box-sizing:border-box;width:100%;min-height:46px;border:1px solid #dbe2e9;border-radius:11px;background:#f9fafc;padding:11px 13px;font:500 14px inherit;color:#253144;outline:none}.tdkPerfilRedesign .tdkEdicaoCampo input:focus,.tdkPerfilRedesign .tdkCepLinha input:focus{border-color:#b32633;box-shadow:0 0 0 3px rgba(163,12,27,.08);background:#fff}
+.tdkPerfilRedesign .tdkEdicaoContatoGrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:17px}.tdkPerfilRedesign .tdkEdicaoContatoCard{min-width:0;border:1px solid #e1e6ec;border-radius:15px;background:#fafbfd;padding:15px}.tdkPerfilRedesign .tdkEdicaoContatoCab{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px}.tdkPerfilRedesign .tdkEdicaoContatoCab strong{font-size:13px}.tdkPerfilRedesign .tdkEdicaoContatoCab button,.tdkPerfilRedesign .tdkNaoSabeCep button{border:0;background:transparent;color:#a20d1a;font:750 12px inherit;cursor:pointer;padding:4px}
+.tdkPerfilRedesign .tdkEdicaoOpcao{display:flex;align-items:center;gap:10px;min-height:45px;margin-top:7px;padding:10px 11px;border:1px solid #e3e8ee;border-radius:10px;background:#fff;cursor:pointer;font-size:13px}.tdkPerfilRedesign .tdkEdicaoOpcao input{width:16px;height:16px;accent-color:#a40d19}.tdkPerfilRedesign .tdkEdicaoOpcao>span{min-width:0;overflow-wrap:anywhere}.tdkPerfilRedesign .tdkEdicaoOpcao>small{margin-left:auto;color:#a20d1a;font-size:10px;font-weight:800}.tdkPerfilRedesign .tdkEdicaoVazio{display:block;padding:14px 4px;color:#8a94a2;font-size:12px}
+.tdkPerfilRedesign .tdkEnderecoAtual{display:flex;align-items:center;gap:13px;margin-top:16px;padding:15px;border:1px solid #eadcdf;border-radius:14px;background:#fff9fa}.tdkPerfilRedesign .tdkEnderecoAtualIcon{width:42px;height:42px;display:grid;place-items:center;flex:none;border-radius:11px;background:#f8e7e9;color:#a30c1b}.tdkPerfilRedesign .tdkEnderecoAtual div{display:flex;flex-direction:column;gap:2px}.tdkPerfilRedesign .tdkEnderecoAtual small{color:#8b6670;font-size:10px;font-weight:800;text-transform:uppercase}.tdkPerfilRedesign .tdkEnderecoAtual strong{font-size:13px}.tdkPerfilRedesign .tdkEnderecoAtual span:not(.tdkEnderecoAtualIcon){font-size:11px;color:#727d8d}
+.tdkPerfilRedesign .tdkEnderecosCadastrados{margin-top:16px}.tdkPerfilRedesign .tdkEnderecosCadastrados>strong{font-size:12px;color:#445064}.tdkPerfilRedesign .tdkEnderecoOpcao>span{display:flex;flex-direction:column;gap:2px}.tdkPerfilRedesign .tdkEnderecoOpcao>span b{font-size:12px}.tdkPerfilRedesign .tdkEnderecoOpcao>span small{font-size:10px;color:#7a8595}.tdkPerfilRedesign .tdkEnderecoOpcao em{margin-left:auto;color:#a20d1a;font-size:10px;font-style:normal;font-weight:800}
+.tdkPerfilRedesign .tdkNovoEndereco{max-width:620px;margin-top:20px;padding:17px;border:1px dashed #d9c7ca;border-radius:14px;background:#fcfafb}.tdkPerfilRedesign .tdkCepLinha{display:flex;gap:9px}.tdkPerfilRedesign .tdkCepLinha input{flex:1}.tdkPerfilRedesign .tdkCepLinha button{min-width:110px;border:0;border-radius:10px;background:#a40d19;color:#fff;font:750 12px inherit;cursor:pointer}.tdkPerfilRedesign .tdkNaoSabeCep{margin:9px 0 0;color:#7a8595;font-size:11px}.tdkPerfilRedesign .tdkNaoSabeCep button{text-decoration:underline;text-underline-offset:2px}
+.tdkPerfilRedesign .tdkEdicaoRodape{justify-content:flex-end;padding-top:20px}.tdkPerfilRedesign .tdkInlineErro,.tdkInlineErro{margin:14px 0 0;padding:11px 13px;border-radius:10px;background:#fff0f1;color:#9d1220;font-size:12px}.tdkPerfilRedesign .tdkInlineSucesso{margin:14px 0 0;padding:11px 13px;border-radius:10px;background:#f1f8f2;color:#31703c;font-size:12px}.tdkPerfilRedesign .tdkEdicaoCarregando{padding:28px 0;color:#7a8595}
+
+/* Modais pequenos: apenas adicionar contato / confirmar endereço */
+.tdkMiniOverlay{position:fixed;inset:0;z-index:100500;display:grid;place-items:center;padding:18px;background:rgba(22,29,41,.45);backdrop-filter:blur(4px)}.tdkMiniModal{position:relative;box-sizing:border-box;width:min(560px,100%);max-height:90dvh;overflow:auto;padding:25px;border:1px solid #e3e6eb;border-radius:18px;background:#fff;box-shadow:0 28px 80px rgba(18,25,38,.25);font-family:inherit;color:#273447}.tdkMiniModal h3{margin:0 35px 5px 0;font-size:21px}.tdkMiniModal>p{margin:0 35px 20px 0;color:#7a8494;font-size:12px}.tdkMiniFechar{position:absolute;right:16px;top:16px;width:36px;height:36px;display:grid;place-items:center;border:1px solid #e1e5ea;border-radius:10px;background:#fff;color:#566173;cursor:pointer}.tdkMiniModal label{display:flex;flex-direction:column;gap:7px;font-size:12px;font-weight:750;color:#3d485a}.tdkMiniModal input{box-sizing:border-box;width:100%;min-height:44px;padding:10px 12px;border:1px solid #dce2e9;border-radius:10px;background:#fafbfd;font:500 13px inherit;color:#253144;outline:none}.tdkMiniModal input:focus{border-color:#b32633;box-shadow:0 0 0 3px rgba(163,12,27,.08);background:#fff}.tdkMiniModal input[readonly]{background:#f2f4f7;color:#667183}.tdkMiniEnderecoGrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.tdkMiniEnderecoGrid .wide{grid-column:1/-1}.tdkMiniAcoes{display:flex;justify-content:flex-end;gap:9px;margin-top:21px}.tdkMiniAcoes button{min-height:42px;padding:0 17px;border-radius:10px;font:750 12px inherit;cursor:pointer}.tdkMiniAcoes .secundario{border:1px solid #dce2e8;background:#fff;color:#536071}.tdkMiniAcoes .primario{border:1px solid #a40d19;background:#a40d19;color:#fff}.tdkMiniAcoes button:disabled{opacity:.55;cursor:not-allowed}
+@media(max-width:760px){.tdkPerfilRedesign .tdkEdicaoInline{padding:17px}.tdkPerfilRedesign .tdkEdicaoTopo{flex-direction:column}.tdkPerfilRedesign .tdkEdicaoTopoAcoes{width:100%}.tdkPerfilRedesign .tdkEdicaoTopoAcoes button{flex:1}.tdkPerfilRedesign .tdkEdicaoContatoGrid{grid-template-columns:1fr}.tdkMiniEnderecoGrid{grid-template-columns:1fr}.tdkMiniEnderecoGrid .wide{grid-column:auto}}
+@media(max-width:480px){.tdkPerfilRedesign .tdkCepLinha{flex-direction:column}.tdkPerfilRedesign .tdkCepLinha button{min-height:43px}.tdkPerfilRedesign .tdkEdicaoContatoCab{align-items:flex-start;flex-direction:column}.tdkMiniOverlay{padding:9px}.tdkMiniModal{padding:20px 16px;border-radius:15px}}
+
+/* =========================================================
+   EDIÇÃO NO PRÓPRIO PERFIL — sem abrir uma segunda área
+   ========================================================= */
+.tdkPerfilRedesign .informacoes.tdkPerfilEmEdicao > .tdkIdentidadePerfil,
+.tdkPerfilRedesign .informacoes.tdkPerfilEmEdicao > .tdkPerfilDadosPublicos,
+.tdkPerfilRedesign .informacoes.tdkPerfilEmEdicao > .tdkEditProfileEntry {
+    display: none !important;
+}
+
+.tdkPerfilRedesign .informacoes.tdkPerfilEmEdicao {
+    width: 100% !important;
+    max-width: none !important;
+}
+
+.tdkPerfilRedesign .tdkPerfilEmEdicao .tdkEdicaoInline {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.tdkPerfilRedesign .tdkEdicaoTopoMesmoLugar {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    gap: 22px !important;
+    align-items: end !important;
+    padding: 0 0 18px !important;
+    border-bottom: 1px solid #e5e9ee !important;
+}
+
+.tdkPerfilRedesign .tdkCampoNomePerfil {
+    margin: 0 !important;
+}
+
+.tdkPerfilRedesign .tdkCampoNomePerfil input {
+    min-height: 48px !important;
+    font-size: 20px !important;
+    font-weight: 750 !important;
+}
+
+.tdkPerfilRedesign .tdkEdicaoBloco {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.tdkPerfilRedesign .tdkContatoNovoInline {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto 34px;
+    gap: 8px;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.tdkPerfilRedesign .tdkContatoNovoInline input {
+    width: 100%;
+    min-height: 40px;
+    padding: 0 12px;
+    border: 1px solid #d9e0e8;
+    border-radius: 10px;
+    outline: none;
+    background: #fff;
+}
+
+.tdkPerfilRedesign .tdkContatoNovoInline input:focus {
+    border-color: #a50c18;
+    box-shadow: 0 0 0 3px rgba(165,12,24,.08);
+}
+
+.tdkPerfilRedesign .tdkContatoNovoInline > button:not(.tdkContatoCancelarInline) {
+    min-height: 40px;
+    padding: 0 13px;
+    border: 1px solid #a50c18;
+    border-radius: 10px;
+    background: #a50c18;
+    color: #fff;
+    font-weight: 750;
+    cursor: pointer;
+}
+
+.tdkPerfilRedesign .tdkContatoCancelarInline {
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: #8e1820;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+@media (max-width: 760px) {
+    .tdkPerfilRedesign .tdkEdicaoTopoMesmoLugar {
+        grid-template-columns: 1fr !important;
+        align-items: stretch !important;
+    }
+    .tdkPerfilRedesign .tdkContatoNovoInline {
+        grid-template-columns: 1fr auto;
+    }
+    .tdkPerfilRedesign .tdkContatoCancelarInline {
+        grid-column: 2;
+    }
+}
+
+/* =========================================================
+   PERFIL — alinhamento com o Feed + uso total da largura
+   ========================================================= */
+.tdkPerfilRedesign {
+    width: 100% !important;
+    min-height: 100vh !important;
+}
+
+/* Mesma barra superior visual do Feed. */
+.tdkPerfilRedesign .tdkPerfilFeedHeader {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 40 !important;
+    width: 100% !important;
+    height: 72px !important;
+    padding: 0 26px !important;
+    background: #fff !important;
+    border-bottom: 1px solid #e5e9ee !important;
+    box-sizing: border-box !important;
+}
+
+.tdkPerfilRedesign .tdkPerfilBuscaTopo {
+    flex: 0 1 500px !important;
+}
+
+.tdkPerfilRedesign .tdkPerfilAcessibilidadeTopo {
+    width: auto !important;
+    min-width: 44px !important;
+    padding: 0 12px !important;
+    gap: 8px !important;
+    border: 0 !important;
+    background: transparent !important;
+}
+
+/* O menu começa logo abaixo do cabeçalho, igual ao Feed. */
+.tdkPerfilRedesign .tadaki-side-nav {
+    top: 72px !important;
+}
+
+/* Remove o max-width que deixava uma faixa vazia à direita. */
+.tdkPerfilRedesign .scrollContent {
+    width: calc(100% - 240px) !important;
+    max-width: none !important;
+    margin-left: 240px !important;
+    margin-right: 0 !important;
+    padding: 18px 24px 55px !important;
+    box-sizing: border-box !important;
+}
+
+.tdkPerfilRedesign .tdkPerfilPaginaGrid {
+    width: 100% !important;
+    max-width: none !important;
+    grid-template-columns: minmax(0, 1fr) 300px !important;
+    gap: 24px !important;
+}
+
+@media (max-width: 1250px) {
+    .tdkPerfilRedesign .scrollContent {
+        width: calc(100% - 200px) !important;
+        margin-left: 200px !important;
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+    }
+}
+
+@media (max-width: 1080px) {
+    .tdkPerfilRedesign .scrollContent {
+        width: 100% !important;
+        margin-left: 0 !important;
+        padding-left: 18px !important;
+        padding-right: 18px !important;
+    }
+}
+
+@media (max-width: 690px) {
+    .tdkPerfilRedesign .tdkPerfilFeedHeader {
+        padding: 0 14px !important;
+    }
+
+    .tdkPerfilRedesign .tdkPerfilAcessibilidadeTopo span {
+        display: none;
+    }
+}
+
+/* =========================================================
+   PERFIL 2026 — barra superior limpa + visual social
+   ========================================================= */
+
+/* Barra do Feed, agora sem campo de busca */
+.tdkPerfilRedesign .tdkPerfilFeedHeader {
+    height: 72px !important;
+    min-height: 72px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0 34px !important;
+    background: rgba(255,255,255,.96) !important;
+    border-bottom: 1px solid #e7ebf0 !important;
+    box-shadow: 0 1px 0 rgba(20,32,48,.02) !important;
+    backdrop-filter: blur(12px);
+}
+.tdkPerfilRedesign .tdkPerfilFeedHeader .logo-button {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+.tdkPerfilRedesign .tdkPerfilFeedHeader .feed-logo {
+    width: 84px !important;
+    height: 48px !important;
+    object-fit: contain !important;
+}
+.tdkPerfilRedesign .tdkPerfilFeedHeader .feed-header__actions {
+    margin-left: auto !important;
+}
+.tdkPerfilRedesign .tdkPerfilBuscaTopo { display: none !important; }
+
+/* Fundo mais leve, como uma rede social */
+.tdkPerfilRedesign {
+    background: #f6f7f9 !important;
+}
+.tdkPerfilRedesign .scrollContent {
+    background: #f6f7f9 !important;
+    padding-top: 24px !important;
+}
+.tdkPerfilRedesign .tdkPerfilPaginaGrid {
+    gap: 22px !important;
+    align-items: start !important;
+}
+
+/* Card principal do perfil: menos “painel”, mais perfil social */
+.tdkPerfilRedesign .topo {
+    position: relative !important;
+    overflow: hidden !important;
+    padding: 26px 28px 24px !important;
+    border: 1px solid #e6e8ed !important;
+    border-radius: 20px !important;
+    background: #fff !important;
+    box-shadow: 0 4px 18px rgba(30,42,58,.045) !important;
+}
+.tdkPerfilRedesign .topo::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 4px !important;
+    background: linear-gradient(90deg,#a70d19 0%,#c62431 55%,#f0b4b9 100%) !important;
+    display: block !important;
+}
+.tdkPerfilRedesign .botaoVoltar {
+    width: 38px !important;
+    height: 38px !important;
+    border: 1px solid #e3e7ec !important;
+    border-radius: 50% !important;
+    background: #fff !important;
+    color: #334155 !important;
+    box-shadow: 0 2px 8px rgba(31,41,55,.04) !important;
+    transition: .18s ease !important;
+}
+.tdkPerfilRedesign .botaoVoltar:hover {
+    transform: translateX(-2px) !important;
+    border-color: #d7a9ae !important;
+    color: #a30e1a !important;
+    background: #fff7f8 !important;
+}
+
+/* Identidade em estilo Instagram: avatar destacado + informações limpas */
+.tdkPerfilRedesign .topo .perfil {
+    padding-top: 14px !important;
+}
+.tdkPerfilRedesign .tdkIdentidadePerfil {
+    gap: 24px !important;
+    align-items: center !important;
+}
+.tdkPerfilRedesign .tdkIdentidadePerfil .avatar {
+    flex: 0 0 104px !important;
+    width: 104px !important;
+    height: 104px !important;
+    padding: 4px !important;
+    border: 2px solid #b20e1c !important;
+    border-radius: 50% !important;
+    background: #fff !important;
+    box-shadow: 0 0 0 4px #fff, 0 0 0 5px #efcdd1, 0 7px 20px rgba(30,42,58,.09) !important;
+}
+.tdkPerfilRedesign .tdkIdentidadePerfil .avatar img {
+    border-radius: 50% !important;
+}
+.tdkPerfilRedesign .tdkIdentidadeTexto .linhaNomeFavorito {
+    align-items: center !important;
+    gap: 14px !important;
+    flex-wrap: wrap !important;
+}
+.tdkPerfilRedesign .tdkIdentidadeTexto .nomeLoja {
+    color: #202938 !important;
+    font-size: clamp(27px,2.3vw,35px) !important;
+    line-height: 1.08 !important;
+    letter-spacing: -.9px !important;
+    font-weight: 800 !important;
+}
+.tdkPerfilRedesign .tdkIdentidadeTexto .categoria {
+    margin-top: 8px !important;
+    padding: 6px 11px !important;
+    border: 1px solid #f1d3d6 !important;
+    border-radius: 999px !important;
+    background: #fff1f2 !important;
+    color: #a30e1a !important;
+    font-size: 11px !important;
+    font-weight: 750 !important;
+}
+
+/* Contatos compactos, como informações da bio */
+.tdkPerfilRedesign .tdkPerfilDadosPublicos {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+    margin: 22px 0 0 128px !important;
+}
+.tdkPerfilRedesign .tdkPerfilDado {
+    min-width: 205px !important;
+    padding: 10px 13px !important;
+    border: 1px solid #e8e9ed !important;
+    border-radius: 12px !important;
+    background: #fff !important;
+    box-shadow: none !important;
+    transition: .18s ease !important;
+}
+.tdkPerfilRedesign .tdkPerfilDado:hover {
+    transform: translateY(-1px) !important;
+    border-color: #e5c1c5 !important;
+    background: #fffafa !important;
+}
+.tdkPerfilRedesign .tdkPerfilDadoIcone {
+    background: #fff0f2 !important;
+    color: #aa101d !important;
+}
+
+/* Navegação de conteúdo semelhante à barra de abas de um perfil social */
+.tdkPerfilRedesign .menuNavegacao {
+    margin: 14px 0 12px !important;
+    padding: 4px !important;
+    min-height: 52px !important;
+    border: 1px solid #e6e8ed !important;
+    border-radius: 16px !important;
+    box-shadow: 0 3px 12px rgba(30,42,58,.025) !important;
+}
+.tdkPerfilRedesign .menuNavegacao .iconeMenu {
+    height: 42px !important;
+    border-radius: 11px !important;
+}
+.tdkPerfilRedesign .menuNavegacao .iconeMenuSelecionado,
+.tdkPerfilRedesign .menuNavegacao .iconeMenuSelecionado:hover {
+    background: #b50f1d !important;
+    box-shadow: 0 5px 12px rgba(181,15,29,.14) !important;
+}
+
+/* Números no estilo contadores de perfil */
+.tdkPerfilRedesign .estatisticas {
+    min-height: 76px !important;
+    margin-bottom: 18px !important;
+    padding: 11px 8px !important;
+    border-radius: 16px !important;
+}
+.tdkPerfilRedesign .estatisticas .numero {
+    font-size: 24px !important;
+    color: #a90f1c !important;
+}
+
+/* Conteúdo principal mais elegante */
+.tdkPerfilRedesign .areaMenu > section,
+.tdkPerfilRedesign .tdkPublicacoesPainel,
+.tdkPerfilRedesign .tdkReviewsPreview,
+.tdkPerfilRedesign .perfilAvaliacaoNova {
+    border-color: #e7e9ed !important;
+}
+.tdkPerfilRedesign .areaMenu h2,
+.tdkPerfilRedesign .areaMenu h3 {
+    letter-spacing: -.35px;
+}
+
+/* Localização acompanha o mesmo visual social */
+.tdkPerfilRedesign .tdkLocalizacaoLateral {
+    border: 1px solid #eadcdf !important;
+    border-radius: 20px !important;
+    background: #fff !important;
+    box-shadow: 0 5px 20px rgba(37,43,55,.045) !important;
+}
+.tdkPerfilRedesign .tdkMapaIlustrativo {
+    border-radius: 15px !important;
+}
+.tdkPerfilRedesign .tdkLocalizacaoBotao {
+    border-radius: 12px !important;
+    box-shadow: 0 5px 12px rgba(176,16,19,.13) !important;
+}
+
+/* Botão de editar discreto, no padrão do perfil */
+.tdkPerfilRedesign .tdkEditProfileEntry {
+    margin-left: 128px !important;
+}
+.tdkPerfilRedesign .tdkEditProfileOpen {
+    border-radius: 10px !important;
+}
+
+@media (max-width: 760px) {
+    .tdkPerfilRedesign .tdkPerfilFeedHeader { padding: 0 16px !important; }
+    .tdkPerfilRedesign .tdkIdentidadePerfil { align-items: flex-start !important; gap: 17px !important; }
+    .tdkPerfilRedesign .tdkIdentidadePerfil .avatar { flex-basis: 82px !important; width:82px !important; height:82px !important; }
+    .tdkPerfilRedesign .tdkPerfilDadosPublicos,
+    .tdkPerfilRedesign .tdkEditProfileEntry { margin-left: 0 !important; }
+    .tdkPerfilRedesign .tdkPerfilDadosPublicos { margin-top: 18px !important; }
+    .tdkPerfilRedesign .tdkPerfilDado { flex: 1 1 100% !important; min-width: 0 !important; }
+}
+
+/* =========================================================
+   PERFIL SOCIAL TaDaKi + AVALIAÇÕES VISUAIS
+   ========================================================= */
+
+/* Hero do perfil: capa vermelha suave + avatar sobreposto */
+.tdkPerfilRedesign .topo {
+    padding: 0 28px 26px !important;
+    overflow: hidden !important;
+    border-radius: 24px !important;
+    border-color: #eadfe1 !important;
+    background: #fff !important;
+    box-shadow: 0 10px 32px rgba(36, 45, 60, .055) !important;
+}
+.tdkPerfilRedesign .topo::before {
+    height: 108px !important;
+    background:
+        radial-gradient(circle at 12% 30%, rgba(255,255,255,.16) 0 44px, transparent 45px),
+        radial-gradient(circle at 88% 70%, rgba(255,255,255,.11) 0 68px, transparent 69px),
+        linear-gradient(120deg, #c8101e 0%, #a80d18 58%, #7e0912 100%) !important;
+}
+.tdkPerfilRedesign .botaoVoltar {
+    position: relative !important;
+    z-index: 5 !important;
+    margin-top: 18px !important;
+    background: rgba(255,255,255,.94) !important;
+}
+.tdkPerfilRedesign .topo .perfil {
+    position: relative !important;
+    z-index: 2 !important;
+    padding-top: 38px !important;
+}
+.tdkPerfilRedesign .tdkIdentidadePerfil {
+    align-items: flex-end !important;
+    gap: 22px !important;
+}
+.tdkPerfilRedesign .tdkIdentidadePerfil .avatar {
+    flex: 0 0 116px !important;
+    width: 116px !important;
+    height: 116px !important;
+    padding: 5px !important;
+    border: 3px solid #fff !important;
+    background: #fff !important;
+    box-shadow: 0 0 0 2px #bd1320, 0 10px 28px rgba(54,28,31,.16) !important;
+}
+.tdkPerfilRedesign .tdkIdentidadeTexto {
+    padding-bottom: 5px !important;
+}
+.tdkPerfilRedesign .tdkIdentidadeTexto .nomeLoja {
+    font-size: clamp(28px, 2.5vw, 38px) !important;
+    color: #1f2937 !important;
+}
+.tdkPerfilRedesign .tdkIdentidadeTexto .categoria {
+    display: inline-flex !important;
+    margin-top: 9px !important;
+    background: #fff0f2 !important;
+    border-color: #f0cfd3 !important;
+    color: #a60d19 !important;
+}
+.tdkPerfilRedesign .tdkPerfilDadosPublicos {
+    margin: 20px 0 0 138px !important;
+    gap: 10px !important;
+}
+.tdkPerfilRedesign .tdkPerfilDado {
+    min-width: 210px !important;
+    background: #fafbfc !important;
+    border-color: #e8eaee !important;
+    border-radius: 14px !important;
+}
+.tdkPerfilRedesign .tdkEditProfileEntry { margin-left: 138px !important; }
+.tdkPerfilRedesign .tdkEditProfileOpen {
+    background: #b0101c !important;
+    color: #fff !important;
+    border-color: #b0101c !important;
+    padding: 10px 16px !important;
+    border-radius: 999px !important;
+}
+
+/* Avaliações: resumo no estilo da referência, usando a paleta TaDaKi */
+.tdkPerfilRedesign .abaAvaliacoes {
+    padding: 28px !important;
+    border-radius: 22px !important;
+    background: #fff !important;
+}
+.tdkPerfilRedesign .cabecalhoAvaliacoes { margin-bottom: 6px !important; }
+.tdkPerfilRedesign .cabecalhoAvaliacoes .mediaAvaliacao { display: none !important; }
+.tdkPerfilRedesign .tdkResumoAvaliacoes {
+    display: grid;
+    grid-template-columns: 150px minmax(260px, 1fr);
+    gap: 20px 26px;
+    margin: 20px 0 26px;
+    padding: 22px;
+    border: 1px solid #f0d9dc;
+    border-radius: 20px;
+    background: linear-gradient(145deg, #fffafb 0%, #fff 65%);
+}
+.tdkPerfilRedesign .tdkResumoNota {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
+.tdkPerfilRedesign .tdkResumoNota > strong {
+    color: #b20d1b;
+    font-size: 52px;
+    line-height: .9;
+    letter-spacing: -2px;
+    font-weight: 850;
+}
+.tdkPerfilRedesign .tdkResumoNota > span,
+.tdkPerfilRedesign .tdkResumoNota > small { color: #687386; font-size: 12px; }
+.tdkPerfilRedesign .tdkResumoEstrelas { display:flex; gap:3px; margin:10px 0 7px; color:#d39a22; }
+.tdkPerfilRedesign .tdkResumoBarras { display:flex; flex-direction:column; justify-content:center; gap:9px; }
+.tdkPerfilRedesign .tdkResumoBarraLinha { display:grid; grid-template-columns:30px minmax(80px,1fr) 28px; align-items:center; gap:9px; }
+.tdkPerfilRedesign .tdkResumoBarraLinha > span { color:#667085; font-size:12px; font-weight:750; }
+.tdkPerfilRedesign .tdkResumoBarraLinha > strong { color:#667085; font-size:12px; text-align:right; }
+.tdkPerfilRedesign .tdkResumoBarraTrilho { height:8px; overflow:hidden; border-radius:999px; background:#f1e7e9; }
+.tdkPerfilRedesign .tdkResumoBarraTrilho i { display:block; height:100%; min-width:0; border-radius:inherit; background:linear-gradient(90deg,#d41424,#a80d18); transition:width .35s ease; }
+.tdkPerfilRedesign .tdkResumoCards { grid-column:1/-1; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.tdkPerfilRedesign .tdkResumoCards > div { display:grid; grid-template-columns:auto 1fr; column-gap:12px; align-items:center; padding:15px 17px; border:1px solid #eee3e5; border-radius:15px; background:#fff; }
+.tdkPerfilRedesign .tdkResumoCards b { grid-row:1/3; color:#b0101c; font-size:24px; }
+.tdkPerfilRedesign .tdkResumoCards span { color:#263244; font-size:13px; font-weight:800; }
+.tdkPerfilRedesign .tdkResumoCards small { color:#7b8492; font-size:11px; }
+
+/* Cards das avaliações */
+.tdkPerfilRedesign .perfilAvaliacoesLista { gap: 12px !important; margin-top: 20px !important; }
+.tdkPerfilRedesign .perfilAvaliacaoNova {
+    padding: 20px 21px !important;
+    border: 1px solid #ece6e7 !important;
+    border-radius: 18px !important;
+    background: #fff !important;
+    box-shadow: 0 5px 18px rgba(35,42,52,.035) !important;
+    transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease !important;
+}
+.tdkPerfilRedesign .perfilAvaliacaoNova:hover {
+    transform: translateY(-2px) !important;
+    border-color: #e6c3c7 !important;
+    box-shadow: 0 9px 24px rgba(82,25,31,.07) !important;
+}
+.tdkPerfilRedesign .perfilAvaliacaoAvatar {
+    width: 42px !important;
+    height: 42px !important;
+    padding: 5px !important;
+    border-radius: 50% !important;
+    background: #fff0f2 !important;
+    border: 1px solid #f0d0d4 !important;
+}
+.tdkPerfilRedesign .perfilAvaliacaoAutor strong { color:#263244 !important; font-size:13px !important; }
+.tdkPerfilRedesign .perfilAvaliacaoAutor span { color:#8a94a3 !important; font-size:11px !important; }
+.tdkPerfilRedesign .perfilAvaliacaoEstrelas { margin-left:auto !important; color:#d39a22 !important; }
+.tdkPerfilRedesign .perfilAvaliacaoEstrelas strong { color:#9a6e16 !important; font-size:11px !important; }
+.tdkPerfilRedesign .perfilAvaliacaoNova h3 { margin:14px 0 5px !important; color:#202b3a !important; font-size:15px !important; font-weight:800 !important; }
+.tdkPerfilRedesign .perfilAvaliacaoComentario { margin:0 !important; color:#5f6978 !important; font-size:13px !important; line-height:1.55 !important; }
+
+@media (max-width: 760px) {
+    .tdkPerfilRedesign .topo { padding:0 18px 22px !important; }
+    .tdkPerfilRedesign .topo::before { height:92px !important; }
+    .tdkPerfilRedesign .topo .perfil { padding-top:30px !important; }
+    .tdkPerfilRedesign .tdkIdentidadePerfil { align-items:flex-end !important; }
+    .tdkPerfilRedesign .tdkIdentidadePerfil .avatar { flex-basis:88px !important; width:88px !important; height:88px !important; }
+    .tdkPerfilRedesign .tdkPerfilDadosPublicos,
+    .tdkPerfilRedesign .tdkEditProfileEntry { margin-left:0 !important; }
+    .tdkPerfilRedesign .tdkResumoAvaliacoes { grid-template-columns:1fr; padding:18px; }
+    .tdkPerfilRedesign .tdkResumoNota { align-items:center; text-align:center; }
+    .tdkPerfilRedesign .tdkResumoCards { grid-column:auto; grid-template-columns:1fr; }
+}
+
+
+/* Avaliações responsivas: compacta em telas grandes e botão ao lado do título */
+.tdkPerfilRedesign .cabecalhoAvaliacoes {
+    display:flex !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+    gap:18px !important;
+}
+.tdkPerfilRedesign .tdkAvaliacaoCabecalhoAcoes {
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:10px;
+    flex:0 0 auto;
+}
+.tdkPerfilRedesign .cabecalhoAvaliacoes .botaoCriarAvaliacao {
+    margin:0 !important;
+    min-height:38px !important;
+    padding:8px 14px !important;
+    border-radius:11px !important;
+}
+@media (min-width:1500px) {
+    .tdkPerfilRedesign .tdkResumoAvaliacoes {
+        width:min(100%,930px) !important;
+        grid-template-columns:140px minmax(360px,1fr) !important;
+        margin:20px auto 26px !important;
+        padding:20px 22px !important;
+    }
+    .tdkPerfilRedesign .tdkResumoBarraLinha {
+        grid-template-columns:30px minmax(220px,1fr) 28px !important;
+    }
+}
+@media (min-width:761px) and (max-width:1499px) {
+    .tdkPerfilRedesign .tdkResumoAvaliacoes {
+        width:100% !important;
+        max-width:none !important;
+        margin-left:0 !important;
+        margin-right:0 !important;
+    }
+}
+@media (max-width:760px) {
+    .tdkPerfilRedesign .cabecalhoAvaliacoes {align-items:flex-start !important;}
+    .tdkPerfilRedesign .cabecalhoAvaliacoes .botaoCriarAvaliacao {
+        min-height:36px !important;
+        padding:7px 11px !important;
+        font-size:11px !important;
+    }
+}
+@media (max-width:480px) {
+    .tdkPerfilRedesign .cabecalhoAvaliacoes {flex-direction:column !important;}
+    .tdkPerfilRedesign .tdkAvaliacaoCabecalhoAcoes,
+    .tdkPerfilRedesign .cabecalhoAvaliacoes .botaoCriarAvaliacao {width:100% !important;}
+    .tdkPerfilRedesign .cabecalhoAvaliacoes .botaoCriarAvaliacao {justify-content:center !important;}
+}
+
+
+/* =========================================================
+   EDIÇÃO DO PERFIL — simples, no mesmo lugar dos dados
+   ========================================================= */
+
+.tdkPerfilRedesign .informacoes.tdkPerfilEmEdicao {
+    display: grid !important;
+    grid-template-columns: 122px minmax(0, 1fr) !important;
+    column-gap: 22px !important;
+    align-items: start !important;
+}
+
+.tdkPerfilRedesign .informacoes.tdkPerfilEmEdicao > .tdkIdentidadePerfil {
+    grid-column: 1 !important;
+    align-items: flex-start !important;
+}
+
+.tdkPerfilRedesign .informacoes.tdkPerfilEmEdicao > .tdkIdentidadePerfil .tdkIdentidadeTexto {
+    display: none !important;
+}
+
+.tdkPerfilRedesign .informacoes.tdkPerfilEmEdicao > .tdkPerfilDadosPublicos,
+.tdkPerfilRedesign .informacoes.tdkPerfilEmEdicao > .tdkEditProfileEntry {
+    display: none !important;
+}
+
+.tdkPerfilRedesign .informacoes.tdkPerfilEmEdicao > .tdkEdicaoInlineCompacta {
+    grid-column: 2 !important;
+    grid-row: 1 / span 4 !important;
+    width: 100% !important;
+    margin: 0 !important;
+}
+
+.tdkPerfilRedesign .tdkEdicaoInlineCompacta {
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+}
+
+.tdkPerfilRedesign .tdkEdicaoCompactaTopo {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 14px;
+    align-items: end;
+}
+
+.tdkPerfilRedesign .tdkEdicaoTopoAcoes {
+    display: flex;
+    gap: 8px;
+}
+
+.tdkPerfilRedesign .tdkEdicaoCampo,
+.tdkPerfilRedesign .tdkCampoSelectPerfil,
+.tdkPerfilRedesign .tdkEnderecoEdicaoCompacto {
+    min-width: 0;
+}
+
+.tdkPerfilRedesign .tdkEdicaoCampo label,
+.tdkPerfilRedesign .tdkCampoSelectPerfil label,
+.tdkPerfilRedesign .tdkEnderecoEdicaoCompacto label {
+    display: block;
+    margin-bottom: 6px;
+    color: #394556;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.tdkPerfilRedesign .tdkEdicaoInlineCompacta input,
+.tdkPerfilRedesign .tdkEdicaoInlineCompacta select {
+    width: 100%;
+    min-height: 42px;
+    border: 1px solid #dfe4ea;
+    border-radius: 11px;
+    background: #fff;
+    padding: 9px 12px;
+    color: #1d2939;
+    font: inherit;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.tdkPerfilRedesign .tdkEdicaoInlineCompacta input:focus,
+.tdkPerfilRedesign .tdkEdicaoInlineCompacta select:focus {
+    border-color: #bd111b;
+    box-shadow: 0 0 0 3px rgba(189,17,27,.08);
+}
+
+.tdkPerfilRedesign .tdkEdicaoCompactaGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 13px;
+}
+
+.tdkPerfilRedesign .tdkCampoSelectCab {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 6px;
+}
+
+.tdkPerfilRedesign .tdkCampoSelectCab label {
+    margin: 0;
+}
+
+.tdkPerfilRedesign .tdkCampoSelectCab small {
+    display: block;
+    margin-top: 2px;
+    color: #7a8492;
+    font-size: 11px;
+}
+
+.tdkPerfilRedesign .tdkAdicionarPequeno {
+    border: 0;
+    background: transparent;
+    color: #b80f18;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.tdkPerfilRedesign .tdkAdicionarPequeno:hover {
+    text-decoration: underline;
+}
+
+.tdkPerfilRedesign .tdkNovoDadoInline {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto 34px;
+    gap: 7px;
+    margin-top: 8px;
+}
+
+.tdkPerfilRedesign .tdkNovoDadoInline > button:not(.tdkNovoDadoFechar),
+.tdkPerfilRedesign .tdkCepLinha button {
+    border: 0;
+    border-radius: 10px;
+    background: #b80f18;
+    color: #fff;
+    padding: 0 13px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.tdkPerfilRedesign .tdkNovoDadoFechar {
+    border: 1px solid #e0e5ea;
+    border-radius: 10px;
+    background: #fff;
+    color: #687385;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.tdkPerfilRedesign .tdkEnderecoEdicaoCompacto {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid #edf0f3;
+}
+
+.tdkPerfilRedesign .tdkNovoEnderecoInline {
+    margin-top: 10px;
+    padding: 12px;
+    border: 1px solid #eceff3;
+    border-radius: 12px;
+    background: #fafbfc;
+}
+
+.tdkPerfilRedesign .tdkCepLinha {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+}
+
+.tdkPerfilRedesign .tdkNaoSabeCep {
+    margin: 8px 0 0;
+    color: #697586;
+    font-size: 11px;
+}
+
+.tdkPerfilRedesign .tdkNaoSabeCep button {
+    border: 0;
+    background: transparent;
+    padding: 0;
+    color: #b80f18;
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.tdkPerfilRedesign .tdkEnderecoInlineGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+}
+
+.tdkPerfilRedesign .tdkEnderecoInlineGrid .wide {
+    grid-column: 1 / -1;
+}
+
+.tdkPerfilRedesign .tdkEnderecoInlineAcoes {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.tdkPerfilRedesign .tdkEdicaoSalvar,
+.tdkPerfilRedesign .tdkEdicaoCancelar {
+    min-height: 40px;
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.tdkPerfilRedesign .tdkEdicaoSalvar {
+    border: 1px solid #b80f18;
+    background: #b80f18;
+    color: #fff;
+}
+
+.tdkPerfilRedesign .tdkEdicaoCancelar {
+    border: 1px solid #dce2e8;
+    background: #fff;
+    color: #4c5868;
+}
+
+.tdkPerfilRedesign .tdkObrigatorio {
+    color: #b80f18;
+}
+
+.tdkPerfilRedesign .tdkOpcional {
+    color: #8a94a3;
+    font-weight: 500;
+}
+
+@media (max-width: 760px) {
+    .tdkPerfilRedesign .informacoes.tdkPerfilEmEdicao {
+        grid-template-columns: 1fr !important;
+    }
+
+    .tdkPerfilRedesign .informacoes.tdkPerfilEmEdicao > .tdkIdentidadePerfil {
+        display: none !important;
+    }
+
+    .tdkPerfilRedesign .informacoes.tdkPerfilEmEdicao > .tdkEdicaoInlineCompacta {
+        grid-column: 1 !important;
+    }
+
+    .tdkPerfilRedesign .tdkEdicaoCompactaTopo,
+    .tdkPerfilRedesign .tdkEdicaoCompactaGrid,
+    .tdkPerfilRedesign .tdkEnderecoInlineGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .tdkPerfilRedesign .tdkEdicaoTopoAcoes {
+        width: 100%;
+    }
+
+    .tdkPerfilRedesign .tdkEdicaoTopoAcoes button {
+        flex: 1;
+    }
+
+    .tdkPerfilRedesign .tdkEnderecoInlineGrid .\wide {
+        grid-column: auto;
+    }
+}
+
+
+/* =========================================================
+   PERFIL dentro do AppShell compartilhado
+   O AppShell já reserva o espaço do menu lateral/cabeçalho.
+   ========================================================= */
+.appShell .tdkPerfilRedesign {
+    width: 100% !important;
+    min-height: 100% !important;
+}
+
+.appShell .tdkPerfilRedesign .scrollContent {
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 18px 24px 55px !important;
+    box-sizing: border-box !important;
+}
+
+@media (max-width: 1250px) {
+    .appShell .tdkPerfilRedesign .scrollContent {
+        width: 100% !important;
+        margin-left: 0 !important;
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+    }
+}
+
+@media (max-width: 1080px) {
+    .appShell .tdkPerfilRedesign .scrollContent {
+        width: 100% !important;
+        margin-left: 0 !important;
+        padding-left: 18px !important;
+        padding-right: 18px !important;
+    }
+}
+
+/* =========================================================
+   HERO DO PERFIL — destaque da identidade + edição à direita
+   ========================================================= */
+.tdkPerfilRedesign .topo {
+    position: relative !important;
+    min-height: 330px !important;
+    padding: 28px 340px 34px 38px !important;
+    overflow: hidden !important;
+    background:
+        radial-gradient(circle at 8% 18%, rgba(192, 16, 31, .10), transparent 190px),
+        linear-gradient(135deg, #fff 0%, #fff 70%, #fff8f8 100%) !important;
+}
+
+.tdkPerfilRedesign .topo::before {
+    content: "" !important;
+    position: absolute !important;
+    width: 360px !important;
+    height: 430px !important;
+    top: -48px !important;
+    right: -105px !important;
+    border-radius: 52% 0 0 52% !important;
+    background: linear-gradient(155deg, rgba(255,242,243,.85), rgba(253,231,234,.58)) !important;
+    filter: none !important;
+    opacity: 1 !important;
+    pointer-events: none !important;
+}
+
+.tdkPerfilRedesign .botaoVoltar {
+    position: relative !important;
+    z-index: 4 !important;
+    margin: 0 0 30px !important;
+}
+
+.tdkPerfilRedesign .topo .perfil {
+    display: block !important;
+    position: relative !important;
+    z-index: 3 !important;
+    padding: 0 !important;
+}
+
+.tdkPerfilRedesign .topo .informacoes {
+    position: relative !important;
+    width: 100% !important;
+}
+
+.tdkPerfilRedesign .tdkIdentidadePerfil {
+    display: flex !important;
+    align-items: center !important;
+    gap: 34px !important;
+    width: 100% !important;
+}
+
+.tdkPerfilRedesign .tdkIdentidadePerfil .avatar {
+    flex: 0 0 154px !important;
+    width: 154px !important;
+    height: 154px !important;
+    padding: 6px !important;
+    border: 3px solid #fff !important;
+    background: #fff !important;
+    box-shadow: 0 0 0 2px #c21727, 0 18px 34px rgba(153, 20, 31, .16) !important;
+}
+
+.tdkPerfilRedesign .tdkIdentidadeTexto {
+    flex: 1 !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+}
+
+.tdkPerfilRedesign .tdkIdentidadeTexto .linhaNomeFavorito {
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+    flex-wrap: wrap !important;
+}
+
+.tdkPerfilRedesign .tdkIdentidadeTexto .nomeLoja {
+    margin: 0 !important;
+    color: #182235 !important;
+    font-size: clamp(38px, 4vw, 54px) !important;
+    line-height: 1 !important;
+    font-weight: 900 !important;
+    letter-spacing: -.045em !important;
+}
+
+.tdkPerfilRedesign .tdkIdentidadeTexto .categoria {
+    display: inline-flex !important;
+    align-items: center !important;
+    min-height: 38px !important;
+    margin: 16px 0 0 !important;
+    padding: 8px 20px !important;
+    border: 1px solid #f3cbd0 !important;
+    border-radius: 999px !important;
+    background: linear-gradient(135deg, #fff0f2, #fde1e5) !important;
+    color: #b20f1d !important;
+    font-size: 15px !important;
+    font-weight: 850 !important;
+    box-shadow: 0 6px 16px rgba(177, 15, 29, .07) !important;
+}
+
+.tdkPerfilRedesign .tdkPerfilDadosPublicos {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(220px, 1fr)) !important;
+    gap: 16px !important;
+    width: min(760px, calc(100% - 188px)) !important;
+    max-width: none !important;
+    margin: 28px 0 0 188px !important;
+}
+
+.tdkPerfilRedesign .tdkPerfilDado {
+    min-width: 0 !important;
+    min-height: 76px !important;
+    padding: 14px 18px !important;
+    border: 1px solid #e4e8ee !important;
+    border-radius: 17px !important;
+    background: rgba(255,255,255,.92) !important;
+    box-shadow: 0 5px 18px rgba(28, 40, 58, .035) !important;
+}
+
+.tdkPerfilRedesign .tdkPerfilDadoIcone {
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 12px !important;
+    background: #fff0f2 !important;
+    color: #c21626 !important;
+    font-size: 19px !important;
+}
+
+.tdkPerfilRedesign .tdkPerfilDado small {
+    color: #7b8492 !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+}
+
+.tdkPerfilRedesign .tdkPerfilDado strong {
+    color: #182235 !important;
+    font-size: 14px !important;
+    font-weight: 800 !important;
+}
+
+.tdkPerfilRedesign .tdkEditProfileEntry {
+    position: absolute !important;
+    top: 48px !important;
+    right: -300px !important;
+    z-index: 5 !important;
+    display: flex !important;
+    width: 245px !important;
+    margin: 0 !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 13px !important;
+    text-align: center !important;
+}
+
+.tdkPerfilRedesign .tdkEditProfileOpen {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    width: 100% !important;
+    min-height: 52px !important;
+    padding: 0 24px !important;
+    border: 0 !important;
+    border-radius: 999px !important;
+    background: linear-gradient(135deg, #d31325, #ae0c19) !important;
+    color: #fff !important;
+    font-size: 16px !important;
+    font-weight: 850 !important;
+    box-shadow: 0 12px 24px rgba(174, 12, 25, .20) !important;
+}
+
+.tdkPerfilRedesign .tdkEditProfileOpen:hover {
+    background: linear-gradient(135deg, #b80f1f, #900913) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 15px 28px rgba(174, 12, 25, .26) !important;
+}
+
+.tdkPerfilRedesign .tdkEditProfileEntry > span {
+    max-width: 210px !important;
+    color: #727987 !important;
+    font-size: 13px !important;
+    line-height: 1.4 !important;
+}
+
+@media (max-width: 1180px) {
+    .tdkPerfilRedesign .topo { padding-right: 38px !important; }
+    .tdkPerfilRedesign .tdkEditProfileEntry {
+        position: static !important;
+        width: auto !important;
+        margin: 24px 0 0 188px !important;
+        flex-direction: row !important;
+        justify-content: flex-start !important;
+        text-align: left !important;
+    }
+    .tdkPerfilRedesign .tdkEditProfileOpen { width: auto !important; min-width: 170px !important; }
+}
+
+@media (max-width: 760px) {
+    .tdkPerfilRedesign .topo { min-height: 0 !important; padding: 20px !important; }
+    .tdkPerfilRedesign .tdkIdentidadePerfil { align-items: center !important; gap: 18px !important; }
+    .tdkPerfilRedesign .tdkIdentidadePerfil .avatar { flex-basis: 96px !important; width: 96px !important; height: 96px !important; }
+    .tdkPerfilRedesign .tdkIdentidadeTexto .nomeLoja { font-size: clamp(28px, 8vw, 38px) !important; }
+    .tdkPerfilRedesign .tdkIdentidadeTexto .categoria { min-height: 32px !important; margin-top: 10px !important; padding: 6px 13px !important; font-size: 12px !important; }
+    .tdkPerfilRedesign .tdkPerfilDadosPublicos { grid-template-columns: 1fr !important; width: 100% !important; margin: 24px 0 0 !important; }
+    .tdkPerfilRedesign .tdkEditProfileEntry { margin: 20px 0 0 !important; flex-direction: column !important; align-items: stretch !important; }
+    .tdkPerfilRedesign .tdkEditProfileOpen { width: 100% !important; }
+    .tdkPerfilRedesign .tdkEditProfileEntry > span { max-width: none !important; text-align: center !important; }
+}
+/* =========================================================
+   SeletorPerfil — dropdown de e-mail, telefone e endereço
+   ========================================================= */
+.tdkSel {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.tdkSelBotao {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 46px;
+  padding: 8px 12px;
+  border: 1px solid #dbe2e9;
+  border-radius: 11px;
+  background: #fff;
+  color: #253144;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+.tdkSelBotao:hover:not(:disabled) { border-color: #c9a0a5; background: #fffafa; }
+.tdkSelBotao:focus-visible,
+.tdkSelAberto .tdkSelBotao {
+  outline: none;
+  border-color: #b32633;
+  box-shadow: 0 0 0 3px rgba(163, 12, 27, .09);
+}
+.tdkSelBotao:disabled { opacity: .6; cursor: not-allowed; background: #f6f7f9; }
+
+.tdkSelIcone,
+.tdkSelOpcaoIcone {
+  display: grid;
+  place-items: center;
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: #fff0f2;
+  color: #a30e1a;
+}
+
+.tdkSelTexto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+.tdkSelTexto strong {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1f2a3a;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tdkSelTexto small {
+  font-size: 11px;
+  color: #7a8595;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tdkSelBadge {
+  flex-shrink: 0;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #fff0f2;
+  border: 1px solid #f1d0d4;
+  color: #a30e1a;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.tdkSelSeta { flex-shrink: 0; color: #6b7788; transition: transform .2s ease; }
+.tdkSelAberto .tdkSelSeta { transform: rotate(180deg); }
+
+/* Lista suspensa */
+.tdkSelLista {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 50;
+  margin: 0;
+  padding: 6px;
+  list-style: none;          /* remove as bolinhas */
+  max-height: 260px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #e3e8ef;
+  border-radius: 13px;
+  box-shadow: 0 14px 36px rgba(25, 35, 52, .16);
+  box-sizing: border-box;
+  animation: tdkSelEntrar .14s ease-out;
+}
+
+.tdkSelOpcao {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: background .12s ease;
+}
+.tdkSelOpcaoDestaque { background: #f6f7f9; }
+.tdkSelOpcaoAtual { background: #fff4f5; }
+.tdkSelOpcaoAtual.tdkSelOpcaoDestaque { background: #ffeaec; }
+
+.tdkSelCheck { flex-shrink: 0; color: #a30e1a; }
+
+@keyframes tdkSelEntrar {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tdkSelLista { animation: none; }
+  .tdkSelSeta { transition: none; }
+}
+
+/* Linha: seletor + botão "+" */
+.tdkEdLinhaCampo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.tdkEdLinhaCampo > .tdkEdAdd { flex-shrink: 0; }
+

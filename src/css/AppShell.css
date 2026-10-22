@@ -1,0 +1,501 @@
+/* =========================================================
+   TA-DA-KI — LAYOUT INTERNO (cabeçalho + menu lateral)
+   Mesmo visual do feed
+========================================================= */
+
+.appShell {
+  --sh-vermelho: #A50E1A;
+  --sh-vermelho-suave: #FDECEE;
+  --sh-azul: #EAF1F8;
+  --sh-borda: #E3E8EF;
+  --sh-texto: #0F1B33;
+  --sh-cinza: #64748B;
+  --sh-altura-cabecalho: 66px;
+
+  min-height: 100vh;
+  background: #FFFFFF;
+  color: var(--sh-texto);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.appShell * {
+  box-sizing: border-box;
+}
+
+/* ACESSIBILIDADE: PULAR PARA O CONTEÚDO */
+
+.shellPularConteudo {
+  position: absolute;
+  top: -48px;
+  left: 12px;
+  z-index: 100;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: var(--sh-texto);
+  color: #FFFFFF;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.shellPularConteudo:focus {
+  top: 12px;
+}
+
+/* CABEÇALHO */
+
+.shellCabecalho {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: grid;
+  grid-template-columns: 1fr minmax(260px, 670px) 1fr;
+  align-items: center;
+  gap: 20px;
+  height: var(--sh-altura-cabecalho);
+  padding: 0 24px;
+  border-bottom: 1px solid var(--sh-borda);
+  background: #FFFFFF;
+}
+
+.shellLogo {
+  justify-self: start;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.shellLogo img {
+  display: block;
+  height: 44px;
+  width: auto;
+}
+
+.shellBusca {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 44px;
+  padding: 0 18px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: var(--sh-azul);
+  color: var(--sh-cinza);
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+
+.shellBusca:focus-within {
+  border-color: var(--sh-vermelho);
+  background: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(165, 14, 26, 0.12);
+}
+
+.shellBusca input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--sh-texto);
+  font-family: inherit;
+  font-size: 15px;
+}
+
+.shellBusca input::placeholder {
+  color: var(--sh-cinza);
+}
+
+/* BOTÃO E PAINEL DE ACESSIBILIDADE */
+
+.shellAcoes {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.shellAcessibilidade {
+  position: relative;
+}
+
+.shellBotaoAcessibilidade {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--sh-texto);
+  font-family: inherit;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.shellBotaoAcessibilidade:hover {
+  background: var(--sh-azul);
+}
+
+.shellPainelAcessibilidade {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 40;
+  width: 300px;
+  padding: 16px;
+  border: 1px solid var(--sh-borda);
+  border-radius: 14px;
+  background: #FFFFFF;
+  box-shadow: 0 14px 32px rgba(15, 27, 51, 0.14);
+}
+
+.shellPainelTitulo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.shellPainelTitulo button {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 50%;
+  background: #F1F4F8;
+  color: var(--sh-texto);
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.shellPainelAcessibilidade p {
+  margin: 6px 0 12px;
+  color: var(--sh-cinza);
+  font-size: 13px;
+}
+
+.shellPainelLinha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 0;
+  border-top: 1px solid var(--sh-borda);
+  font-size: 14px;
+}
+
+.shellPainelLinha input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--sh-vermelho);
+}
+
+.shellPainelFonte {
+  display: flex;
+  gap: 6px;
+}
+
+.shellPainelFonte button {
+  min-width: 38px;
+  padding: 6px 8px;
+  border: 1px solid var(--sh-borda);
+  border-radius: 8px;
+  background: #FFFFFF;
+  color: var(--sh-texto);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.shellPainelFonte button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.shellPainelRestaurar {
+  width: 100%;
+  margin-top: 8px;
+  padding: 9px;
+  border: 1px solid var(--sh-vermelho);
+  border-radius: 999px;
+  background: #FFFFFF;
+  color: var(--sh-vermelho);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.shellPainelRestaurar:hover {
+  background: var(--sh-vermelho-suave);
+}
+
+/* CORPO: MENU + CONTEÚDO */
+
+.shellCorpo {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  align-items: start;
+}
+
+/* MENU LATERAL */
+
+.shellMenu {
+  position: sticky;
+  top: var(--sh-altura-cabecalho);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height: calc(100vh - var(--sh-altura-cabecalho));
+  padding: 16px 10px;
+  overflow-y: auto;
+  border-right: 1px solid var(--sh-borda);
+  background: #FFFFFF;
+}
+
+.shellMenu button {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--sh-texto);
+  font-family: inherit;
+  font-size: 15px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.shellMenu button:hover:not(:disabled) {
+  background: #F3F6FA;
+}
+
+.shellMenu button.ativo {
+  background: var(--sh-azul);
+  color: var(--sh-vermelho);
+  font-weight: 800;
+}
+
+.shellMenu hr {
+  width: 100%;
+  margin: 12px 0;
+  border: none;
+  border-top: 1px solid var(--sh-borda);
+}
+
+.shellMenu .shellSair {
+  color: var(--sh-vermelho);
+}
+
+.shellMenu .shellSair:hover:not(:disabled) {
+  background: var(--sh-vermelho-suave);
+}
+
+.shellMenu button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.shellCabecalho button:focus-visible,
+.shellMenu button:focus-visible {
+  outline: 3px solid rgba(165, 14, 26, 0.35);
+  outline-offset: 2px;
+}
+
+/* CONTEÚDO */
+
+.shellConteudo {
+  min-width: 0;
+  outline: none;
+}
+
+/* BOTÃO "CRIAR PUBLICAÇÃO" (contas de organização) */
+
+.appShell .shellAcoes .create-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 42px;
+  margin: 0;
+  padding: 0 20px;
+  border: none;
+  border-radius: 999px;
+  background: var(--sh-vermelho);
+  box-shadow: 0 6px 14px rgba(165, 14, 26, 0.22);
+  color: #FFFFFF;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+.appShell .shellAcoes .create-button:hover {
+  background: #8A0B15;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(165, 14, 26, 0.3);
+}
+
+.appShell .shellAcoes .create-button:focus-visible {
+  outline: 3px solid rgba(165, 14, 26, 0.35);
+  outline-offset: 2px;
+}
+
+.appShell .shellAcoes .create-button svg {
+  flex-shrink: 0;
+}
+
+/* FEED DENTRO DO SHELL
+   O feed continua usando o Feed.css para os cards; aqui só neutralizamos
+   o espaço que antes era reservado ao menu lateral antigo. */
+
+.shellConteudo .feed-page {
+  min-height: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.shellConteudo .feed-shell {
+  display: block;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 24px 36px 60px;
+}
+
+/* Posts à esquerda e "Sua região" à direita, lado a lado e sem sobrepor.
+   A coluna lateral acompanha a rolagem (sticky) em vez de ficar fixa na tela. */
+
+.shellConteudo .feed-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  align-items: start;
+  gap: 24px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.shellConteudo .feed-main {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  margin: 0;
+}
+
+.shellConteudo .feed-sidebar {
+  position: sticky;
+  top: calc(var(--sh-altura-cabecalho) + 16px);
+  right: auto;
+  bottom: auto;
+  left: auto;
+  width: auto;
+  max-width: none;
+  height: auto;
+  max-height: calc(100vh - var(--sh-altura-cabecalho) - 32px);
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+@media (max-width: 1100px) {
+  .shellConteudo .feed-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .shellConteudo .feed-sidebar {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+}
+
+/* TELAS INSTITUCIONAIS (Sobre / Ajuda) DENTRO DO SHELL
+   O Institucional.css continua cuidando dos cards; aqui só tiramos o que
+   era de página inteira (altura e fundo), já que o shell cuida disso. */
+
+.shellConteudo .institutional-page {
+  min-height: 0;
+  background: transparent;
+}
+
+/* TABLET / CELULAR */
+
+@media (max-width: 900px) {
+  .shellCabecalho {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 12px;
+    padding: 0 14px;
+  }
+
+  .shellBotaoAcessibilidade span {
+    display: none;
+  }
+
+  .shellCorpo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Menu vira uma faixa rolável no topo */
+  .shellMenu {
+    position: static;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    height: auto;
+    padding: 10px 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-right: none;
+    border-bottom: 1px solid var(--sh-borda);
+  }
+
+  .shellMenu button {
+    width: auto;
+    min-height: 40px;
+    padding: 0 14px;
+    white-space: nowrap;
+  }
+
+  .shellMenu hr {
+    width: 1px;
+    height: 24px;
+    margin: 0 4px;
+    border-top: none;
+    border-left: 1px solid var(--sh-borda);
+  }
+}
+
+@media (max-width: 600px) {
+  /* No celular o botão vira só o ícone "+" */
+  .appShell .shellAcoes .create-button {
+    width: 42px;
+    padding: 0;
+  }
+
+  .appShell .shellAcoes .create-button span {
+    display: none;
+  }
+
+  .shellLogo img {
+    height: 36px;
+  }
+
+  .shellPainelAcessibilidade {
+    position: fixed;
+    top: calc(var(--sh-altura-cabecalho) + 8px);
+    right: 12px;
+    left: 12px;
+    width: auto;
+  }
+}
