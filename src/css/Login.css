@@ -1118,3 +1118,15 @@
 .login-page .form-input {
   transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease !important;
 }
+
+/* Login com o google */
+.login-google {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 18px;
+}
+
+.login-google > div {
+  margin: 0 auto;
+}
