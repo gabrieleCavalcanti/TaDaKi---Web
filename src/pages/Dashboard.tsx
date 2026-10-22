@@ -5,6 +5,7 @@ import { getImageUrl } from "../services/api";
 import { userType } from "../components/feed/model";
 import { useDashboard } from "../components/dashboard/useDashboard";
 import { currentMonth, monthLabel } from "../components/dashboard/model";
+import { AppShell } from "../components/AppShell";
 import "../css/Dashboard.css";
 
 export default function Dashboard() {
@@ -22,10 +23,11 @@ export default function Dashboard() {
     { label: "Novos favoritos no mês", value: data.novos_favoritos_mes, copy: "Favoritos ativos com data registrada neste mês.", Icon: CalendarDays, accent: "red" },
   ] : [];
   return (
+    <AppShell>
     <main className="organization-dashboard">
       <div className="dashboard-shell">
         <header className="dashboard-topbar">
-          <button className="dashboard-back" onClick={() => navigate("/")}><ArrowLeft size={17} /> Voltar para o feed</button>
+          {/* <button className="dashboard-back" onClick={() => navigate("/")}><ArrowLeft size={17} /> Voltar para o feed</button> */}
           <span className="dashboard-brand">TaDaKi <span>/ Sua organização</span></span>
         </header>
         <section className="dashboard-heading">
@@ -83,5 +85,6 @@ export default function Dashboard() {
         )}
       </div>
     </main>
+    </AppShell>
   );
 }

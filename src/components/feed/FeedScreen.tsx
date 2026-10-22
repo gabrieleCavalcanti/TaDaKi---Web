@@ -186,7 +186,7 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
             </div>
             {!onlyLikes && (
               <div className="discovery-controls">
-                <div className="category-filters" aria-label="Modo da vitrine">
+                {/* <div className="category-filters" aria-label="Modo da vitrine">
                   <button
                     className={!favoritesOnly ? "selected" : ""}
                     aria-pressed={!favoritesOnly}
@@ -210,7 +210,7 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
                       Favoritas
                     </button>
                   )}
-                </div>
+                </div> */}
                 {favoritesOnly ? (
                   <p>
                     Timeline somente das empresas que você favoritou, das
@@ -218,7 +218,7 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
                   </p>
                 ) : (
                   <>
-                    <p>
+                    {/* <p>
                       {discovery.locating
                         ? "Ordenando por proximidade…"
                         : !discovery.locations.user.length
@@ -230,7 +230,7 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
                     <RegionPicker
                       initial={discovery.locations.user[0]}
                       save={discovery.saveReference}
-                    />
+                    /> */}
                     {!favoritesOnly && !discovery.hasInterests && (
                       <p>
                         Curta produtos, amplie fotos ou visite empresas para
@@ -241,7 +241,7 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
                 )}
               </div>
             )}
-            <div className="feed-toolbar">
+            {/* <div className="feed-toolbar">
               <label className="search-field">
                 <Search size={20} />
                 <input
@@ -268,7 +268,7 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
                   ? "Carregando…"
                   : `${filtered.length} ${filtered.length === 1 ? "publicação" : "publicações"}`}
               </span>
-            </div>
+            </div> */}
             <div className="category-filters" aria-label="Filtrar por categoria">
               <button
                 aria-pressed={!category}

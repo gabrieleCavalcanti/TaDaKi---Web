@@ -108,6 +108,26 @@ export function AppShell({
     navigate("/perfil-pessoal");
   }
 
+  // function abrirDashboard() {
+  //   if (Mo) {
+  //     aoAbrirDashboard();
+
+  //     return;
+  //   }
+
+  //   if (tipoConta === "ORGANIZACAO") {
+  //     const id = Number(user?.id_pessoa ?? user?.id_pessoa_login);
+
+  //     if (Number.isSafeInteger(id) && id > 0) {
+  //       navigate(`/perfil/${id}`);
+
+  //       return;
+  //     }
+  //   }
+
+  //   navigate("/perfil-pessoal");
+  // }
+
   const buscaControlada = aoMudarBusca !== undefined;
 
   const [buscaLocal, setBuscaLocal] = useState("");

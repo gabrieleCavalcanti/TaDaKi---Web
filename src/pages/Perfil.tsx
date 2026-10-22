@@ -2408,14 +2408,14 @@ export default function PerfilScreen() {
 
                             <header className="topo">
 
-                                <button
+                                {/* <button
                                     type="button"
                                     className="botaoVoltar"
                                     onClick={() => navigate("/")}
                                     aria-label="Voltar para a Home"
                                 >
                                     ←
-                                </button>
+                                </button> */}
 
                                 <div className="perfil">
 
