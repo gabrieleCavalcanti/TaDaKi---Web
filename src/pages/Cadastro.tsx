@@ -27,9 +27,8 @@ const formatarTelefone = (valor: string) => {
   }
 
   if (numeros.length <= 10) {
-    return `(${numeros.slice(0, 2)}) ${numeros.slice(2, 6)}${
-      numeros.length > 6 ? `-${numeros.slice(6, 10)}` : ""
-    }`;
+    return `(${numeros.slice(0, 2)}) ${numeros.slice(2, 6)}${numeros.length > 6 ? `-${numeros.slice(6, 10)}` : ""
+      }`;
   }
 
   return `(${numeros.slice(0, 2)}) ${numeros.slice(2, 7)}-${numeros.slice(7, 11)}`;
@@ -81,6 +80,10 @@ const validarSenha = (senha: string): string | null => {
   }
 
   return null;
+};
+
+const validarEmailGmail = (email: string): boolean => {
+  return /^[a-zA-Z0-9._%+-]+@gmail\.com$/i.test(email.trim());
 };
 
 export const Cadastro: React.FC = () => {
@@ -212,6 +215,21 @@ export const Cadastro: React.FC = () => {
           return;
         }
 
+        if (nome.length < 3) {
+          setErrorMessage("O nome deve ter pelo menos 3 caracteres.");
+          return;
+        }
+
+        if (usuario.length === 0) {
+          setErrorMessage("O username é obrigatório.");
+          return;
+        }
+        
+        if (!validarEmailGmail(email)) {
+          setErrorMessage("Digite um e-mail válido do Gmail (exemplo@gmail.com).");
+          return;
+        }
+
         const erroSenha = validarSenha(senha);
 
         if (erroSenha) {
@@ -307,6 +325,16 @@ export const Cadastro: React.FC = () => {
           return;
         }
 
+        if (nomeOrganizacao.length < 3) {
+          setErrorMessage("O nome da organização deve ter pelo menos 3 caracteres.");
+          return;
+        }
+
+        if (!validarEmailGmail(email)) {
+          setErrorMessage("Digite um e-mail válido do Gmail (exemplo@gmail.com).");
+          return;
+        }
+
         const erroSenha = validarSenha(senha);
 
         if (erroSenha) {
@@ -319,6 +347,7 @@ export const Cadastro: React.FC = () => {
 
           return;
         }
+
 
         // DADOS PARA O BACKEND
 
@@ -715,9 +744,8 @@ export const Cadastro: React.FC = () => {
 
                 <button
                   type="button"
-                  className={`documento-card ${
-                    tipoDocumento === "cpf" ? "ativo" : ""
-                  }`}
+                  className={`documento-card ${tipoDocumento === "cpf" ? "ativo" : ""
+                    }`}
                   onClick={() => setTipoDocumento("cpf")}
                 >
                   <div className="documento-icone">
@@ -739,9 +767,8 @@ export const Cadastro: React.FC = () => {
 
                 <button
                   type="button"
-                  className={`documento-card ${
-                    tipoDocumento === "cnpj" ? "ativo" : ""
-                  }`}
+                  className={`documento-card ${tipoDocumento === "cnpj" ? "ativo" : ""
+                    }`}
                   onClick={() => setTipoDocumento("cnpj")}
                 >
                   <div className="documento-icone">
