@@ -1391,3 +1391,61 @@ html.tadaki-reduce-motion .feed-page *,html.tadaki-reduce-motion .feed-page *::b
 }
 .tadaki-business-more{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;margin:24px auto 8px;border:0;background:#b50917;color:#fff;font:inherit;font-weight:800;border-radius:14px;padding:12px 25px;cursor:pointer;transition:background .2s,transform .2s}
 .tadaki-business-more:hover{background:#900817;transform:translateY(-2px)}
+
+/* O modal não depende mais do wrapper .feed-page */
+.create-post-overlay,
+.create-post-modal {
+  --brand: #b01013;
+  --brand-hover: #8c0b0e;
+  --blue: #a2b9d5;
+  --blue-soft: #edf3f8;
+  --ink: #0e2037;
+  --muted: #5d728b;
+  --line: #e2eaf2;
+  color: var(--ink);
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.create-post-modal *,
+.create-post-modal *::before,
+.create-post-modal *::after {
+  box-sizing: border-box;
+}
+
+.create-post-modal button,
+.create-post-modal input,
+.create-post-modal textarea,
+.create-post-modal select {
+  font: inherit;
+}
+
+.create-post-modal button {
+  cursor: pointer;
+}
+
+.create-post-modal button:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.create-post-modal .primary-button {
+  background: var(--brand);
+  color: #fff;
+}
+
+.create-post-modal .primary-button:hover:not(:disabled) {
+  background: var(--brand-hover);
+}
+
+.create-post-modal .feed-action {
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  height: 44px;
+  width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 13px;
+  padding: 0;
+}

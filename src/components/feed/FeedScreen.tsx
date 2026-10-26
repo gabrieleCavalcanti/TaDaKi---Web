@@ -13,6 +13,7 @@ import {
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppShell } from "../../components/AppShell";
+import type { Sugestao } from "../../components/AppShell";
 import { useAuth } from "../../hooks/useAuth";
 import { getImageUrl } from "../../services/api";
 import { filterPosts, userType, photo } from "./model";
@@ -26,6 +27,12 @@ import { CreatePostModal } from "./CreatePostModal";
 import { PostCard } from "./PostCard";
 import { ScrollReveal } from "./ScrollReveal";
 import "../../css/Feed.css";
+
+const normalizar = (texto: string) =>
+  texto
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
 
 export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
   const navigate = useNavigate();
@@ -79,7 +86,7 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
   );
   const featured = useMemo(() => {
     const seen = new Set<number>();
-    return filtered.filter(post => {
+    return filtered.filter((post) => {
       if (seen.has(post.id_organizacao)) return false;
       seen.add(post.id_organizacao);
       return true;
@@ -89,26 +96,42 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
   // deve aparecer na descoberta mesmo sem ter criado nenhuma publicação.
   const discoveredOrganizations = useMemo(() => {
     if (onlyLikes || favoritesOnly) return [];
-    const term = search.trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-    const active = feed.organizations.filter(org => {
-      const name = String(org.nome ?? org.username ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    const term = search
+      .trim()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+    const active = feed.organizations.filter((org) => {
+      const name = String(org.nome ?? org.username ?? "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
       return Number(org.id_pessoa) > 0 && name.includes(term);
     });
-    return active.sort((a,b) => {
-      const aPosts = feed.allPosts.filter(p => Number(p.id_organizacao) === Number(a.id_organizacao));
-      const bPosts = feed.allPosts.filter(p => Number(p.id_organizacao) === Number(b.id_organizacao));
+    return active.sort((a, b) => {
+      const aPosts = feed.allPosts.filter(
+        (p) => Number(p.id_organizacao) === Number(a.id_organizacao),
+      );
+      const bPosts = feed.allPosts.filter(
+        (p) => Number(p.id_organizacao) === Number(b.id_organizacao),
+      );
       return bPosts.length - aPosts.length;
     });
   }, [feed.organizations, feed.allPosts, search, onlyLikes, favoritesOnly]);
   const regionName = discovery.selectedAddress
     ? `${discovery.selectedAddress.municipio}, ${discovery.selectedAddress.uf}`
-    : discovery.locations.user.length ? "Sua região cadastrada" : "Defina sua região";
+    : discovery.locations.user.length
+      ? "Sua região cadastrada"
+      : "Defina sua região";
   const title = onlyLikes
     ? "Minhas curtidas"
     : favoritesOnly
       ? "Suas empresas favoritas"
       : "Seu próximo achado está por perto";
-  const timelineError = favoritesOnly && feed.favoritesError ? "Não foi possível carregar sua timeline. Atualize os favoritos para tentar novamente." : "";
+  const timelineError =
+    favoritesOnly && feed.favoritesError
+      ? "Não foi possível carregar sua timeline. Atualize os favoritos para tentar novamente."
+      : "";
   const goProfile = () => {
     if (type === "CLIENTE") {
       navigate("/perfil-pessoal");
@@ -116,24 +139,84 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
     }
     if (type === "ORGANIZACAO") {
       const id = Number(
-        user?.id_pessoa ?? user?.id_pessoa_login ??
-        feed.person?.id_pessoa ?? feed.person?.id_pessoa_login,
+        user?.id_pessoa ??
+          user?.id_pessoa_login ??
+          feed.person?.id_pessoa ??
+          feed.person?.id_pessoa_login,
       );
       if (Number.isSafeInteger(id) && id > 0) {
         navigate(`/perfil/${id}`);
       } else {
-        feed.setNotice("Não foi possível identificar seu perfil. Atualize a página e tente novamente.");
+        feed.setNotice(
+          "Não foi possível identificar seu perfil. Atualize a página e tente novamente.",
+        );
       }
       return;
     }
-    feed.setNotice("Não foi possível identificar o tipo da sua conta. Atualize a página e tente novamente.");
+    feed.setNotice(
+      "Não foi possível identificar o tipo da sua conta. Atualize a página e tente novamente.",
+    );
   };
+
+  const sugestoes = useMemo<Sugestao[]>(() => {
+    const termo = normalizar(search.trim());
+    if (!termo || onlyLikes) return [];
+
+    const negocios: Sugestao[] = feed.organizations
+      .filter(
+        (org) =>
+          Number(org.id_pessoa) > 0 &&
+          normalizar(String(org.nome ?? org.username ?? "")).includes(termo),
+      )
+      .slice(0, 4)
+      .map((org) => ({
+        id: `org-${org.id_pessoa}`,
+        rotulo: String(org.nome ?? org.username),
+        detalhe: "Negócio",
+        aoEscolher: () => navigate(`/perfil/${org.id_pessoa}`),
+      }));
+
+    const categorias: Sugestao[] = feed.categories
+      .filter((c) => normalizar(c.descricao).includes(termo))
+      .slice(0, 3)
+      .map((c) => ({
+        id: `cat-${c.id_categoria}`,
+        rotulo: c.descricao,
+        detalhe: "Categoria",
+        aoEscolher: () => {
+          setCategory(Number(c.id_categoria));
+          setSearch("");
+          setLimit(12);
+        },
+      }));
+
+    const publicacoes: Sugestao[] = feed.allPosts
+      .filter((p) => normalizar(p.titulo).includes(termo))
+      .slice(0, 4)
+      .map((p) => ({
+        id: `post-${p.id_post}`,
+        rotulo: p.titulo,
+        detalhe: p.nome_organizacao,
+        aoEscolher: () => setSearch(p.titulo),
+      }));
+
+    return [...negocios, ...categorias, ...publicacoes];
+  }, [
+    search,
+    onlyLikes,
+    feed.organizations,
+    feed.categories,
+    feed.allPosts,
+    navigate,
+  ]);
+
   return (
     <>
       <AppShell
         ativo={onlyLikes ? "curtidas" : "inicio"}
         busca={search}
         aoMudarBusca={setSearch}
+        sugestoes={sugestoes}
         aoClicarLogo={() => {
           navigate("/");
           setFavoritesOnly(false);
@@ -186,7 +269,7 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
             </div>
             {!onlyLikes && (
               <div className="discovery-controls">
-                <div className="category-filters" aria-label="Modo da vitrine">
+                {/* <div className="category-filters" aria-label="Modo da vitrine">
                   <button
                     className={!favoritesOnly ? "selected" : ""}
                     aria-pressed={!favoritesOnly}
@@ -210,7 +293,7 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
                       Favoritas
                     </button>
                   )}
-                </div>
+                </div> */}
                 {favoritesOnly ? (
                   <p>
                     Timeline somente das empresas que você favoritou, das
@@ -218,7 +301,7 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
                   </p>
                 ) : (
                   <>
-                    <p>
+                    {/* <p>
                       {discovery.locating
                         ? "Ordenando por proximidade…"
                         : !discovery.locations.user.length
@@ -230,7 +313,7 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
                     <RegionPicker
                       initial={discovery.locations.user[0]}
                       save={discovery.saveReference}
-                    />
+                    /> */}
                     {!favoritesOnly && !discovery.hasInterests && (
                       <p>
                         Curta produtos, amplie fotos ou visite empresas para
@@ -241,7 +324,7 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
                 )}
               </div>
             )}
-            <div className="feed-toolbar">
+            {/* <div className="feed-toolbar">
               <label className="search-field">
                 <Search size={20} />
                 <input
@@ -268,8 +351,11 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
                   ? "Carregando…"
                   : `${filtered.length} ${filtered.length === 1 ? "publicação" : "publicações"}`}
               </span>
-            </div>
-            <div className="category-filters" aria-label="Filtrar por categoria">
+            </div> */}
+            <div
+              className="category-filters"
+              aria-label="Filtrar por categoria"
+            >
               <button
                 aria-pressed={!category}
                 className={!category ? "selected" : ""}
@@ -309,27 +395,132 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
               </div>
             )}
             {!onlyLikes && !favoritesOnly && (
-              <section className="tadaki-nearby" aria-label="Organizações da comunidade">
-                <div className="tadaki-section-title"><h2>Negócios para descobrir</h2><span>{regionName}</span></div>
-                {discoveredOrganizations.length ? <div className="tadaki-nearby-grid">{discoveredOrganizations.slice(0, businessLimit).map(org => {
-                  const orgPost = feed.allPosts.find(post => Number(post.id_organizacao) === Number(org.id_organizacao));
-                  const cover = orgPost?.vincularImagem || photo(org);
-                  return <div key={org.id_pessoa} className="tadaki-nearby-card">
-                    <button className="tadaki-nearby-item" aria-label={`Conhecer ${org.nome || org.username || "organização"}`} onClick={() => navigate(`/perfil/${org.id_pessoa}`)}>
-                      {cover ? <img src={getImageUrl(cover)} alt="" loading="lazy"/> : <span className="tadaki-nearby-placeholder"><Compass/></span>}
-                      <span><strong>{org.nome || org.username || "Organização"}</strong><small>{orgPost?.descricao_categoria || "Negócio local"}</small><small><MapPin size={12}/> {orgPost ? "Ver perfil e publicações" : "Conheça esta organização"}</small></span>
-                    </button>
-                    {canFavorite && <button type="button" className="tadaki-nearby-favorite" aria-pressed={Boolean(feed.favorites[Number(org.id_organizacao)]?.favoritado)} aria-label={`${feed.favorites[Number(org.id_organizacao)]?.favoritado ? "Remover dos favoritos" : "Favoritar"}: ${org.nome || org.username}`} disabled={feed.pending.has(`favorite:${Number(org.id_organizacao)}`) || !Number(org.id_organizacao)} onClick={() => void feed.toggleFavorite(Number(org.id_organizacao))}><Star size={19} fill={feed.favorites[Number(org.id_organizacao)]?.favoritado ? "currentColor" : "none"}/></button>}
-                    {feed.favoriteErrors[Number(org.id_organizacao)] && <small role="alert" className="post-favorite-error">{feed.favoriteErrors[Number(org.id_organizacao)]}</small>}
-                  </div>;
-                })}</div> : <p>Nenhuma organização encontrada para sua busca.</p>}
-                {discoveredOrganizations.length > businessLimit && <button type="button" className="tadaki-business-more" onClick={() => setBusinessLimit(n => n + 6)}>Ver mais negócios <ChevronRight size={18}/></button>}
+              <section
+                className="tadaki-nearby"
+                aria-label="Organizações da comunidade"
+              >
+                <div className="tadaki-section-title">
+                  <h2>Negócios para descobrir</h2>
+                  <span>{regionName}</span>
+                </div>
+                {discoveredOrganizations.length ? (
+                  <div className="tadaki-nearby-grid">
+                    {discoveredOrganizations
+                      .slice(0, businessLimit)
+                      .map((org) => {
+                        const orgPost = feed.allPosts.find(
+                          (post) =>
+                            Number(post.id_organizacao) ===
+                            Number(org.id_organizacao),
+                        );
+                        const cover = orgPost?.vincularImagem || photo(org);
+                        return (
+                          <div
+                            key={org.id_pessoa}
+                            className="tadaki-nearby-card"
+                          >
+                            <button
+                              className="tadaki-nearby-item"
+                              aria-label={`Conhecer ${org.nome || org.username || "organização"}`}
+                              onClick={() =>
+                                navigate(`/perfil/${org.id_pessoa}`)
+                              }
+                            >
+                              {cover ? (
+                                <img
+                                  src={getImageUrl(cover)}
+                                  alt=""
+                                  loading="lazy"
+                                />
+                              ) : (
+                                <span className="tadaki-nearby-placeholder">
+                                  <Compass />
+                                </span>
+                              )}
+                              <span>
+                                <strong>
+                                  {org.nome || org.username || "Organização"}
+                                </strong>
+                                <small>
+                                  {orgPost?.descricao_categoria ||
+                                    "Negócio local"}
+                                </small>
+                                <small>
+                                  <MapPin size={12} />{" "}
+                                  {orgPost
+                                    ? "Ver perfil e publicações"
+                                    : "Conheça esta organização"}
+                                </small>
+                              </span>
+                            </button>
+                            {canFavorite && (
+                              <button
+                                type="button"
+                                className="tadaki-nearby-favorite"
+                                aria-pressed={Boolean(
+                                  feed.favorites[Number(org.id_organizacao)]
+                                    ?.favoritado,
+                                )}
+                                aria-label={`${feed.favorites[Number(org.id_organizacao)]?.favoritado ? "Remover dos favoritos" : "Favoritar"}: ${org.nome || org.username}`}
+                                disabled={
+                                  feed.pending.has(
+                                    `favorite:${Number(org.id_organizacao)}`,
+                                  ) || !Number(org.id_organizacao)
+                                }
+                                onClick={() =>
+                                  void feed.toggleFavorite(
+                                    Number(org.id_organizacao),
+                                  )
+                                }
+                              >
+                                <Star
+                                  size={19}
+                                  fill={
+                                    feed.favorites[Number(org.id_organizacao)]
+                                      ?.favoritado
+                                      ? "currentColor"
+                                      : "none"
+                                  }
+                                />
+                              </button>
+                            )}
+                            {feed.favoriteErrors[
+                              Number(org.id_organizacao)
+                            ] && (
+                              <small
+                                role="alert"
+                                className="post-favorite-error"
+                              >
+                                {
+                                  feed.favoriteErrors[
+                                    Number(org.id_organizacao)
+                                  ]
+                                }
+                              </small>
+                            )}
+                          </div>
+                        );
+                      })}
+                  </div>
+                ) : (
+                  <p>Nenhuma organização encontrada para sua busca.</p>
+                )}
+                {discoveredOrganizations.length > businessLimit && (
+                  <button
+                    type="button"
+                    className="tadaki-business-more"
+                    onClick={() => setBusinessLimit((n) => n + 6)}
+                  >
+                    Ver mais negócios <ChevronRight size={18} />
+                  </button>
+                )}
               </section>
             )}
             <div className="feed-layout">
               <section
                 className="feed-main"
-                id="tadaki-publicacoes" tabIndex={-1}
+                id="tadaki-publicacoes"
+                tabIndex={-1}
                 aria-label={onlyLikes ? "Publicações curtidas" : "Publicações"}
                 aria-busy={feed.loading}
               >
@@ -373,7 +564,9 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
                     <p>
                       {onlyLikes
                         ? "Curta uma publicação no feed e reencontre o produto aqui."
-                        : favoritesOnly ? "Favorite uma organização no Para você para acompanhar as publicações dela aqui." : "Explore outros termos ou volte para todas as publicações."}
+                        : favoritesOnly
+                          ? "Favorite uma organização no Para você para acompanhar as publicações dela aqui."
+                          : "Explore outros termos ou volte para todas as publicações."}
                     </p>
                     <button
                       className="primary-button"
@@ -422,7 +615,9 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
                             `favorite:${post.id_organizacao}`,
                           )}
                           canFavorite={canFavorite}
-                          favoriteError={feed.favoriteErrors[post.id_organizacao]}
+                          favoriteError={
+                            feed.favoriteErrors[post.id_organizacao]
+                          }
                           onLike={(id) => void feed.toggleLike(id)}
                           onFavorite={(id) => void feed.toggleFavorite(id)}
                           onOpenOrganization={(id) => {
@@ -451,20 +646,72 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
               <aside className="feed-sidebar">
                 <section className="tadaki-region-panel">
                   <h2>Sua região</h2>
-                  <p className="tadaki-region-title"><MapPin size={19}/>{regionName}</p>
-                  <p>Descubra negócios da sua rua, bairro, cidade e estado, conforme os endereços cadastrados.</p>
-                  <div className="tadaki-region-map" aria-label="Ilustração de localização; não é um mapa de navegação"><MapPin size={35}/><span>Negócios perto de você</span></div>
-                  <RegionPicker initial={discovery.locations.user[0]} save={discovery.saveReference}/>
+                  <p className="tadaki-region-title">
+                    <MapPin size={19} />
+                    {regionName}
+                  </p>
+                  <p>
+                    Descubra negócios da sua rua, bairro, cidade e estado,
+                    conforme os endereços cadastrados.
+                  </p>
+                  <div
+                    className="tadaki-region-map"
+                    aria-label="Ilustração de localização; não é um mapa de navegação"
+                  >
+                    <MapPin size={35} />
+                    <span>Negócios perto de você</span>
+                  </div>
+                  <RegionPicker
+                    initial={discovery.locations.user[0]}
+                    save={discovery.saveReference}
+                  />
                 </section>
                 <section className="tadaki-highlights">
                   <h2>Negócios em destaque na sua região</h2>
-                  {featured.slice(0, 4).map(post => <button key={post.id_organizacao} className="tadaki-highlight" disabled={!post.id_pessoa_organizacao} onClick={() => navigate(`/perfil/${post.id_pessoa_organizacao}`)}>
-                    {post.vincularImagem ? <img src={getImageUrl(post.vincularImagem)} alt=""/> : <span className="tadaki-highlight-fallback"><Compass/></span>}
-                    <span><strong>{post.nome_organizacao}</strong><small>{post.descricao_categoria || "Negócio local"}</small></span><ChevronRight size={18}/>
-                  </button>)}
-                  {!featured.length && <p>Explore organizações da sua região, mesmo que ainda não tenham publicações.</p>}
+                  {featured.slice(0, 4).map((post) => (
+                    <button
+                      key={post.id_organizacao}
+                      className="tadaki-highlight"
+                      disabled={!post.id_pessoa_organizacao}
+                      onClick={() =>
+                        navigate(`/perfil/${post.id_pessoa_organizacao}`)
+                      }
+                    >
+                      {post.vincularImagem ? (
+                        <img src={getImageUrl(post.vincularImagem)} alt="" />
+                      ) : (
+                        <span className="tadaki-highlight-fallback">
+                          <Compass />
+                        </span>
+                      )}
+                      <span>
+                        <strong>{post.nome_organizacao}</strong>
+                        <small>
+                          {post.descricao_categoria || "Negócio local"}
+                        </small>
+                      </span>
+                      <ChevronRight size={18} />
+                    </button>
+                  ))}
+                  {!featured.length && (
+                    <p>
+                      Explore organizações da sua região, mesmo que ainda não
+                      tenham publicações.
+                    </p>
+                  )}
                 </section>
-                {canCreate && !onlyLikes && <div className="business-note"><h3>Mostre seu trabalho à região</h3><p>Uma boa foto ajuda seus produtos a serem descobertos.</p><button className="primary-button" onClick={() => setComposerOpen(true)}><Plus size={18}/> Criar publicação</button></div>}
+                {canCreate && !onlyLikes && (
+                  <div className="business-note">
+                    <h3>Mostre seu trabalho à região</h3>
+                    <p>Uma boa foto ajuda seus produtos a serem descobertos.</p>
+                    <button
+                      className="primary-button"
+                      onClick={() => setComposerOpen(true)}
+                    >
+                      <Plus size={18} /> Criar publicação
+                    </button>
+                  </div>
+                )}
               </aside>
             </div>
           </section>
