@@ -63,9 +63,13 @@ export async function apiFetch<T = any>(
           if (!result.ok) {
             if (result.status === 401 || result.status === 403) {
               clearAuthTokens();
-              throw new Error("Sua sessão expirou. Entre novamente para continuar.");
+              throw new Error(
+                "Sua sessão expirou. Entre novamente para continuar.",
+              );
             }
-            throw new Error("Não foi possível renovar sua sessão. Tente novamente.");
+            throw new Error(
+              "Não foi possível renovar sua sessão. Tente novamente.",
+            );
           }
           if (data.token_acesso) {
             saveAuthTokens(data.token_acesso, data.refresh_token);
@@ -81,19 +85,22 @@ export async function apiFetch<T = any>(
     }
     await refreshing;
     const refreshedToken = localStorage.getItem(ACCESS_TOKEN_KEY);
-    if (refreshedToken) headers.set("Authorization", `Bearer ${refreshedToken}`);
+    if (refreshedToken)
+      headers.set("Authorization", `Bearer ${refreshedToken}`);
     else headers.delete("Authorization");
     response = await request();
   }
   const data = await parseResponse(response);
-  if (!response.ok)
+  if (!response.ok) {
     throw new Error(
-      response.status === 401
-        ? "Sua sessão expirou. Entre novamente para continuar."
-        : data?.error ||
-            data?.message ||
-            `Erro ${response.status} na requisição`,
+      data?.error ||
+        data?.message ||
+        (response.status === 401
+          ? "Usuário ou senha inválidos, ou sessão não autorizada."
+          : `Erro ${response.status} na requisição`),
     );
+  }
+
   return data as T;
 }
 export async function cadastrarPessoa(dados: any) {

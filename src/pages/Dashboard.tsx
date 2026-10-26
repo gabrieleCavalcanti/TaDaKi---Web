@@ -23,7 +23,7 @@ export default function Dashboard() {
     { label: "Novos favoritos no mês", value: data.novos_favoritos_mes, copy: "Favoritos ativos com data registrada neste mês.", Icon: CalendarDays, accent: "red" },
   ] : [];
   return (
-    <AppShell>
+    <AppShell ativo="dashboard">
     <main className="organization-dashboard">
       <div className="dashboard-shell">
         <header className="dashboard-topbar">

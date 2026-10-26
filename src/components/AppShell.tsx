@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import type { FormEvent, ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { FormEvent, KeyboardEvent, ReactNode } from "react";
 
 import {
   Accessibility,
@@ -39,10 +39,20 @@ interface ItemDoMenu {
   aoClicar: () => void;
 }
 
+export interface Sugestao {
+  id: string;
+  rotulo: string;
+  detalhe?: string;
+  aoEscolher: () => void;
+}
+
 interface Props {
   /** Item do menu que aparece marcado */
   ativo?: ItemMenu;
   children: ReactNode;
+
+  /** Opções que se abrem abaixo da busca enquanto a pessoa digita */
+  sugestoes?: Sugestao[];
 
   /** Busca controlada pela tela (ex.: o feed filtra as publicações). */
   busca?: string;
@@ -71,6 +81,7 @@ interface Props {
 export function AppShell({
   ativo,
   children,
+  sugestoes,
   busca,
   aoMudarBusca,
   aoClicarLogo,
@@ -108,31 +119,58 @@ export function AppShell({
     navigate("/perfil-pessoal");
   }
 
-  // function abrirDashboard() {
-  //   if (Mo) {
-  //     aoAbrirDashboard();
-
-  //     return;
-  //   }
-
-  //   if (tipoConta === "ORGANIZACAO") {
-  //     const id = Number(user?.id_pessoa ?? user?.id_pessoa_login);
-
-  //     if (Number.isSafeInteger(id) && id > 0) {
-  //       navigate(`/perfil/${id}`);
-
-  //       return;
-  //     }
-  //   }
-
-  //   navigate("/perfil-pessoal");
-  // }
-
   const buscaControlada = aoMudarBusca !== undefined;
 
   const [buscaLocal, setBuscaLocal] = useState("");
 
   const valorBusca = buscaControlada ? (busca ?? "") : buscaLocal;
+
+  // Sugestões da busca (dropdown em leque)
+  const [sugestoesAbertas, setSugestoesAbertas] = useState(false);
+  const [indiceSugestao, setIndiceSugestao] = useState(-1);
+  const buscaRef = useRef<HTMLFormElement>(null);
+
+  const listaSugestoes = sugestoes ?? [];
+  const mostrarSugestoes =
+    sugestoesAbertas &&
+    valorBusca.trim().length > 0 &&
+    listaSugestoes.length > 0;
+
+  // Fecha ao clicar fora
+  useEffect(() => {
+    function fora(e: MouseEvent) {
+      if (!buscaRef.current?.contains(e.target as Node)) {
+        setSugestoesAbertas(false);
+      }
+    }
+
+    document.addEventListener("mousedown", fora);
+
+    return () => document.removeEventListener("mousedown", fora);
+  }, []);
+
+  function escolherSugestao(s: Sugestao) {
+    setSugestoesAbertas(false);
+    setIndiceSugestao(-1);
+    s.aoEscolher();
+  }
+
+  function teclado(e: KeyboardEvent<HTMLInputElement>) {
+    if (!mostrarSugestoes) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setIndiceSugestao((i) => (i + 1) % listaSugestoes.length);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setIndiceSugestao((i) => (i <= 0 ? listaSugestoes.length - 1 : i - 1));
+    } else if (e.key === "Enter" && indiceSugestao >= 0) {
+      e.preventDefault();
+      escolherSugestao(listaSugestoes[indiceSugestao]);
+    } else if (e.key === "Escape") {
+      setSugestoesAbertas(false);
+    }
+  }
 
   const [saindo, setSaindo] = useState(false);
 
@@ -289,19 +327,58 @@ export function AppShell({
           <img src={logo} alt="TaDaKi" />
         </button>
 
-        <form className="shellBusca" role="search" onSubmit={pesquisar}>
+        <form
+          className="shellBusca"
+          role="search"
+          onSubmit={pesquisar}
+          ref={buscaRef}
+        >
           <Search size={19} />
 
           <input
             aria-label="Buscar negócios e serviços"
             placeholder="Buscar negócios e serviços"
+            role="combobox"
+            aria-expanded={mostrarSugestoes}
+            aria-controls="shellSugestoes"
+            aria-autocomplete="list"
+            autoComplete="off"
             value={valorBusca}
-            onChange={(e) =>
-              buscaControlada
-                ? aoMudarBusca?.(e.target.value)
-                : setBuscaLocal(e.target.value)
-            }
+            onFocus={() => setSugestoesAbertas(true)}
+            onKeyDown={teclado}
+            onChange={(e) => {
+              setSugestoesAbertas(true);
+              setIndiceSugestao(-1);
+
+              if (buscaControlada) aoMudarBusca?.(e.target.value);
+              else setBuscaLocal(e.target.value);
+            }}
           />
+
+          {mostrarSugestoes && (
+            <ul id="shellSugestoes" className="shellSugestoes" role="listbox">
+              {listaSugestoes.map((s, i) => (
+                <li
+                  key={s.id}
+                  role="presentation"
+                  style={{ animationDelay: `${i * 30}ms` }}
+                >
+                  <button
+                    type="button"
+                    role="option"
+                    aria-selected={i === indiceSugestao}
+                    className={i === indiceSugestao ? "ativa" : ""}
+                    onMouseEnter={() => setIndiceSugestao(i)}
+                    onClick={() => escolherSugestao(s)}
+                  >
+                    <span>{s.rotulo}</span>
+
+                    {s.detalhe && <small>{s.detalhe}</small>}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </form>
 
         <div className="shellAcoes">
