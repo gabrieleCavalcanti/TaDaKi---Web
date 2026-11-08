@@ -33,6 +33,12 @@ export const Login: React.FC = () => {
   const [loadingSubmit, setLoadingSubmit] = useState(false);
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [tipoGoogle, setTipoGoogle] = useState<"CLIENTE" | "ORGANIZACAO">(
+    "CLIENTE",
+  );
+
+  const tipoRef = useRef(tipoGoogle);
+  tipoRef.current = tipoGoogle;
 
   // referência do card, usada no efeito de inclinação 3D
   const cardRef = useRef<HTMLDivElement>(null);
@@ -68,13 +74,11 @@ export const Login: React.FC = () => {
     setLoadingSubmit(true);
 
     try {
-      await loginComGoogle(res.credential);
-
-      // Recarrega a página inicial para o AuthProvider ler a sessão nova
+      await loginComGoogle(res.credential, tipoRef.current);
       window.location.href = "/";
-    } catch (error) {
+    } catch (error: any) {
       console.error("ERRO LOGIN GOOGLE:", error);
-      setErrorMessage("Não foi possível entrar com o Google. Tente novamente.");
+      setErrorMessage(error.message || "Não foi possível entrar com o Google.");
       setLoadingSubmit(false);
     }
   };
@@ -242,9 +246,24 @@ export const Login: React.FC = () => {
             <div className="login-divider-line" />
           </div>
 
+          <div className="login-google-tipo">
+            <button
+              type="button"
+              className={tipoGoogle === "CLIENTE" ? "ativo" : ""}
+              onClick={() => setTipoGoogle("CLIENTE")}
+            >
+              Sou cliente
+            </button>
+            <button
+              type="button"
+              className={tipoGoogle === "ORGANIZACAO" ? "ativo" : ""}
+              onClick={() => setTipoGoogle("ORGANIZACAO")}
+            >
+              Sou organização
+            </button>
+          </div>
           {/* BOTÃO GOOGLE */}
-          <div className="login-google"
-          >
+          <div className="login-google">
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
               onError={() => setErrorMessage("Falha no login com Google.")}

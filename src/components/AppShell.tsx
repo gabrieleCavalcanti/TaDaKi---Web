@@ -10,6 +10,7 @@ import {
   Info,
   LogOut,
   Search,
+  Star,
   UserRound,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -27,6 +28,7 @@ import "../css/AppShell.css";
 export type ItemMenu =
   | "inicio"
   | "curtidas"
+  | "favoritos"
   | "perfil"
   | "dashboard"
   | "sobre"
@@ -262,6 +264,16 @@ export function AppShell({
       Icone: Heart,
       aoClicar: () => navigate("/likes"),
     },
+    ...(tipoConta === "CLIENTE"
+  ? [
+      {
+        id: "favoritos" as const,
+        rotulo: "Favoritos",
+        Icone: Star,
+        aoClicar: () => navigate("/favoritos"),
+      },
+    ]
+  : []),
     {
       id: "perfil",
       rotulo: "Meu perfil",

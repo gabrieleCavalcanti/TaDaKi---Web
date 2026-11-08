@@ -10,7 +10,7 @@ import {
   Compass,
   ChevronRight,
 } from "lucide-react";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppShell } from "../../components/AppShell";
 import type { Sugestao } from "../../components/AppShell";
@@ -34,7 +34,14 @@ const normalizar = (texto: string) =>
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase();
 
-export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
+// export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
+export function FeedScreen({
+  onlyLikes = false,
+  onlyFavorites = false,
+}: {
+  onlyLikes?: boolean;
+  onlyFavorites?: boolean;
+}) {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const { user } = useAuth();
@@ -42,9 +49,14 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
   // A busca do cabeçalho do perfil chega aqui em ?q=
   const [search, setSearch] = useState(params.get("q") || "");
   const [category, setCategory] = useState(0);
-  const [favoritesOnly, setFavoritesOnly] = useState(
-    params.get("favoritos") === "1",
+  const [favoritesOnly, setFavoritesOnly] = useState(onlyFavorites
+    // params.get("favoritos") === "1",
   );
+  // Mantém o modo "favoritas" em sincronia com a URL (menu lateral)
+  useEffect(() => {
+    setFavoritesOnly(onlyFavorites);
+    setLimit(12);
+  }, [onlyFavorites]);
   const [composerOpen, setComposerOpen] = useState(false);
   const [imagePost, setImagePost] = useState<Post | null>(null);
   const [limit, setLimit] = useState(12);
@@ -213,7 +225,8 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
   return (
     <>
       <AppShell
-        ativo={onlyLikes ? "curtidas" : "inicio"}
+        // ativo={onlyLikes ? "curtidas" : "inicio"}
+        ativo={onlyLikes ? "curtidas" : favoritesOnly ? "favoritos" : "inicio"}
         busca={search}
         aoMudarBusca={setSearch}
         sugestoes={sugestoes}
@@ -571,7 +584,7 @@ export function FeedScreen({ onlyLikes = false }: { onlyLikes?: boolean }) {
                     <button
                       className="primary-button"
                       onClick={() => {
-                        if (onlyLikes) navigate("/");
+                        if (onlyLikes || onlyFavorites) navigate("/");
                         else {
                           setSearch("");
                           setCategory(0);

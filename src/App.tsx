@@ -11,6 +11,7 @@ import { Cadastro } from "./pages/Cadastro";
 import { Home } from "./pages/Home";
 import { Likes } from "./pages/Likes";
 import { Login } from "./pages/Login";
+import { Favoritos } from "./pages/Favoritos";
 import Dashboard from "./pages/Dashboard";
 import Sobre from "./pages/Sobre";
 import Ajuda from "./pages/Ajuda";
@@ -32,6 +33,7 @@ export const App: React.FC = () => {
         <Route element={<PrivateRoute />}>
           <Route path="/" element={<Home />} />
           <Route path="/likes" element={<Likes />} />
+          <Route path="/favoritos" element={<Favoritos />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/sobre" element={<Sobre />} />
           <Route path="/ajuda" element={<Ajuda />} />
