@@ -106,10 +106,13 @@ export async function apiFetch<T = any>(
 export async function cadastrarPessoa(dados: any) {
   return apiFetch("/pessoas", { method: "POST", body: JSON.stringify(dados) });
 }
-export async function loginComGoogle(credential: string) {
+export async function loginComGoogle(
+  credential: string,
+  tipo: "CLIENTE" | "ORGANIZACAO",
+) {
   const data = await apiFetch<any>("/auth/google", {
     method: "POST",
-    body: JSON.stringify({ token: credential }),
+    body: JSON.stringify({ token: credential, tipo }),
   });
   saveAuthTokens(data.token_acesso, data.refresh_token);
   return data;

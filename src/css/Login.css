@@ -1130,3 +1130,31 @@
 .login-google > div {
   margin: 0 auto;
 }
+
+.login-google-tipo {
+  display: flex;
+  gap: 8px;
+  margin-top: 18px;
+  padding: 4px;
+  border-radius: 14px;
+  background: #f1f4f9;
+}
+
+.login-google-tipo button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.login-google-tipo button.ativo {
+  background: #fff;
+  color: #c82029;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.1);
+}
